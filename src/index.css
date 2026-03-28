@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --color-academic-navy: #0f172a;
+  --color-academic-blue: #1e3a8a;
+  --color-academic-gold: #b45309;
+  --color-academic-paper: #f8fafc;
+  
+  --font-serif: "Crimson Pro", "Playfair Display", serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-academic-paper text-slate-900 font-sans;
+  }
+  
+  h1, h2, h3, h4 {
+    @apply font-serif;
+  }
+}
+
+.glass-panel {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl shadow-slate-200/50;
+}
+
+.premium-card {
+  @apply bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl;
+}
