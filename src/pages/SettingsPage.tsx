@@ -1,11 +1,13 @@
+import { useNavigate } from "react-router-dom";
 import React from 'react';
-import Sidebar from './Sidebar';
+import Sidebar from "../components/Sidebar";
 import { Upload, LogOut, Moon, Sun, Globe, Mail } from 'lucide-react';
 
-export default function SettingsPage({ onNavigate, isAdmin }: { onNavigate: (screen: string) => void, isAdmin?: boolean }) {
+export default function SettingsPage({ isAdmin }: { isAdmin?: boolean }) {
+  const navigate = useNavigate();
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <Sidebar currentScreen="settings" onNavigate={onNavigate} isAdmin={isAdmin} />
+      <Sidebar currentScreen="settings" isAdmin={isAdmin} />
       
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Top Header */}
@@ -97,7 +99,7 @@ export default function SettingsPage({ onNavigate, isAdmin }: { onNavigate: (scr
               <h2 className="text-lg font-bold text-red-600 mb-2">Account Actions</h2>
               <p className="text-sm text-slate-500 mb-4">Log out of your account on this device.</p>
               <button 
-                onClick={() => onNavigate('landing')}
+                onClick={() => navigate('/')}
                 className="flex items-center gap-2 bg-red-50 text-red-600 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-red-100 transition-colors"
               >
                 <LogOut className="w-4 h-4" />

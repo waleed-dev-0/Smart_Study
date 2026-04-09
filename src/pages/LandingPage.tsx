@@ -1,7 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import React from 'react';
 import { BookOpen, GraduationCap, FileText, Search, Upload, ShieldCheck, ChevronRight } from 'lucide-react';
 
-export default function LandingPage({ onNavigate }: { onNavigate: (screen: string) => void }) {
+export default function LandingPage() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-academic-paper flex flex-col font-sans">
       {/* Navigation */}
@@ -20,13 +22,13 @@ export default function LandingPage({ onNavigate }: { onNavigate: (screen: strin
           </div>
           <div className="flex items-center gap-6">
             <button 
-              onClick={() => onNavigate('login')}
+              onClick={() => navigate('/login')}
               className="text-sm font-bold text-slate-600 hover:text-academic-navy transition-colors"
             >
               Log In
             </button>
             <button 
-              onClick={() => onNavigate('register')}
+              onClick={() => navigate('/register')}
               className="text-sm font-bold bg-academic-blue text-white px-6 py-2.5 rounded-full hover:bg-academic-navy transition-all shadow-lg shadow-academic-blue/20"
             >
               Join Portal
@@ -52,14 +54,14 @@ export default function LandingPage({ onNavigate }: { onNavigate: (screen: strin
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 px-4 md:px-0">
               <button 
-                onClick={() => onNavigate('register')}
+                onClick={() => navigate('/register')}
                 className="w-full sm:w-auto flex items-center justify-center gap-2 bg-academic-navy text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-academic-blue transition-all shadow-2xl shadow-academic-navy/30 hover:-translate-y-1"
               >
                 Start Researching
                 <ChevronRight className="w-6 h-6" />
               </button>
               <button 
-                onClick={() => onNavigate('about')}
+                onClick={() => navigate('/about')}
                 className="w-full sm:w-auto text-academic-navy font-bold hover:underline"
               >
                 View Institutional Overview
@@ -116,7 +118,7 @@ export default function LandingPage({ onNavigate }: { onNavigate: (screen: strin
               Join a community of scholars leveraging precision tools to optimize their study workflows and academic performance.
             </p>
             <button 
-              onClick={() => onNavigate('dashboard')}
+              onClick={() => navigate('/dashboard')}
               className="w-full sm:w-auto bg-white text-academic-navy px-12 py-5 rounded-2xl text-xl font-bold hover:bg-slate-100 transition-all shadow-xl shadow-black/20"
             >
               Request Access

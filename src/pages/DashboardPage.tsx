@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import React from 'react';
-import Sidebar from './Sidebar';
+import Sidebar from "../components/Sidebar";
 import { Search, Upload, FileText, CheckCircle2, Clock, ChevronRight, Calendar, HardDrive, ArrowRight, Library, BookOpen, GraduationCap } from 'lucide-react';
 
-export default function DashboardPage({ onNavigate, isAdmin }: { onNavigate: (screen: string) => void, isAdmin?: boolean }) {
+export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
+  const navigate = useNavigate();
   const documents = [
     { id: 1, name: 'Introduction to Machine Learning.pdf', date: 'Oct 24, 2023', status: 'Completed', size: '2.4 MB', category: 'Computer Science' },
     { id: 2, name: 'Advanced Calculus Chapter 4.pdf', date: 'Oct 22, 2023', status: 'Completed', size: '1.1 MB', category: 'Mathematics' },
@@ -12,7 +14,7 @@ export default function DashboardPage({ onNavigate, isAdmin }: { onNavigate: (sc
 
   return (
     <div className="flex min-h-screen bg-academic-paper">
-      <Sidebar currentScreen="dashboard" onNavigate={onNavigate} isAdmin={isAdmin} />
+      <Sidebar currentScreen="dashboard" isAdmin={isAdmin} />
       
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Top Header */}
@@ -56,7 +58,7 @@ export default function DashboardPage({ onNavigate, isAdmin }: { onNavigate: (sc
                 <p className="text-slate-500 font-medium">Welcome back, Scholar. You have 4 repositories active in your archive.</p>
               </div>
               <button 
-                onClick={() => onNavigate('upload')}
+                onClick={() => navigate('/upload')}
                 className="w-full sm:w-auto flex items-center justify-center gap-3 bg-academic-navy text-white px-8 py-4 rounded-2xl text-sm font-bold hover:bg-academic-blue transition-all shadow-xl shadow-academic-navy/20 hover:-translate-y-1 active:translate-y-0"
               >
                 <Upload className="w-5 h-5 stroke-[2.5]" />
@@ -100,7 +102,7 @@ export default function DashboardPage({ onNavigate, isAdmin }: { onNavigate: (sc
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-serif font-bold text-academic-navy">Active Archive</h2>
               <button 
-                onClick={() => onNavigate('library')}
+                onClick={() => navigate('/library')}
                 className="text-xs font-bold text-academic-blue hover:text-academic-navy flex items-center gap-2 transition-all uppercase tracking-widest group"
               >
                 View Full Library
@@ -112,7 +114,7 @@ export default function DashboardPage({ onNavigate, isAdmin }: { onNavigate: (sc
               {documents.map((doc) => (
                 <div 
                   key={doc.id} 
-                  onClick={() => doc.status === 'Completed' && onNavigate('summary')}
+                  onClick={() => doc.status === 'Completed' && navigate('/summary')}
                   className={`bg-white rounded-[2rem] border border-slate-100 p-7 transition-all group flex flex-col h-full relative overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-academic-navy/5 hover:border-academic-blue/10 ${
                     doc.status === 'Completed' ? 'cursor-pointer hover:-translate-y-2' : 'opacity-80 cursor-not-allowed'
                   }`}

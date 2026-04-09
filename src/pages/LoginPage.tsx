@@ -1,19 +1,21 @@
+import { useNavigate } from "react-router-dom";
 import React from "react";
 import { GraduationCap, Mail, Lock, ArrowRight } from "lucide-react";
 
 export default function LoginPage({
-  onNavigate,
+  
 }: {
-  onNavigate: (screen: string) => void;
+  
 }) {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-academic-paper flex">
       {/* Left Side - Form */}
-      <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:flex-none lg:w-[480px] lg:px-16 xl:px-24 border-r border-slate-200 bg-white">
+      <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:flex-none lg:w-[560px] lg:px-16 xl:px-24 border-r border-slate-200 bg-white shadow-lg shadow-slate-200/30">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div
-            className="flex items-center gap-3 mb-8 cursor-pointer group"
-            onClick={() => onNavigate("landing")}
+            className="flex items-center gap-3 mb-10 cursor-pointer group"
+            onClick={() => navigate('/')}
           >
             <div className="w-10 h-10 bg-academic-navy rounded-xl flex items-center justify-center transition-transform group-hover:scale-105">
               <GraduationCap className="w-6 h-6 text-white" />
@@ -27,13 +29,13 @@ export default function LoginPage({
             <h2 className="text-3xl font-serif font-bold text-academic-navy tracking-tight">
               Institutional Access
             </h2>
-            <p className="mt-2 text-sm text-slate-500 font-medium uppercase tracking-wider">
+            <p className="mt-2 mb-2 text-sm text-slate-500 font-medium uppercase tracking-wider">
               Secure Scholar Authentication
             </p>
           </div>
 
-          <div className="mt-8">
-            <div className="space-y-5">
+          <div className="mt-10">
+            <div className="space-y-6">
               <div>
                 <label
                   htmlFor="email"
@@ -96,7 +98,7 @@ export default function LoginPage({
                 <div className="text-sm">
                   <button
                     type="button"
-                    onClick={() => onNavigate("reset_password")}
+                    onClick={() => navigate('/reset-password')}
                     className="font-bold text-academic-blue hover:text-academic-navy transition-colors bg-transparent border-none p-0 cursor-pointer"
                   >
                     Reset Credentials
@@ -106,7 +108,7 @@ export default function LoginPage({
 
               <div>
                 <button
-                  onClick={() => onNavigate("dashboard")}
+                  onClick={() => navigate('/dashboard')}
                   className="w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-2xl shadow-xl text-lg font-bold text-white bg-academic-navy hover:bg-academic-blue transition-all hover:shadow-academic-navy/30 active:scale-[0.98]"
                 >
                   Enter Portal
@@ -115,10 +117,10 @@ export default function LoginPage({
               </div>
             </div>
 
-            <p className="mt-12 text-center text-sm text-slate-500 font-medium">
+            <p className="mt-10 text-center text-sm text-slate-500 font-medium">
               New Research Applicant?{" "}
               <button
-                onClick={() => onNavigate("register")}
+                onClick={() => navigate('/register')}
                 className="font-bold text-academic-blue hover:text-academic-navy transition-colors bg-transparent border-none p-0 cursor-pointer"
               >
                 Apply for Access
@@ -133,9 +135,9 @@ export default function LoginPage({
         <div className="absolute inset-0 bg-gradient-to-br from-academic-navy to-academic-blue opacity-95" />
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541339907198-e08759dfc3ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
 
-        <div className="absolute inset-0 flex flex-col justify-center px-16 xl:px-24">
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-12 rounded-[2rem] max-w-xl shadow-2xl">
-            <div className="flex gap-1 mb-8">
+        <div className="absolute inset-0 flex flex-col justify-center px-16 xl:px-24 gap-8">
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-10 rounded-[2rem] max-w-xl shadow-2xl">
+            <div className="flex gap-1 mb-6">
               {[1, 2, 3, 4, 5].map((star) => (
                 <div
                   key={star}
@@ -143,7 +145,7 @@ export default function LoginPage({
                 ></div>
               ))}
             </div>
-            <blockquote className="text-3xl font-serif font-light text-white leading-relaxed mb-10 italic">
+            <blockquote className="text-2xl font-serif font-light text-white leading-relaxed mb-8 italic">
               "The precision and fidelity of the research synthesis provided by
               this portal is unparalleled. It has become an essential component
               of my doctoral studies."

@@ -1,11 +1,13 @@
+import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { GraduationCap, Mail, ArrowRight, ArrowLeft } from "lucide-react";
 
 export default function ResetPasswordPage({
-  onNavigate,
+  
 }: {
-  onNavigate: (screen: string) => void;
+  
 }) {
+  const navigate = useNavigate();
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -20,7 +22,7 @@ export default function ResetPasswordPage({
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div
             className="flex items-center gap-3 mb-12 cursor-pointer group"
-            onClick={() => onNavigate("landing")}
+            onClick={() => navigate('/')}
           >
             <div className="w-10 h-10 bg-academic-navy rounded-xl flex items-center justify-center transition-transform group-hover:scale-105">
               <GraduationCap className="w-6 h-6 text-white" />
@@ -96,7 +98,7 @@ export default function ResetPasswordPage({
 
             <div className="mt-12 text-center">
               <button
-                onClick={() => onNavigate("login")}
+                onClick={() => navigate('/login')}
                 className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-academic-navy transition-colors bg-transparent border-none p-0 cursor-pointer"
                 type="button"
               >

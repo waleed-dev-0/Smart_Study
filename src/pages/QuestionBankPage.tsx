@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import React, { useState } from 'react';
-import Sidebar from './Sidebar';
+import Sidebar from "../components/Sidebar";
 import { ArrowLeft, CheckCircle2, XCircle, RefreshCw, ChevronRight, BrainCircuit, Target, Lightbulb, GraduationCap, ShieldCheck } from 'lucide-react';
 
-export default function QuestionBankPage({ onNavigate, isAdmin }: { onNavigate: (screen: string) => void, isAdmin?: boolean }) {
+export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
+  const navigate = useNavigate();
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -33,14 +35,14 @@ export default function QuestionBankPage({ onNavigate, isAdmin }: { onNavigate: 
 
   return (
     <div className="flex min-h-screen bg-academic-paper">
-      <Sidebar currentScreen="question_bank" onNavigate={onNavigate} isAdmin={isAdmin} />
+      <Sidebar currentScreen="question_bank" isAdmin={isAdmin} />
       
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Top Header */}
         <header className="h-24 bg-white/80 backdrop-blur-md border-b border-academic-navy/5 flex items-center justify-between px-6 md:px-10 shrink-0 sticky top-0 z-10">
           <div className="flex items-center gap-6">
             <button 
-              onClick={() => onNavigate('summary')}
+              onClick={() => navigate('/summary')}
               className="p-3 bg-slate-50 hover:bg-academic-navy hover:text-white rounded-xl text-slate-500 transition-all shrink-0 hover:shadow-lg"
             >
               <ArrowLeft className="w-5 h-5" />

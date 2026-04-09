@@ -1,5 +1,6 @@
+import { useNavigate } from "react-router-dom";
 import React, { useState, useRef, useEffect } from "react";
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/Sidebar";
 import {
   ArrowLeft,
   MessageSquare,
@@ -19,12 +20,13 @@ import {
 } from "lucide-react";
 
 export default function AIChatPage({
-  onNavigate,
+  
   isAdmin,
 }: {
-  onNavigate: (screen: string) => void;
+  
   isAdmin?: boolean;
 }) {
+  const navigate = useNavigate();
   const [input, setInput] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -74,7 +76,7 @@ export default function AIChatPage({
 
   return (
     <div className="flex min-h-screen bg-academic-paper">
-      <Sidebar currentScreen="chat" onNavigate={onNavigate} isAdmin={isAdmin} />
+      <Sidebar currentScreen="chat" isAdmin={isAdmin} />
 
       {/* Mobile History Backdrop */}
       {isHistoryOpen && (
@@ -270,7 +272,7 @@ export default function AIChatPage({
                     <button
                       onClick={() => {
                         setIsDropdownOpen(false);
-                        onNavigate("library");
+                        navigate('/library');
                       }}
                       className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-xl transition-colors text-left"
                     >
@@ -280,7 +282,7 @@ export default function AIChatPage({
                     <button
                       onClick={() => {
                         setIsDropdownOpen(false);
-                        onNavigate("upload");
+                        navigate('/upload');
                       }}
                       className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-xl transition-colors text-left"
                     >

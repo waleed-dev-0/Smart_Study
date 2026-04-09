@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import React, { useState } from 'react';
-import Sidebar from './Sidebar';
+import Sidebar from "../components/Sidebar";
 import { Search, FileText, Calendar, HardDrive, ChevronRight, ArrowLeft, Filter, Library, GraduationCap } from 'lucide-react';
 
-export default function DocumentLibraryPage({ onNavigate, isAdmin }: { onNavigate: (screen: string) => void, isAdmin?: boolean }) {
+export default function DocumentLibraryPage({ isAdmin }: { isAdmin?: boolean }) {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
   const documents = [
@@ -23,13 +25,13 @@ export default function DocumentLibraryPage({ onNavigate, isAdmin }: { onNavigat
 
   return (
     <div className="flex min-h-screen bg-academic-paper">
-      <Sidebar currentScreen="dashboard" onNavigate={onNavigate} isAdmin={isAdmin} />
+      <Sidebar currentScreen="dashboard" isAdmin={isAdmin} />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Top Header */}
         <header className="h-20 bg-white/80 backdrop-blur-md border-b border-academic-navy/5 flex items-center px-6 md:px-10 shrink-0 z-10 gap-6">
           <button 
-            onClick={() => onNavigate('dashboard')}
+            onClick={() => navigate('/dashboard')}
             className="p-3 bg-slate-50 hover:bg-academic-navy hover:text-white rounded-xl text-slate-500 transition-all shrink-0 hover:shadow-lg"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -70,7 +72,7 @@ export default function DocumentLibraryPage({ onNavigate, isAdmin }: { onNavigat
               {filteredDocs.map((doc) => (
                 <div 
                   key={doc.id}
-                  onClick={() => onNavigate('chat')}
+                  onClick={() => navigate('/chat')}
                   className="bg-white rounded-[2rem] border border-slate-100 p-8 hover:border-academic-blue/20 hover:shadow-2xl hover:shadow-academic-navy/5 transition-all cursor-pointer group flex flex-col h-full relative overflow-hidden shadow-sm"
                 >
                   <div className="absolute top-0 left-0 w-1.5 h-full bg-academic-blue transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>

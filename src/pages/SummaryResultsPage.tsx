@@ -1,18 +1,20 @@
+import { useNavigate } from "react-router-dom";
 import React from 'react';
-import Sidebar from './Sidebar';
+import Sidebar from "../components/Sidebar";
 import { ArrowLeft, Brain, FileText, MessageSquare, Download, Share2, ChevronRight, Zap, Target, BookOpen, ShieldCheck, GraduationCap } from 'lucide-react';
 
-export default function SummaryResultsPage({ onNavigate, isAdmin }: { onNavigate: (screen: string) => void, isAdmin?: boolean }) {
+export default function SummaryResultsPage({ isAdmin }: { isAdmin?: boolean }) {
+  const navigate = useNavigate();
   return (
     <div className="flex min-h-screen bg-academic-paper">
-      <Sidebar currentScreen="summary" onNavigate={onNavigate} isAdmin={isAdmin} />
+      <Sidebar currentScreen="summary" isAdmin={isAdmin} />
       
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Top Header */}
         <header className="h-24 bg-white/80 backdrop-blur-md border-b border-academic-navy/5 flex items-center justify-between px-6 md:px-10 shrink-0 sticky top-0 z-10">
           <div className="flex items-center gap-6">
             <button 
-              onClick={() => onNavigate('dashboard')}
+              onClick={() => navigate('/dashboard')}
               className="p-3 bg-slate-50 hover:bg-academic-navy hover:text-white rounded-xl text-slate-500 transition-all shrink-0 hover:shadow-lg"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -45,14 +47,14 @@ export default function SummaryResultsPage({ onNavigate, isAdmin }: { onNavigate
             </div>
             <div className="h-10 w-px bg-slate-100 mx-2 hidden lg:block"></div>
             <button 
-              onClick={() => onNavigate('chat')}
+              onClick={() => navigate('/chat')}
               className="flex items-center justify-center gap-3 bg-white border border-slate-200 text-academic-navy px-6 py-3.5 rounded-2xl text-sm font-bold hover:bg-slate-50 transition-all shadow-sm group"
             >
               <MessageSquare className="w-5 h-5 text-academic-blue" />
               <span className="hidden sm:inline">Semantic Inquiry</span>
             </button>
             <button 
-              onClick={() => onNavigate('question_bank')}
+              onClick={() => navigate('/question-bank')}
               className="flex items-center justify-center gap-3 bg-academic-navy text-white px-6 py-3.5 rounded-2xl text-sm font-bold hover:bg-academic-blue transition-all shadow-xl shadow-academic-navy/20"
             >
               <Brain className="w-5 h-5" />
@@ -146,14 +148,14 @@ export default function SummaryResultsPage({ onNavigate, isAdmin }: { onNavigate
             {/* Bottom Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-12 border-t border-slate-100">
               <button 
-                onClick={() => onNavigate('chat')}
+                onClick={() => navigate('/chat')}
                 className="w-full sm:w-auto flex items-center justify-center gap-4 bg-white border border-slate-200 text-academic-navy px-10 py-5 rounded-[2rem] text-lg font-bold hover:bg-slate-50 hover:border-academic-navy/20 transition-all shadow-sm group"
               >
                 <MessageSquare className="w-6 h-6 text-academic-blue group-hover:scale-110 transition-transform" />
                 Inquire Further
               </button>
               <button 
-                onClick={() => onNavigate('question_bank')}
+                onClick={() => navigate('/question-bank')}
                 className="w-full sm:w-auto flex items-center justify-center gap-4 bg-academic-navy text-white px-10 py-5 rounded-[2rem] text-lg font-bold hover:bg-academic-blue transition-all shadow-2xl shadow-academic-navy/20 hover:-translate-y-1 active:translate-y-0"
               >
                 <GraduationCap className="w-6 h-6" />

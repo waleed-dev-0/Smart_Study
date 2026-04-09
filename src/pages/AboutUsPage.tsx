@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import React from 'react';
-import Sidebar from './Sidebar';
+import Sidebar from "../components/Sidebar";
 import { Github, Linkedin, Mail, Library, Award, Globe, GraduationCap, Users } from 'lucide-react';
 
-export default function AboutUsPage({ onNavigate, isAdmin }: { onNavigate: (screen: string) => void, isAdmin?: boolean }) {
+export default function AboutUsPage({ isAdmin }: { isAdmin?: boolean }) {
+  const navigate = useNavigate();
   const team = [
     {
       name: 'Ahmed Youssef',
@@ -28,7 +30,7 @@ export default function AboutUsPage({ onNavigate, isAdmin }: { onNavigate: (scre
 
   return (
     <div className="flex min-h-screen bg-academic-paper">
-      <Sidebar currentScreen="about" onNavigate={onNavigate} isAdmin={isAdmin} />
+      <Sidebar currentScreen="about" isAdmin={isAdmin} />
       
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Top Header */}

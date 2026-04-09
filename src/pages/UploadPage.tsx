@@ -1,8 +1,10 @@
+import { useNavigate } from "react-router-dom";
 import React, { useState } from 'react';
-import Sidebar from './Sidebar';
+import Sidebar from "../components/Sidebar";
 import { UploadCloud, File, X, CheckCircle2, AlertCircle, FileText, ShieldCheck, GraduationCap, Clock } from 'lucide-react';
 
-export default function UploadPage({ onNavigate, isAdmin }: { onNavigate: (screen: string) => void, isAdmin?: boolean }) {
+export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
+  const navigate = useNavigate();
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
@@ -57,7 +59,7 @@ export default function UploadPage({ onNavigate, isAdmin }: { onNavigate: (scree
           clearInterval(interval);
           setUploadStatus('success');
           setTimeout(() => {
-            onNavigate('dashboard');
+            navigate('/dashboard');
           }, 1500);
           return 100;
         }
@@ -68,7 +70,7 @@ export default function UploadPage({ onNavigate, isAdmin }: { onNavigate: (scree
 
   return (
     <div className="flex min-h-screen bg-academic-paper">
-      <Sidebar currentScreen="upload" onNavigate={onNavigate} isAdmin={isAdmin} />
+      <Sidebar currentScreen="upload" isAdmin={isAdmin} />
       
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Top Header */}
@@ -201,7 +203,7 @@ export default function UploadPage({ onNavigate, isAdmin }: { onNavigate: (scree
                   {/* Actions */}
                   <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-slate-50">
                     <button 
-                      onClick={() => onNavigate('dashboard')}
+                      onClick={() => navigate('/dashboard')}
                       disabled={uploadStatus === 'uploading'}
                       className="flex-1 bg-white border border-slate-200 text-slate-500 px-8 py-4 rounded-2xl text-sm font-bold hover:bg-slate-50 transition-all disabled:opacity-50 uppercase tracking-widest"
                     >

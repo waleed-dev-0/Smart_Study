@@ -1,5 +1,6 @@
+import { useNavigate } from "react-router-dom";
 import React from "react";
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/Sidebar";
 import {
   Users,
   FileUp,
@@ -13,10 +14,11 @@ import {
 } from "lucide-react";
 
 export default function ReportsPage({
-  onNavigate,
+  
 }: {
-  onNavigate: (screen: string) => void;
+  
 }) {
+  const navigate = useNavigate();
   const stats = [
     {
       label: "Total Scholars",
@@ -101,7 +103,7 @@ export default function ReportsPage({
 
   return (
     <div className="flex min-h-screen bg-academic-paper">
-      <Sidebar currentScreen="reports" onNavigate={onNavigate} />
+      <Sidebar currentScreen="reports" />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Header */}
