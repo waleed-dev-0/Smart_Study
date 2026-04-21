@@ -12,11 +12,7 @@ import {
   Search,
 } from "lucide-react";
 
-export default function RegisterPage({
-  
-}: {
-  
-}) {
+export default function RegisterPage({}: {}) {
   const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-academic-paper flex">
@@ -25,7 +21,7 @@ export default function RegisterPage({
         <div className="mx-auto w-full max-w-sm lg:w-full">
           <div
             className="flex items-center gap-3 mb-10 cursor-pointer group"
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
           >
             <div className="w-10 h-10 bg-academic-navy rounded-xl flex items-center justify-center transition-transform group-hover:scale-105">
               <GraduationCap className="w-6 h-6 text-white" />
@@ -142,7 +138,7 @@ export default function RegisterPage({
 
               <div>
                 <button
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate("/dashboard")}
                   className="w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-2xl shadow-xl text-lg font-bold text-white bg-academic-navy hover:bg-academic-blue transition-all hover:shadow-academic-navy/30 active:scale-[0.98]"
                 >
                   Confirm Registration
@@ -154,7 +150,7 @@ export default function RegisterPage({
             <p className="mt-10 text-center text-sm text-slate-500 font-medium">
               Already have an account?{" "}
               <button
-                onClick={() => navigate('/login')}
+                onClick={() => navigate("/login")}
                 className="font-bold text-academic-blue hover:text-academic-navy transition-colors"
               >
                 Log in to Portal
