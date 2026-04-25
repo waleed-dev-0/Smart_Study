@@ -28,7 +28,6 @@ export default function DocumentLibraryPage({ isAdmin }: { isAdmin?: boolean }) 
       <Sidebar currentScreen="dashboard" isAdmin={isAdmin} />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Top Header */}
         <header className="h-20 bg-white/80 backdrop-blur-md border-b border-academic-navy/5 flex items-center px-6 md:px-10 shrink-0 z-10 gap-6">
           <button 
             onClick={() => navigate('/dashboard')}
@@ -42,12 +41,10 @@ export default function DocumentLibraryPage({ isAdmin }: { isAdmin?: boolean }) 
           </div>
         </header>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-6 md:p-10 pb-24 md:pb-10">
           <div className="max-w-7xl mx-auto">
             
             <div className="mb-12 flex flex-col sm:flex-row gap-6">
-              {/* Search Bar */}
               <div className="relative flex-1">
                 <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
                   <Search className="w-5 h-5 text-slate-300" />
@@ -67,7 +64,6 @@ export default function DocumentLibraryPage({ isAdmin }: { isAdmin?: boolean }) 
               </button>
             </div>
 
-            {/* Document Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredDocs.map((doc) => (
                 <div 

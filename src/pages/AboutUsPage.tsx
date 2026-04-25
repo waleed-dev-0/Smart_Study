@@ -33,7 +33,6 @@ export default function AboutUsPage({ isAdmin }: { isAdmin?: boolean }) {
       <Sidebar currentScreen="about" isAdmin={isAdmin} />
       
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Top Header */}
         <header className="h-24 bg-white/80 backdrop-blur-md border-b border-academic-navy/5 flex items-center px-10 shrink-0 sticky top-0 z-10">
           <div className="w-12 h-12 bg-academic-navy/5 text-academic-navy rounded-2xl flex items-center justify-center border border-academic-navy/10 mr-6">
             <Library className="w-6 h-6" />
@@ -44,7 +43,6 @@ export default function AboutUsPage({ isAdmin }: { isAdmin?: boolean }) {
           </div>
         </header>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-10 pb-24 md:pb-10">
           <div className="max-w-6xl mx-auto">
             

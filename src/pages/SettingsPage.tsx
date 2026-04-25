@@ -10,16 +10,13 @@ export default function SettingsPage({ isAdmin }: { isAdmin?: boolean }) {
       <Sidebar currentScreen="settings" isAdmin={isAdmin} />
       
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Top Header */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center px-8 shrink-0">
           <h1 className="text-xl font-bold text-slate-900">Settings</h1>
         </header>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8">
           <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">
             
-            {/* Profile Picture */}
             <div className="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
               <h2 className="text-lg font-bold text-slate-900 mb-4">Avatar Picture</h2>
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6">
@@ -38,7 +35,6 @@ export default function SettingsPage({ isAdmin }: { isAdmin?: boolean }) {
               </div>
             </div>
 
-            {/* Email Settings */}
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
               <h2 className="text-lg font-bold text-slate-900 mb-4">Email Address</h2>
               <div className="max-w-md">
@@ -56,12 +52,10 @@ export default function SettingsPage({ isAdmin }: { isAdmin?: boolean }) {
               </div>
             </div>
 
-            {/* Preferences */}
             <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
               <h2 className="text-lg font-bold text-slate-900 mb-4">Preferences</h2>
               
               <div className="space-y-6 max-w-md">
-                {/* Language */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Language</label>
                   <div className="relative">
@@ -77,7 +71,6 @@ export default function SettingsPage({ isAdmin }: { isAdmin?: boolean }) {
                   </div>
                 </div>
 
-                {/* Theme */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Theme</label>
                   <div className="flex items-center gap-4">
@@ -94,7 +87,6 @@ export default function SettingsPage({ isAdmin }: { isAdmin?: boolean }) {
               </div>
             </div>
 
-            {/* Danger Zone */}
             <div className="bg-white p-6 rounded-2xl border border-red-100 shadow-sm">
               <h2 className="text-lg font-bold text-red-600 mb-2">Account Actions</h2>
               <p className="text-sm text-slate-500 mb-4">Log out of your account on this device.</p>

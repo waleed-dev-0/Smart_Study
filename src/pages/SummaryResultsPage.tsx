@@ -10,7 +10,6 @@ export default function SummaryResultsPage({ isAdmin }: { isAdmin?: boolean }) {
       <Sidebar currentScreen="summary" isAdmin={isAdmin} />
       
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Top Header */}
         <header className="h-24 bg-white/80 backdrop-blur-md border-b border-academic-navy/5 flex items-center justify-between px-6 md:px-10 shrink-0 sticky top-0 z-10">
           <div className="flex items-center gap-6">
             <button 
@@ -63,11 +62,9 @@ export default function SummaryResultsPage({ isAdmin }: { isAdmin?: boolean }) {
           </div>
         </header>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-6 md:p-10 pb-24 md:pb-10">
           <div className="max-w-5xl mx-auto space-y-10">
             
-            {/* General Summary */}
             <section className="bg-white rounded-[2.5rem] border border-slate-100 p-10 md:p-14 shadow-2xl shadow-academic-navy/5 relative overflow-hidden group">
               <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-academic-navy to-academic-blue"></div>
               <div className="flex items-center gap-4 mb-10">
@@ -84,7 +81,6 @@ export default function SummaryResultsPage({ isAdmin }: { isAdmin?: boolean }) {
               </p>
             </section>
 
-            {/* Key Bullet Points */}
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
               <div className="lg:col-span-3 space-y-8">
                 <section className="bg-white rounded-[2.5rem] border border-slate-100 p-10 shadow-xl shadow-slate-200/40">
@@ -116,7 +112,6 @@ export default function SummaryResultsPage({ isAdmin }: { isAdmin?: boolean }) {
                 </section>
               </div>
 
-              {/* Extracted Definitions */}
               <div className="lg:col-span-2 space-y-8">
                 <section className="bg-white rounded-[2.5rem] border border-slate-100 p-10 shadow-xl shadow-slate-200/40 sticky top-32">
                   <div className="flex items-center gap-4 mb-10">
@@ -145,7 +140,6 @@ export default function SummaryResultsPage({ isAdmin }: { isAdmin?: boolean }) {
               </div>
             </div>
 
-            {/* Bottom Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-12 border-t border-slate-100">
               <button 
                 onClick={() => navigate('/chat')}

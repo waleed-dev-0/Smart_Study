@@ -17,13 +17,15 @@ import {
   X,
   Search,
   BookOpen,
+  Sparkles,
+  Bot
 } from "lucide-react";
+import { useChat } from "../features/chat/hooks/useChat";
+import { fetchDocuments } from "../features/upload/services/uploadService";
 
 export default function AIChatPage({
-  
   isAdmin,
 }: {
-  
   isAdmin?: boolean;
 }) {
   const navigate = useNavigate();
@@ -32,6 +34,11 @@ export default function AIChatPage({
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isQuizzesOpen, setIsQuizzesOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const { messages, isLoading, sendMessage, setMessages } = useChat();
+  const [provider, setProvider] = useState<'gemini' | 'openrouter'>('gemini');
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [activeDocId, setActiveDocId] = useState<string | null>(localStorage.getItem('activeDocumentId'));
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -46,39 +53,50 @@ export default function AIChatPage({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const messages = [
-    {
-      id: 1,
-      role: "ai",
-      text: "Welcome to the Research Portal. I have indexed 'Introduction to Machine Learning.pdf'. How may I assist your inquiry today?",
-      timestamp: "10:00 AM",
-    },
-    {
-      id: 2,
-      role: "user",
-      text: "Can you explain the difference between supervised and unsupervised learning in simple terms?",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 3,
-      role: "ai",
-      text: "In an academic context, **supervised learning** is analogous to tutored instruction. The model is provided with a 'ground truth' (labeled data) and optimizes its parameters by minimizing the error relative to these labels.\n\nConversely, **unsupervised learning** involves autonomous pattern recognition. The system analyzes the inherent structure of the dataset to identify latent clusters or dimensions without external guidance.",
-      timestamp: "10:03 AM",
-      citations: [
-        { page: 12, text: "Supervised learning relies on labeled datasets..." },
-        {
-          page: 15,
-          text: "Unsupervised algorithms discover hidden structures...",
-        },
-      ],
-    },
-  ];
+  useEffect(() => {
+    const loadDocs = async () => {
+      try {
+        const res = await fetchDocuments();
+        setDocuments(res.data);
+        if (res.data.length > 0 && !activeDocId) {
+          setActiveDocId(res.data[0]._id);
+          localStorage.setItem('activeDocumentId', res.data[0]._id);
+        }
+      } catch (err) {
+        console.error("Failed to load documents", err);
+      }
+    };
+    loadDocs();
+  }, []);
+
+  useEffect(() => {
+    if (activeDocId && messages.length === 0) {
+      setMessages([{
+        id: 'initial',
+        role: 'ai',
+        text: "Welcome to the Research Portal. I have indexed your document. How may I assist your inquiry today?",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      }]);
+    }
+  }, [activeDocId]);
+
+  const handleSend = () => {
+    if (!input.trim() || !activeDocId) return;
+    sendMessage(input, activeDocId, provider);
+    setInput("");
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-academic-paper">
       <Sidebar currentScreen="chat" isAdmin={isAdmin} />
 
-      {/* Mobile History Backdrop */}
       {isHistoryOpen && (
         <div
           className="fixed inset-0 bg-academic-navy/20 backdrop-blur-sm z-[60] lg:hidden"
@@ -86,7 +104,6 @@ export default function AIChatPage({
         />
       )}
 
-      {/* Secondary Sidebar for Documents */}
       <div
         className={`fixed inset-y-0 left-0 z-[70] w-72 bg-white border-r border-slate-200 transform transition-transform duration-300 lg:relative lg:translate-x-0 lg:flex flex-col h-screen lg:w-64 lg:sticky lg:top-0 ${isHistoryOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
@@ -102,34 +119,46 @@ export default function AIChatPage({
           </button>
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          <button className="w-full text-left p-4 rounded-2xl bg-slate-50 border border-academic-blue/20 shadow-sm flex items-start gap-3 group">
-            <FileText className="w-5 h-5 text-academic-blue shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-bold text-academic-navy line-clamp-2 leading-tight mb-1 font-serif">
-                Intro to ML.pdf
-              </p>
-              <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">
-                Active Analysis
-              </p>
+          {documents.map((doc) => (
+            <button
+              key={doc._id}
+              onClick={() => {
+                setActiveDocId(doc._id);
+                localStorage.setItem('activeDocumentId', doc._id);
+                setMessages([]);
+              }}
+              className={`w-full text-left p-4 rounded-2xl transition-all flex items-start gap-3 group ${
+                activeDocId === doc._id
+                  ? "bg-slate-50 border border-academic-blue/20 shadow-sm"
+                  : "bg-transparent hover:bg-slate-50 border border-transparent"
+              }`}
+            >
+              <FileText className={`w-5 h-5 shrink-0 mt-0.5 ${activeDocId === doc._id ? "text-academic-blue" : "text-slate-400 group-hover:text-academic-navy"}`} />
+              <div className="min-w-0">
+                <p className={`text-sm line-clamp-2 leading-tight mb-1 font-serif ${activeDocId === doc._id ? "font-bold text-academic-navy" : "font-medium text-slate-600"}`}>
+                  {doc.title}
+                </p>
+                <p className={`text-[10px] font-bold uppercase tracking-wider ${activeDocId === doc._id ? "text-emerald-600" : "text-slate-400"}`}>
+                  {activeDocId === doc._id ? "Active Analysis" : "Indexed"}
+                </p>
+              </div>
+            </button>
+          ))}
+          {documents.length === 0 && (
+            <div className="text-center py-10">
+              <p className="text-xs text-slate-400 font-medium">No documents indexed yet.</p>
+              <button 
+                onClick={() => navigate('/upload')}
+                className="mt-4 text-[10px] font-bold text-academic-blue uppercase tracking-widest hover:underline"
+              >
+                Upload Now
+              </button>
             </div>
-          </button>
-
-          <button className="w-full text-left p-4 rounded-2xl bg-transparent hover:bg-slate-50 border border-transparent transition-all flex items-start gap-3 group">
-            <FileText className="w-5 h-5 text-slate-400 shrink-0 mt-0.5 group-hover:text-academic-navy" />
-            <div>
-              <p className="text-sm font-medium text-slate-600 line-clamp-2 leading-tight mb-1">
-                Advanced Calculus.pdf
-              </p>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                Indexed 2d ago
-              </p>
-            </div>
-          </button>
+          )}
         </div>
       </div>
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden bg-white relative">
-        {/* Top Header */}
         <header className="h-20 border-b border-slate-100 flex items-center justify-between px-6 shrink-0 sticky top-0 z-10 bg-white/80 backdrop-blur-md gap-4">
           <div className="flex items-center gap-4 min-w-0">
             <button
@@ -149,7 +178,7 @@ export default function AIChatPage({
                 <p className="text-xs text-slate-500 flex items-center gap-1 truncate font-medium">
                   Analysis:{" "}
                   <span className="text-academic-blue truncate">
-                    Introduction to Machine Learning.pdf
+                    {documents.find(d => d._id === activeDocId)?.title || "Select a document"}
                   </span>
                 </p>
               </div>
@@ -157,6 +186,22 @@ export default function AIChatPage({
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
+            <div className="hidden sm:flex bg-slate-50 border border-slate-200 rounded-xl p-1 gap-1">
+              <button
+                onClick={() => setProvider('gemini')}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 ${provider === 'gemini' ? 'bg-academic-navy text-white shadow-sm' : 'text-slate-500 hover:text-academic-navy'}`}
+              >
+                <Sparkles className="w-3 h-3" />
+                Gemini
+              </button>
+              <button
+                onClick={() => setProvider('openrouter')}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 ${provider === 'openrouter' ? 'bg-academic-navy text-white shadow-sm' : 'text-slate-500 hover:text-academic-navy'}`}
+              >
+                <Bot className="w-3 h-3" />
+                OpenRouter
+              </button>
+            </div>
             <button
               onClick={() => setIsQuizzesOpen(true)}
               className="px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-academic-navy transition-all flex items-center gap-2"
@@ -170,7 +215,6 @@ export default function AIChatPage({
           </div>
         </header>
 
-        {/* Chat Area */}
         <main className="flex-1 overflow-y-auto p-6 flex flex-col gap-8 scroll-smooth">
           <div className="text-center my-6">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] bg-slate-50 px-4 py-1.5 rounded-full border border-slate-100">
@@ -182,7 +226,6 @@ export default function AIChatPage({
               key={msg.id}
               className={`flex gap-6 max-w-4xl ${msg.role === "user" ? "ml-auto flex-row-reverse" : ""}`}
             >
-              {/* Avatar */}
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-sm ${
                   msg.role === "ai"
@@ -197,7 +240,6 @@ export default function AIChatPage({
                 )}
               </div>
 
-              {/* Message Content */}
               <div
                 className={`flex flex-col gap-2 ${msg.role === "user" ? "items-end" : "items-start"} max-w-[85%]`}
               >
@@ -235,7 +277,6 @@ export default function AIChatPage({
                   ))}
                 </div>
 
-                {/* Citations */}
                 {msg.citations && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {msg.citations.map((cite, i) => (
@@ -252,10 +293,9 @@ export default function AIChatPage({
               </div>
             </div>
           ))}
-          <div className="h-20"></div> {/* Bottom padding */}
+          <div className="h-20"></div>
         </main>
 
-        {/* Input Area */}
         <div className="p-6 bg-white border-t border-slate-100 shrink-0">
           <div className="max-w-4xl mx-auto">
             <div className="relative flex items-end gap-3 bg-slate-50 border border-slate-200 rounded-2xl p-3 focus-within:border-academic-blue focus-within:ring-4 focus-within:ring-academic-blue/5 transition-all shadow-inner">
@@ -296,13 +336,19 @@ export default function AIChatPage({
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Formulate your inquiry regarding the document..."
+                onKeyDown={handleKeyPress}
+                placeholder={activeDocId ? "Formulate your inquiry regarding the document..." : "Please upload a document first to start chatting."}
+                disabled={!activeDocId || isLoading}
                 className="w-full max-h-32 min-h-[48px] bg-transparent border-none outline-none resize-none py-3 text-sm text-slate-700 placeholder:text-slate-400 font-medium"
                 rows={1}
               />
 
-              <button className="p-3.5 bg-academic-navy text-white hover:bg-academic-blue rounded-xl transition-all shrink-0 shadow-lg shadow-academic-navy/20 active:scale-95">
-                <Send className="w-5 h-5" />
+              <button 
+                onClick={handleSend}
+                disabled={!input.trim() || !activeDocId || isLoading}
+                className="p-3.5 bg-academic-navy text-white hover:bg-academic-blue rounded-xl transition-all shrink-0 shadow-lg shadow-academic-navy/20 active:scale-95 disabled:opacity-50"
+              >
+                {isLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Send className="w-5 h-5" />}
               </button>
             </div>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] text-center mt-4">
@@ -312,7 +358,6 @@ export default function AIChatPage({
         </div>
       </div>
 
-      {/* Tertiary Sidebar for Evaluations */}
       <div
         className={`fixed inset-y-0 right-0 z-[70] w-80 bg-white border-l border-slate-200 transform transition-transform duration-300 flex flex-col h-screen shadow-2xl ${isQuizzesOpen ? "translate-x-0" : "translate-x-full"}`}
       >

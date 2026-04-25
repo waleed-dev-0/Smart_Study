@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useState } from 'react';
 import Sidebar from "../components/Sidebar";
 import { UploadCloud, File, X, CheckCircle2, AlertCircle, FileText, ShieldCheck, GraduationCap, Clock } from 'lucide-react';
+import { uploadFile } from "../features/upload/services/uploadService";
 
 export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
   const navigate = useNavigate();
@@ -47,25 +48,26 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!selectedFile) return;
     
     setUploadStatus('uploading');
-    setUploadProgress(0);
+    setUploadProgress(30);
     
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setUploadStatus('success');
-          setTimeout(() => {
-            navigate('/dashboard');
-          }, 1500);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 200);
+    try {
+      const result = await uploadFile(selectedFile);
+      setUploadProgress(100);
+      setUploadStatus('success');
+      
+      localStorage.setItem('activeDocumentId', result.data.documentId);
+      
+      setTimeout(() => {
+        navigate('/chat');
+      }, 1500);
+    } catch (error) {
+      console.error('Upload failed:', error);
+      setUploadStatus('error');
+    }
   };
 
   return (
@@ -73,12 +75,10 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
       <Sidebar currentScreen="upload" isAdmin={isAdmin} />
       
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Top Header */}
         <header className="h-20 bg-white/80 backdrop-blur-md border-b border-academic-navy/5 flex items-center px-10 shrink-0 z-10">
           <h1 className="text-2xl font-serif font-bold text-academic-navy tracking-tight">Archive Ingestion</h1>
         </header>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-6 md:p-10 pb-24 md:pb-10 flex items-center justify-center">
           <div className="w-full max-w-3xl">
             
@@ -96,7 +96,6 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
                 </p>
               </div>
 
-              {/* Drag & Drop Area */}
               {!selectedFile && uploadStatus !== 'error' && (
                 <div 
                   className={`border-2 border-dashed rounded-[2rem] p-16 flex flex-col items-center justify-center transition-all group ${
@@ -126,7 +125,6 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
                 </div>
               )}
 
-              {/* Error State */}
               {uploadStatus === 'error' && !selectedFile && (
                 <div className="border-2 border-dashed border-red-200 bg-red-50/50 rounded-[2rem] p-16 flex flex-col items-center justify-center text-center">
                   <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg mb-6 border border-red-100">
@@ -145,7 +143,6 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
                 </div>
               )}
 
-              {/* Selected File State */}
               {selectedFile && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <div className="bg-white border border-slate-100 shadow-xl shadow-academic-navy/5 rounded-[1.5rem] p-6 flex items-center justify-between">
@@ -179,7 +176,6 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
                     )}
                   </div>
 
-                  {/* Progress Bar */}
                   {uploadStatus === 'uploading' && (
                     <div className="space-y-4 px-2">
                       <div className="flex justify-between items-end">
@@ -200,7 +196,6 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
                     </div>
                   )}
 
-                  {/* Actions */}
                   <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-slate-50">
                     <button 
                       onClick={() => navigate('/dashboard')}

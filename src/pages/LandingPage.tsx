@@ -6,7 +6,6 @@ export default function LandingPage() {
   const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-academic-paper flex flex-col font-sans">
-      {/* Navigation */}
       <nav className="border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -37,7 +36,6 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-32 pb-20 md:pb-40">
           <div className="text-center max-w-4xl mx-auto">
@@ -70,7 +68,6 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Values Section - Academic Style */}
         <div className="bg-white py-24 border-y border-slate-100 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-96 h-96 bg-academic-blue/5 rounded-full -mr-48 -mt-48 blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-academic-gold/5 rounded-full -ml-48 -mb-48 blur-3xl"></div>
@@ -99,7 +96,7 @@ export default function LandingPage() {
               
               <div className="premium-card p-10">
                 <div className="w-14 h-14 bg-slate-50 text-academic-navy rounded-2xl flex items-center justify-center mb-8 border border-slate-100 shadow-sm">
-                  <Search className="w-7 h-7" />
+                  < Search className="w-7 h-7" />
                 </div>
                 <h3 className="text-2xl font-serif font-bold text-academic-navy mb-4">Interactive Synthesis</h3>
                 <p className="text-slate-600 leading-relaxed font-light">
@@ -110,7 +107,6 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Institutional CTA */}
         <div className="bg-academic-navy py-20 relative overflow-hidden">
           <div className="max-w-5xl mx-auto px-4 text-center relative z-10">
             <h2 className="text-3xl md:text-5xl font-serif font-bold text-white mb-8">Modernizing the Pursuit of Knowledge</h2>

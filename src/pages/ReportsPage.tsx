@@ -97,7 +97,6 @@ export default function ReportsPage({
     },
   ];
 
-  // Simple mock data for 7 days
   const weeklyTrends = [45, 52, 38, 65, 48, 72, 58];
   const maxTrend = Math.max(...weeklyTrends);
 
@@ -106,7 +105,6 @@ export default function ReportsPage({
       <Sidebar currentScreen="reports" />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Header */}
         <header className="h-20 bg-white/80 backdrop-blur-md border-b border-academic-navy/5 flex items-center justify-between px-6 md:px-10 shrink-0 z-10">
           <div>
             <h1 className="text-2xl font-serif font-bold text-academic-navy">
@@ -125,10 +123,8 @@ export default function ReportsPage({
           </div>
         </header>
 
-        {/* Content */}
         <main className="flex-1 overflow-y-auto p-6 md:p-10 space-y-10">
           <div className="max-w-7xl mx-auto space-y-10">
-            {/* Quick Metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {stats.map((stat, i) => (
                 <div
@@ -159,7 +155,6 @@ export default function ReportsPage({
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Scholar Table */}
               <div className="lg:col-span-2 bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-col overflow-hidden">
                 <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
                   <div className="flex items-center gap-3">
@@ -248,7 +243,6 @@ export default function ReportsPage({
                 </div>
               </div>
 
-              {/* Activity Trend (CSS Chart) */}
               <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 p-8 flex flex-col">
                 <div className="flex items-center gap-3 mb-10">
                   <div className="w-10 h-10 bg-academic-gold/10 text-academic-gold rounded-xl flex items-center justify-center">

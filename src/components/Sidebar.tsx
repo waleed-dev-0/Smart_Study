@@ -30,7 +30,6 @@ export default function Sidebar({ currentScreen, isAdmin }: SidebarProps) {
 
   return (
     <>
-      {/* Desktop Sidebar */}
       <div className="hidden md:flex w-64 bg-white border-r border-slate-200 h-screen sticky top-0 flex-col shrink-0">
         <div className="p-6 flex items-center gap-3 border-b border-slate-100">
           <div className="w-10 h-10 bg-academic-navy rounded-xl flex items-center justify-center shrink-0 shadow-md shadow-slate-900/10">
@@ -86,7 +85,6 @@ export default function Sidebar({ currentScreen, isAdmin }: SidebarProps) {
         </div>
       </div>
 
-      {/* Mobile Bottom Navigation */}
       <div className="md:hidden fixed bottom-6 left-6 right-6 bg-white/90 backdrop-blur-xl border border-white/20 flex justify-around items-center px-4 py-3 z-40 rounded-3xl shadow-2xl shadow-slate-900/10 lg:hidden">
         {navItems.map((item) => {
           const Icon = item.icon;

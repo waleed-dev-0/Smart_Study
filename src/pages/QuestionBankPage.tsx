@@ -38,7 +38,6 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
       <Sidebar currentScreen="question_bank" isAdmin={isAdmin} />
       
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Top Header */}
         <header className="h-24 bg-white/80 backdrop-blur-md border-b border-academic-navy/5 flex items-center justify-between px-6 md:px-10 shrink-0 sticky top-0 z-10">
           <div className="flex items-center gap-6">
             <button 
@@ -76,11 +75,9 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
           </div>
         </header>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-6 md:p-10 pb-24 md:pb-10 flex flex-col items-center">
           <div className="w-full max-w-4xl">
             
-            {/* Progress Bar */}
             <div className="mb-12">
               <div className="flex justify-between items-end mb-4 px-2">
                 <div className="flex flex-col gap-1">
@@ -96,7 +93,6 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
               </div>
             </div>
 
-            {/* Question Card */}
             <div className="bg-white rounded-[3rem] border border-slate-100 shadow-2xl shadow-academic-navy/5 overflow-hidden">
               <div className="p-10 md:p-16">
                 <h2 className="text-3xl md:text-4xl font-serif font-bold text-academic-navy mb-12 leading-tight text-center max-w-3xl mx-auto">
@@ -150,7 +146,6 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
                 </div>
               </div>
 
-              {/* Explanation Section (Shows after submit) */}
               {isSubmitted && (
                 <div className="bg-slate-50/80 backdrop-blur-sm border-t border-slate-100 p-10 md:p-16 animate-in fade-in slide-in-from-bottom-8 duration-700">
                   <div className="flex flex-col md:flex-row items-start gap-8 max-w-4xl mx-auto">
@@ -187,7 +182,6 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
                 </div>
               )}
 
-              {/* Submit Button (Shows before submit) */}
               {!isSubmitted && (
                 <div className="bg-slate-50/50 border-t border-slate-100 p-8 md:p-12 flex justify-center">
                   <button

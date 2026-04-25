@@ -1,13 +1,47 @@
 import express, { Router, Request, Response } from 'express';
 import * as testController from '../controllers/testController';
+import * as uploadController from '../controllers/uploadController';
+import * as chatController from '../controllers/chatController';
+import * as documentController from '../controllers/documentController';
+import { mockAuth } from '../middlewares/authMiddleware';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
 const router: Router = express.Router();
+
+const uploadDir = 'uploads';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+
+const upload = multer({ 
+  storage,
+  fileFilter: (req, file, cb) => {
+    if (path.extname(file.originalname) !== '.pdf') {
+      return cb(new Error('Only PDFs are allowed'));
+    }
+    cb(null, true);
+  }
+});
 
 router.get('/', (req: Request, res: Response) => {
   res.json({ success: true, message: 'Server is running! API v1' });
 });
 
 router.get('/test-db', testController.testDb);
-router.get('/test-relations', testController.testRelations);
+
+router.get('/documents', mockAuth, documentController.getDocuments);
+router.post('/upload', mockAuth, upload.single('file'), uploadController.uploadDocument);
+router.post('/chat', mockAuth, chatController.askAI);
 
 export default router;

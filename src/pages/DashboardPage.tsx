@@ -17,7 +17,6 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
       <Sidebar currentScreen="dashboard" isAdmin={isAdmin} />
       
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Top Header */}
         <header className="h-20 bg-white/80 backdrop-blur-md border-b border-academic-navy/5 flex items-center justify-between px-6 md:px-10 shrink-0 z-10">
           <div className="flex items-center gap-4 bg-slate-50 px-5 py-2.5 rounded-2xl w-full max-w-[240px] md:max-w-lg border border-slate-200/60 focus-within:border-academic-blue focus-within:ring-4 focus-within:ring-academic-blue/5 transition-all">
             <Search className="w-4 h-4 text-slate-400 shrink-0" />
@@ -49,7 +48,6 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
           </div>
         </header>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-6 md:p-10 pb-24 md:pb-10">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-12">
@@ -66,7 +64,6 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
               </button>
             </div>
 
-            {/* Academic Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
               <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 flex items-center gap-6 group hover:border-academic-blue/20 transition-all">
                 <div className="w-16 h-16 bg-academic-blue/5 text-academic-blue rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform border border-academic-blue/10">

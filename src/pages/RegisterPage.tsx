@@ -16,7 +16,6 @@ export default function RegisterPage({}: {}) {
   const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-academic-paper flex">
-      {/* Left Side - Form */}
       <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:flex-none lg:w-[520px] lg:px-16 xl:px-24 border-r border-slate-200 bg-white py-12">
         <div className="mx-auto w-full max-w-sm lg:w-full">
           <div
@@ -160,7 +159,6 @@ export default function RegisterPage({}: {}) {
         </div>
       </div>
 
-      {/* Right Side - Benefits */}
       <div className="hidden lg:block relative w-0 flex-1 bg-slate-50 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white to-slate-100" />
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-academic-navy via-academic-blue to-academic-gold opacity-50"></div>

@@ -17,7 +17,6 @@ export default function ResetPasswordPage({
 
   return (
     <div className="min-h-screen bg-academic-paper flex">
-      {/* Left Side - Form */}
       <div className="flex-1 flex flex-col justify-center px-4 py-12 sm:px-6 sm:py-16 lg:flex-none lg:w-[480px] lg:px-16 xl:px-24 border-r border-slate-200 bg-white">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div
@@ -110,7 +109,6 @@ export default function ResetPasswordPage({
         </div>
       </div>
 
-      {/* Right Side - Academic Image */}
       <div className="hidden lg:block relative w-0 flex-1 bg-academic-navy overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-academic-navy to-academic-blue opacity-95" />
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
