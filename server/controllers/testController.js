@@ -1,10 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 
-export const testDb = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const testDb = async (req, res, next) => {
   try {
     const state = mongoose.connection.readyState;
-    const states: { [key: number]: string } = {
+    const states = {
       0: 'disconnected',
       1: 'connected',
       2: 'connecting',
@@ -21,7 +20,7 @@ export const testDb = async (req: Request, res: Response, next: NextFunction): P
   }
 };
 
-export const testRelations = (req: Request, res: Response, next: NextFunction): void => {
+export const testRelations = (req, res, next) => {
   try {
     const models = mongoose.modelNames();
     res.json({

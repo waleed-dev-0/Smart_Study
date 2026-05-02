@@ -5,11 +5,11 @@ import dotenv from "dotenv";
 dotenv.config();
 
 class AIService {
-  private genAI: GoogleGenerativeAI | null = null;
-  private geminiModel: any = null;
-  private embeddingModel: any = null;
+  genAI = null;
+  geminiModel = null;
+  embeddingModel = null;
 
-  private openRouterModel = "minimax/minimax-m2.5:free";
+  openRouterModel = "minimax/minimax-m2.5:free";
 
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -31,7 +31,7 @@ class AIService {
     }
   }
 
-  async generateEmbedding(text: string): Promise<number[]> {
+  async generateEmbedding(text) {
     if (this.embeddingModel) {
       try {
         const result = await this.embeddingModel.embedContent(text);
@@ -44,7 +44,7 @@ class AIService {
     return this.generateOpenRouterEmbedding(text);
   }
 
-  private async generateOpenRouterEmbedding(text: string): Promise<number[]> {
+  async generateOpenRouterEmbedding(text) {
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) throw new Error("API Configuration missing for embeddings");
 
@@ -64,7 +64,7 @@ class AIService {
       );
 
       return response.data.data[0].embedding;
-    } catch (error: any) {
+    } catch (error) {
       console.error(
         "Embedding generation error:",
         error.response?.data || error.message,
@@ -73,11 +73,7 @@ class AIService {
     }
   }
 
-  async askAI(
-    prompt: string,
-    context: string,
-    provider: "gemini" | "openrouter" = "gemini",
-  ): Promise<string> {
+  async askAI(prompt, context, provider = "gemini") {
     const fullPrompt = `
       You are an elite academic research assistant. Use the following context extracted from a student's textbook to provide a high-quality, accurate, and educational answer.
       
@@ -105,7 +101,7 @@ class AIService {
     return this.askOpenRouter(fullPrompt);
   }
 
-  private async askOpenRouter(prompt: string): Promise<string> {
+  async askOpenRouter(prompt) {
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) throw new Error("API Configuration missing");
 
@@ -131,7 +127,7 @@ class AIService {
       }
 
       return response.data.choices[0].message.content;
-    } catch (error: any) {
+    } catch (error) {
       const errorMsg = error.response?.data?.error?.message || error.message;
       console.error("Service error:", errorMsg);
       throw new Error(`AI Service error: ${errorMsg}`);

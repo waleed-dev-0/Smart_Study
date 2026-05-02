@@ -1,7 +1,6 @@
-import { Request, Response } from 'express';
-import DocumentModel from '../models/document';
+import DocumentModel from '../models/document.js';
 
-export const getDocuments = async (req: any, res: Response) => {
+export const getDocuments = async (req, res) => {
   try {
     const userId = req.user?._id;
     const documents = await DocumentModel.find({ user_id: userId }).sort({ createdAt: -1 });
@@ -10,7 +9,7 @@ export const getDocuments = async (req: any, res: Response) => {
       success: true,
       data: documents
     });
-  } catch (error: any) {
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };

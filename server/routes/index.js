@@ -1,14 +1,14 @@
-import express, { Router, Request, Response } from 'express';
-import * as testController from '../controllers/testController';
-import * as uploadController from '../controllers/uploadController';
-import * as chatController from '../controllers/chatController';
-import * as documentController from '../controllers/documentController';
-import { mockAuth } from '../middlewares/authMiddleware';
+import express from 'express';
+import * as testController from '../controllers/testController.js';
+import * as uploadController from '../controllers/uploadController.js';
+import * as chatController from '../controllers/chatController.js';
+import * as documentController from '../controllers/documentController.js';
+import { mockAuth } from '../middlewares/authMiddleware.js';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 
-const router: Router = express.Router();
+const router = express.Router();
 
 const uploadDir = 'uploads';
 if (!fs.existsSync(uploadDir)) {
@@ -34,7 +34,7 @@ const upload = multer({
   }
 });
 
-router.get('/', (req: Request, res: Response) => {
+router.get('/', (req, res) => {
   res.json({ success: true, message: 'Server is running! API v1' });
 });
 

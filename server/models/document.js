@@ -1,16 +1,6 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export interface IDocument extends Document {
-  user_id: mongoose.Types.ObjectId;
-  title: string;
-  file_path: string;
-  file_size_bytes?: number;
-  file_format?: string;
-  page_count: number;
-  processing_status: 'pending' | 'processing' | 'completed' | 'failed';
-}
-
-const DocumentSchema: Schema<IDocument> = new Schema({
+const DocumentSchema = new Schema({
   user_id: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -44,6 +34,6 @@ const DocumentSchema: Schema<IDocument> = new Schema({
   timestamps: true
 });
 
-const DocumentModel: Model<IDocument> = mongoose.model<IDocument>('Document', DocumentSchema);
+const DocumentModel = mongoose.model('Document', DocumentSchema);
 
 export default DocumentModel;

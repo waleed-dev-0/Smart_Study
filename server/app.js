@@ -1,13 +1,13 @@
-import express, { Application } from 'express';
+import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import connectDB from './config/db';
-import routes from './routes';
-import errorHandler from './middlewares/errorHandler';
+import connectDB from './config/db.js';
+import routes from './routes/index.js';
+import errorHandler from './middlewares/errorHandler.js';
 
 dotenv.config();
 
-const app: Application = express();
+const app = express();
 const PORT = process.env.PORT || 5000;
 
 connectDB();
@@ -20,8 +20,7 @@ app.use('/api', routes);
 
 app.use(errorHandler);
 
-
-if (require.main === module) {
+if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });

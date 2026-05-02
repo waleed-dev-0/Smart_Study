@@ -1,16 +1,6 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export interface IUser extends Document {
-  full_name: string;
-  email: string;
-  password_hash: string;
-  role: 'student' | 'admin';
-  points: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const UserSchema: Schema<IUser> = new Schema({
+const UserSchema = new Schema({
   full_name: {
     type: String,
     required: [true, 'Full name is required'],
@@ -40,6 +30,6 @@ const UserSchema: Schema<IUser> = new Schema({
   timestamps: true
 });
 
-const User: Model<IUser> = mongoose.model<IUser>('User', UserSchema);
+const User = mongoose.model('User', UserSchema);
 
 export default User;

@@ -1,16 +1,16 @@
 import fs from 'fs';
 import { PDFParse } from 'pdf-parse';
-import DocumentModel from '../models/document';
-import DocumentChunk from '../models/documentchunk';
-import aiService from './aiService';
+import DocumentModel from '../models/document.js';
+import DocumentChunk from '../models/documentchunk.js';
+import aiService from './aiService.js';
 import mongoose from 'mongoose';
 
 class UploadService {
   async processPDF(
-    filePath: string,
-    originalName: string,
-    userId: string
-  ): Promise<string> {
+    filePath,
+    originalName,
+    userId
+  ) {
     try {
       const dataBuffer = fs.readFileSync(filePath);
       
@@ -53,8 +53,8 @@ class UploadService {
     }
   }
 
-  private chunkText(text: string, size: number, overlap: number): string[] {
-    const chunks: string[] = [];
+  chunkText(text, size, overlap) {
+    const chunks = [];
     let start = 0;
 
     while (start < text.length) {

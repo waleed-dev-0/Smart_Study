@@ -1,7 +1,6 @@
-import { Request, Response } from 'express';
-import chatService from '../services/chatService';
+import chatService from '../services/chatService.js';
 
-export const askAI = async (req: any, res: Response) => {
+export const askAI = async (req, res) => {
   try {
     const { query, documentId, provider, model } = req.body;
     const userId = req.user?._id;
@@ -25,7 +24,7 @@ export const askAI = async (req: any, res: Response) => {
       success: true,
       data: result
     });
-  } catch (error: any) {
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };

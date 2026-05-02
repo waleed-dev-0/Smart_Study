@@ -1,16 +1,6 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export interface IQuestion extends Document {
-  document_id: mongoose.Types.ObjectId;
-  user_id: mongoose.Types.ObjectId;
-  question_text: string;
-  question_type: 'multiple_choice' | 'true_false' | 'short_answer';
-  options: any;
-  correct_answer: string;
-  explanation?: string;
-}
-
-const QuestionSchema: Schema<IQuestion> = new Schema({
+const QuestionSchema = new Schema({
   document_id: {
     type: Schema.Types.ObjectId,
     ref: 'Document',
@@ -45,6 +35,6 @@ const QuestionSchema: Schema<IQuestion> = new Schema({
   timestamps: true
 });
 
-const Question: Model<IQuestion> = mongoose.model<IQuestion>('Question', QuestionSchema);
+const Question = mongoose.model('Question', QuestionSchema);
 
 export default Question;

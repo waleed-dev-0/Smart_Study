@@ -1,15 +1,15 @@
-import DocumentChunk from '../models/documentchunk';
-import aiService, { AIProvider } from './aiService';
-import ChatMessage from '../models/chatmessage';
-import ChatSession from '../models/chatsession';
+import DocumentChunk from '../models/documentchunk.js';
+import aiService from './aiService.js';
+import ChatMessage from '../models/chatmessage.js';
+import ChatSession from '../models/chatsession.js';
 import mongoose from 'mongoose';
 
 class ChatService {
   async askQuestion(
-    query: string,
-    documentId: string,
-    userId: string,
-    provider: AIProvider = 'gemini'
+    query,
+    documentId,
+    userId,
+    provider = 'gemini'
   ) {
     try {
       let session = await ChatSession.findOne({ 
@@ -66,7 +66,7 @@ class ChatService {
     }
   }
 
-  private cosineSimilarity(vecA: number[], vecB: number[]): number {
+  cosineSimilarity(vecA, vecB) {
     if (vecA.length !== vecB.length) return 0;
     let dotProduct = 0;
     let normA = 0;

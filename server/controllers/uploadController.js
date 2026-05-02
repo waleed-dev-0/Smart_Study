@@ -1,7 +1,6 @@
-import { Request, Response } from 'express';
-import uploadService from '../services/uploadService';
+import uploadService from '../services/uploadService.js';
 
-export const uploadDocument = async (req: any, res: Response) => {
+export const uploadDocument = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
@@ -19,7 +18,7 @@ export const uploadDocument = async (req: any, res: Response) => {
       message: 'Document uploaded and indexed successfully',
       data: { documentId }
     });
-  } catch (error: any) {
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
