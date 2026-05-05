@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import React, { useState } from 'react';
 import Sidebar from "../components/Sidebar";
 import { UploadCloud, File, X, CheckCircle2, AlertCircle, FileText, ShieldCheck, GraduationCap, Clock } from 'lucide-react';
@@ -6,6 +6,8 @@ import { uploadFile } from "../features/upload/services/uploadService";
 
 export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const parentId = searchParams.get('parentId');
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
@@ -55,7 +57,7 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
     setUploadProgress(30);
     
     try {
-      const result = await uploadFile(selectedFile);
+      const result = await uploadFile(selectedFile, parentId || undefined);
       setUploadProgress(100);
       setUploadStatus('success');
       

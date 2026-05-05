@@ -1,4 +1,7 @@
 import chatService from '../services/chatService.js';
+import ChatSession from '../models/chatsession.js';
+import ChatMessage from '../models/chatmessage.js';
+import mongoose from 'mongoose';
 
 export const askAI = async (req, res) => {
   try {
@@ -23,6 +26,49 @@ export const askAI = async (req, res) => {
     res.status(200).json({
       success: true,
       data: result
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getChatHistory = async (req, res) => {
+  try {
+    const { documentId } = req.params;
+    const userId = req.user?._id;
+
+    if (!documentId) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Document ID is required' 
+      });
+    }
+
+    const session = await ChatSession.findOne({
+      user_id: new mongoose.Types.ObjectId(userId),
+      $or: [
+        { document_id: new mongoose.Types.ObjectId(documentId) },
+        { additional_documents: new mongoose.Types.ObjectId(documentId) }
+      ]
+    });
+
+    if (!session) {
+      return res.status(200).json({
+        success: true,
+        data: []
+      });
+    }
+
+    const messages = await ChatMessage.find({ session_id: session._id }).sort({ createdAt: 1 });
+
+    res.status(200).json({
+      success: true,
+      data: messages.map(msg => ({
+        id: msg._id.toString(),
+        role: msg.sender_type,
+        text: msg.message_content,
+        timestamp: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }))
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

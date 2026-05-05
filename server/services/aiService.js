@@ -1,137 +1,98 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import axios from "axios";
 import dotenv from "dotenv";
 
 dotenv.config();
 
+const OPENROUTER_TIMEOUT = 45000;
+const OPENROUTER_CHAT_MODEL = "openrouter/free";
+const OPENROUTER_EMBED_MODEL = "openai/text-embedding-3-small";
+
 class AIService {
-  genAI = null;
-  geminiModel = null;
-  embeddingModel = null;
-
-  openRouterModel = "minimax/minimax-m2.5:free";
-
   constructor() {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (apiKey) {
+    const key = process.env.GEMINI_API_KEY;
+    this.hasGemini = false;
+    if (key && key.trim().length > 0) {
       try {
-        this.genAI = new GoogleGenerativeAI(apiKey);
-        this.geminiModel = this.genAI.getGenerativeModel({
-          model: "gemini-1.5-flash",
-        });
-        this.embeddingModel = this.genAI.getGenerativeModel({
-          model: "text-embedding-004",
-        });
-        console.log("AI Service Initialized");
+        this.ai = new GoogleGenAI({ apiKey: key });
+        this.hasGemini = true;
+        console.log("[AI] Gemini Initialized Successfully");
       } catch (err) {
-        console.error("Failed to initialize AI Service:", err);
+        console.error("[AI] Initialization Error:", err.message);
       }
-    } else {
-      console.warn("AI configuration incomplete, using secondary provider.");
     }
   }
 
   async generateEmbedding(text) {
-    if (this.embeddingModel) {
+    if (this.hasGemini) {
       try {
-        const result = await this.embeddingModel.embedContent(text);
-        return result.embedding.values;
+        const result = await this.ai.models.embedContent({
+          model: "gemini-embedding-001",
+          contents: text,
+        });
+        return result.embeddings[0].values;
       } catch (error) {
-        console.error("Primary embedding error, using fallback...", error);
+        console.error("[AI] Gemini Embed Failed:", error.message);
       }
     }
-
     return this.generateOpenRouterEmbedding(text);
   }
 
-  async generateOpenRouterEmbedding(text) {
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) throw new Error("API Configuration missing for embeddings");
+  async askAI(prompt, context, provider = "gemini", history = "") {
+    const fullPrompt = `Context:\n${context}\nHistory:\n${history}\nQuery:\n${prompt}`;
 
-    try {
-      const response = await axios.post(
-        "https://openrouter.ai/api/v1/embeddings",
-        {
-          model: "openai/text-embedding-3-small",
-          input: text,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      return response.data.data[0].embedding;
-    } catch (error) {
-      console.error(
-        "Embedding generation error:",
-        error.response?.data || error.message,
-      );
-      throw new Error("Failed to generate content embedding");
-    }
-  }
-
-  async askAI(prompt, context, provider = "gemini") {
-    const fullPrompt = `
-      You are an elite academic research assistant. Use the following context extracted from a student's textbook to provide a high-quality, accurate, and educational answer.
-      
-      RULES:
-      1. If the answer is within the context, prioritize that information.
-      2. If the context is insufficient, provide a general academic answer but clearly state it's based on general knowledge.
-      3. Maintain a professional, clear, and encouraging tone.
-      
-      CONTEXT FROM DOCUMENT:
-      ${context}
-      
-      STUDENT'S INQUIRY:
-      ${prompt}
-    `;
-
-    if (provider === "gemini" && this.geminiModel) {
+    if (provider === "gemini" && this.hasGemini) {
       try {
-        const result = await this.geminiModel.generateContent(fullPrompt);
-        return result.response.text();
+        const response = await this.ai.models.generateContent({
+          model: "gemini-flash-latest",
+          contents: fullPrompt,
+        });
+        return response.text;
       } catch (err) {
-        console.error("Primary provider error, using fallback...", err);
+        const isQuotaError =
+          err.message?.includes("429") ||
+          err.message?.includes("RESOURCE_EXHAUSTED") ||
+          err.message?.includes("quota");
+
+        if (isQuotaError) {
+          console.warn(
+            "[AI] Gemini quota exhausted, falling back to OpenRouter...",
+          );
+        } else {
+          console.error("[AI] Gemini Chat Failed:", err.message);
+        }
       }
     }
-
     return this.askOpenRouter(fullPrompt);
   }
 
+  async generateOpenRouterEmbedding(text) {
+    const key = process.env.OPENROUTER_API_KEY;
+    const response = await axios.post(
+      "https://openrouter.ai/api/v1/embeddings",
+      { model: OPENROUTER_EMBED_MODEL, input: text },
+      {
+        headers: { Authorization: `Bearer ${key}` },
+        timeout: OPENROUTER_TIMEOUT,
+      },
+    );
+    return response.data.data[0].embedding;
+  }
+
   async askOpenRouter(prompt) {
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) throw new Error("API Configuration missing");
-
-    try {
-      const response = await axios.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        {
-          model: this.openRouterModel,
-          messages: [{ role: "user", content: prompt }],
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "HTTP-Referer": "http://localhost:3000",
-            "X-Title": "Smart Study Research Portal",
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (!response.data?.choices || response.data.choices.length === 0) {
-        throw new Error('Invalid response from AI provider');
-      }
-
-      return response.data.choices[0].message.content;
-    } catch (error) {
-      const errorMsg = error.response?.data?.error?.message || error.message;
-      console.error("Service error:", errorMsg);
-      throw new Error(`AI Service error: ${errorMsg}`);
-    }
+    const key = process.env.OPENROUTER_API_KEY;
+    const response = await axios.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: OPENROUTER_CHAT_MODEL,
+        messages: [{ role: "user", content: prompt }],
+      },
+      {
+        headers: { Authorization: `Bearer ${key}` },
+        timeout: OPENROUTER_TIMEOUT,
+      },
+    );
+    return response.data.choices[0].message.content;
   }
 }
 

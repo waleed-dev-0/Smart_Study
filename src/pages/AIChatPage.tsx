@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import Sidebar from "../components/Sidebar";
 import {
   ArrowLeft,
@@ -18,27 +20,56 @@ import {
   Search,
   BookOpen,
   Sparkles,
-  Bot
+  Bot,
 } from "lucide-react";
 import { useChat } from "../features/chat/hooks/useChat";
-import { fetchDocuments } from "../features/upload/services/uploadService";
+import {
+  fetchDocuments,
+  uploadFile,
+} from "../features/upload/services/uploadService";
 
-export default function AIChatPage({
-  isAdmin,
-}: {
-  isAdmin?: boolean;
-}) {
+export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   const navigate = useNavigate();
   const [input, setInput] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isQuizzesOpen, setIsQuizzesOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { messages, isLoading, sendMessage, setMessages } = useChat();
-  const [provider, setProvider] = useState<'gemini' | 'openrouter'>('gemini');
+  const {
+    messages,
+    isLoading,
+    isFetchingHistory,
+    loadingStatus,
+    sendMessage,
+    fetchHistory,
+    setMessages,
+  } = useChat();
+  const [provider, setProvider] = useState<"gemini" | "openrouter">("gemini");
   const [documents, setDocuments] = useState<any[]>([]);
-  const [activeDocId, setActiveDocId] = useState<string | null>(localStorage.getItem('activeDocumentId'));
+  const [activeDocId, setActiveDocId] = useState<string | null>(
+    localStorage.getItem("activeDocumentId"),
+  );
+
+  const loadDocs = async () => {
+    try {
+      const res = await fetchDocuments();
+      setDocuments(res.data);
+      if (res.data.length > 0 && !activeDocId) {
+        setActiveDocId(res.data[0]._id);
+        localStorage.setItem("activeDocumentId", res.data[0]._id);
+      }
+    } catch (err) {
+      console.error("Failed to load documents", err);
+    }
+  };
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isLoading, isUploading]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -54,29 +85,13 @@ export default function AIChatPage({
   }, []);
 
   useEffect(() => {
-    const loadDocs = async () => {
-      try {
-        const res = await fetchDocuments();
-        setDocuments(res.data);
-        if (res.data.length > 0 && !activeDocId) {
-          setActiveDocId(res.data[0]._id);
-          localStorage.setItem('activeDocumentId', res.data[0]._id);
-        }
-      } catch (err) {
-        console.error("Failed to load documents", err);
-      }
-    };
     loadDocs();
   }, []);
 
   useEffect(() => {
-    if (activeDocId && messages.length === 0) {
-      setMessages([{
-        id: 'initial',
-        role: 'ai',
-        text: "Welcome to the Research Portal. I have indexed your document. How may I assist your inquiry today?",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      }]);
+    if (activeDocId) {
+      setMessages([]);
+      fetchHistory(activeDocId);
     }
   }, [activeDocId]);
 
@@ -87,9 +102,36 @@ export default function AIChatPage({
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setIsDropdownOpen(false);
+
+    try {
+      const result = await uploadFile(file, activeDocId || undefined);
+      await loadDocs();
+
+      const newDocId = result.data.documentId;
+      if (!activeDocId) {
+        setActiveDocId(newDocId);
+        localStorage.setItem("activeDocumentId", newDocId);
+      } else {
+        await fetchHistory(activeDocId);
+      }
+    } catch (err) {
+      console.error("File upload failed", err);
+      alert("Failed to upload document. Please ensure it is a valid PDF.");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -123,9 +165,11 @@ export default function AIChatPage({
             <button
               key={doc._id}
               onClick={() => {
-                setActiveDocId(doc._id);
-                localStorage.setItem('activeDocumentId', doc._id);
-                setMessages([]);
+                if (activeDocId !== doc._id) {
+                  setActiveDocId(doc._id);
+                  localStorage.setItem("activeDocumentId", doc._id);
+                  setMessages([]);
+                }
               }}
               className={`w-full text-left p-4 rounded-2xl transition-all flex items-start gap-3 group ${
                 activeDocId === doc._id
@@ -133,12 +177,18 @@ export default function AIChatPage({
                   : "bg-transparent hover:bg-slate-50 border border-transparent"
               }`}
             >
-              <FileText className={`w-5 h-5 shrink-0 mt-0.5 ${activeDocId === doc._id ? "text-academic-blue" : "text-slate-400 group-hover:text-academic-navy"}`} />
+              <FileText
+                className={`w-5 h-5 shrink-0 mt-0.5 ${activeDocId === doc._id ? "text-academic-blue" : "text-slate-400 group-hover:text-academic-navy"}`}
+              />
               <div className="min-w-0">
-                <p className={`text-sm line-clamp-2 leading-tight mb-1 font-serif ${activeDocId === doc._id ? "font-bold text-academic-navy" : "font-medium text-slate-600"}`}>
+                <p
+                  className={`text-sm line-clamp-2 leading-tight mb-1 font-serif ${activeDocId === doc._id ? "font-bold text-academic-navy" : "font-medium text-slate-600"}`}
+                >
                   {doc.title}
                 </p>
-                <p className={`text-[10px] font-bold uppercase tracking-wider ${activeDocId === doc._id ? "text-emerald-600" : "text-slate-400"}`}>
+                <p
+                  className={`text-[10px] font-bold uppercase tracking-wider ${activeDocId === doc._id ? "text-emerald-600" : "text-slate-400"}`}
+                >
                   {activeDocId === doc._id ? "Active Analysis" : "Indexed"}
                 </p>
               </div>
@@ -146,9 +196,11 @@ export default function AIChatPage({
           ))}
           {documents.length === 0 && (
             <div className="text-center py-10">
-              <p className="text-xs text-slate-400 font-medium">No documents indexed yet.</p>
-              <button 
-                onClick={() => navigate('/upload')}
+              <p className="text-xs text-slate-400 font-medium">
+                No documents indexed yet.
+              </p>
+              <button
+                onClick={() => navigate("/upload")}
                 className="mt-4 text-[10px] font-bold text-academic-blue uppercase tracking-widest hover:underline"
               >
                 Upload Now
@@ -178,7 +230,8 @@ export default function AIChatPage({
                 <p className="text-xs text-slate-500 flex items-center gap-1 truncate font-medium">
                   Analysis:{" "}
                   <span className="text-academic-blue truncate">
-                    {documents.find(d => d._id === activeDocId)?.title || "Select a document"}
+                    {documents.find((d) => d._id === activeDocId)?.title ||
+                      "Select a document"}
                   </span>
                 </p>
               </div>
@@ -188,15 +241,15 @@ export default function AIChatPage({
           <div className="flex items-center gap-3 shrink-0">
             <div className="hidden sm:flex bg-slate-50 border border-slate-200 rounded-xl p-1 gap-1">
               <button
-                onClick={() => setProvider('gemini')}
-                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 ${provider === 'gemini' ? 'bg-academic-navy text-white shadow-sm' : 'text-slate-500 hover:text-academic-navy'}`}
+                onClick={() => setProvider("gemini")}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 ${provider === "gemini" ? "bg-academic-navy text-white shadow-sm" : "text-slate-500 hover:text-academic-navy"}`}
               >
                 <Sparkles className="w-3 h-3" />
                 Gemini
               </button>
               <button
-                onClick={() => setProvider('openrouter')}
-                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 ${provider === 'openrouter' ? 'bg-academic-navy text-white shadow-sm' : 'text-slate-500 hover:text-academic-navy'}`}
+                onClick={() => setProvider("openrouter")}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 ${provider === "openrouter" ? "bg-academic-navy text-white shadow-sm" : "text-slate-500 hover:text-academic-navy"}`}
               >
                 <Bot className="w-3 h-3" />
                 OpenRouter
@@ -218,82 +271,236 @@ export default function AIChatPage({
         <main className="flex-1 overflow-y-auto p-6 flex flex-col gap-8 scroll-smooth">
           <div className="text-center my-6">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] bg-slate-50 px-4 py-1.5 rounded-full border border-slate-100">
-              Academic Session • March 2024
+              Academic Session •{" "}
+              {new Date().toLocaleDateString("en-US", {
+                month: "long",
+                year: "numeric",
+              })}
             </span>
           </div>
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`flex gap-6 max-w-4xl ${msg.role === "user" ? "ml-auto flex-row-reverse" : ""}`}
-            >
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-sm ${
-                  msg.role === "ai"
-                    ? "bg-academic-navy text-white"
-                    : "bg-slate-100 text-slate-600"
-                }`}
-              >
-                {msg.role === "ai" ? (
-                  <GraduationCap className="w-6 h-6" />
-                ) : (
-                  <User className="w-6 h-6" />
-                )}
-              </div>
 
+          {isFetchingHistory ? (
+            <div className="flex flex-col gap-8 w-full max-w-4xl mx-auto py-10 opacity-70 animate-pulse">
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-xl bg-slate-200 shrink-0"></div>
+                <div className="h-24 bg-slate-100 rounded-2xl w-3/4"></div>
+              </div>
+              <div className="flex gap-4 flex-row-reverse">
+                <div className="w-10 h-10 rounded-xl bg-slate-200 shrink-0"></div>
+                <div className="h-16 bg-academic-blue/20 rounded-2xl w-2/3"></div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-xl bg-slate-200 shrink-0"></div>
+                <div className="h-32 bg-slate-100 rounded-2xl w-full"></div>
+              </div>
+            </div>
+          ) : (
+            messages.map((msg) => (
               <div
-                className={`flex flex-col gap-2 ${msg.role === "user" ? "items-end" : "items-start"} max-w-[85%]`}
+                key={msg.id}
+                className={`flex gap-6 max-w-4xl ${msg.role === "user" ? "ml-auto flex-row-reverse" : ""}`}
               >
-                <div className="flex items-center gap-3 px-1">
-                  <span className="text-xs font-bold text-academic-navy uppercase tracking-wider">
-                    {msg.role === "ai" ? "Research Assistant" : "Scholar"}
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-medium">
-                    {msg.timestamp}
-                  </span>
+                <div
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-sm ${
+                    msg.role === "ai"
+                      ? msg.isError
+                        ? "bg-red-500 text-white"
+                        : "bg-academic-navy text-white"
+                      : "bg-slate-100 text-slate-600"
+                  }`}
+                >
+                  {msg.role === "ai" ? (
+                    <GraduationCap className="w-6 h-6" />
+                  ) : (
+                    <User className="w-6 h-6" />
+                  )}
                 </div>
 
                 <div
-                  className={`p-5 rounded-2xl text-sm leading-relaxed ${
-                    msg.role === "user"
-                      ? "bg-academic-blue text-white rounded-tr-none shadow-lg shadow-academic-blue/10"
-                      : "bg-white border border-slate-200 text-slate-800 rounded-tl-none shadow-sm"
-                  }`}
+                  className={`flex flex-col gap-2 ${msg.role === "user" ? "items-end" : "items-start"} max-w-[85%]`}
                 >
-                  {msg.text.split("\n\n").map((paragraph, i) => (
-                    <p key={i} className={i > 0 ? "mt-4" : ""}>
-                      {paragraph.split("**").map((part, j) =>
-                        j % 2 === 1 ? (
-                          <strong
-                            key={j}
-                            className="font-bold underline decoration-academic-gold/30"
-                          >
-                            {part}
-                          </strong>
-                        ) : (
-                          part
-                        ),
-                      )}
-                    </p>
-                  ))}
-                </div>
-
-                {msg.citations && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {msg.citations.map((cite, i) => (
-                      <button
-                        key={i}
-                        className="flex items-center gap-2 px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-[10px] font-bold text-academic-navy transition-all uppercase tracking-wide group"
-                      >
-                        <FileText className="w-3.5 h-3.5 text-academic-blue" />
-                        Reference: Page {cite.page}
-                      </button>
-                    ))}
+                  <div className="flex items-center gap-3 px-1">
+                    <span className="text-xs font-bold text-academic-navy uppercase tracking-wider">
+                      {msg.role === "ai" ? "Research Assistant" : "Scholar"}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">
+                      {msg.timestamp}
+                    </span>
                   </div>
-                )}
+
+                  <div
+                    className={`p-5 rounded-2xl text-sm leading-relaxed ${
+                      msg.role === "user"
+                        ? "bg-academic-blue text-white rounded-tr-none shadow-lg shadow-academic-blue/10"
+                        : msg.isError
+                          ? "bg-red-50 border border-red-200 text-red-800 rounded-tl-none shadow-sm"
+                          : "bg-white border border-slate-200 text-slate-800 rounded-tl-none shadow-sm"
+                    }`}
+                  >
+                    {msg.role === "user" ? (
+                      <p>{msg.text}</p>
+                    ) : (
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          h1: ({ children }) => (
+                            <h1 className="text-xl font-serif font-bold text-academic-navy mt-4 mb-2 first:mt-0">
+                              {children}
+                            </h1>
+                          ),
+                          h2: ({ children }) => (
+                            <h2 className="text-lg font-serif font-bold text-academic-navy mt-4 mb-2 first:mt-0">
+                              {children}
+                            </h2>
+                          ),
+                          h3: ({ children }) => (
+                            <h3 className="text-base font-bold text-academic-navy mt-3 mb-1 first:mt-0">
+                              {children}
+                            </h3>
+                          ),
+                          p: ({ children }) => (
+                            <p className="mb-3 last:mb-0 leading-relaxed">
+                              {children}
+                            </p>
+                          ),
+                          strong: ({ children }) => (
+                            <strong className="font-bold text-academic-navy">
+                              {children}
+                            </strong>
+                          ),
+                          em: ({ children }) => (
+                            <em className="italic">{children}</em>
+                          ),
+                          ul: ({ children }) => (
+                            <ul className="list-disc list-inside space-y-1 mb-3 ml-2">
+                              {children}
+                            </ul>
+                          ),
+                          ol: ({ children }) => (
+                            <ol className="list-decimal list-inside space-y-1 mb-3 ml-2">
+                              {children}
+                            </ol>
+                          ),
+                          li: ({ children }) => (
+                            <li className="leading-relaxed">{children}</li>
+                          ),
+                          code: ({ inline, children }: any) =>
+                            inline ? (
+                              <code className="bg-slate-100 text-academic-navy px-1.5 py-0.5 rounded text-[12px] font-mono">
+                                {children}
+                              </code>
+                            ) : (
+                              <pre className="bg-slate-900 text-slate-100 p-4 rounded-xl overflow-x-auto text-[12px] font-mono my-3">
+                                <code>{children}</code>
+                              </pre>
+                            ),
+                          table: ({ children }) => (
+                            <div className="overflow-x-auto my-3">
+                              <table className="w-full border-collapse text-sm">
+                                {children}
+                              </table>
+                            </div>
+                          ),
+                          thead: ({ children }) => (
+                            <thead className="bg-slate-100">{children}</thead>
+                          ),
+                          th: ({ children }) => (
+                            <th className="border border-slate-200 px-3 py-2 text-left font-bold text-academic-navy text-xs uppercase tracking-wide">
+                              {children}
+                            </th>
+                          ),
+                          td: ({ children }) => (
+                            <td className="border border-slate-200 px-3 py-2 text-slate-700">
+                              {children}
+                            </td>
+                          ),
+                          tr: ({ children }) => (
+                            <tr className="hover:bg-slate-50 transition-colors">
+                              {children}
+                            </tr>
+                          ),
+                          blockquote: ({ children }) => (
+                            <blockquote className="border-l-4 border-academic-blue pl-4 italic text-slate-600 my-3">
+                              {children}
+                            </blockquote>
+                          ),
+                          a: ({ href, children }) => (
+                            <a
+                              href={href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-academic-blue underline hover:text-academic-navy transition-colors"
+                            >
+                              {children}
+                            </a>
+                          ),
+                          hr: () => <hr className="border-slate-200 my-4" />,
+                        }}
+                      >
+                        {msg.text}
+                      </ReactMarkdown>
+                    )}
+                  </div>
+
+                  {msg.citations && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {msg.citations.map((cite, i) => (
+                        <button
+                          key={i}
+                          className="flex items-center gap-2 px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-[10px] font-bold text-academic-navy transition-all uppercase tracking-wide group"
+                        >
+                          <FileText className="w-3.5 h-3.5 text-academic-blue" />
+                          Reference: Page {cite.page}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+
+          {/* Animated typing indicator shown while AI is thinking */}
+          {(isLoading || isUploading) && (
+            <div className="flex gap-6 max-w-4xl">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-sm bg-academic-navy text-white">
+                <GraduationCap className="w-6 h-6" />
+              </div>
+              <div className="flex flex-col gap-2 items-start max-w-[85%]">
+                <div className="flex items-center gap-3 px-1">
+                  <span className="text-xs font-bold text-academic-navy uppercase tracking-wider">
+                    Research Assistant
+                  </span>
+                </div>
+                <div className="p-5 rounded-2xl bg-white border border-slate-200 rounded-tl-none shadow-sm flex flex-col gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="w-2 h-2 bg-academic-navy rounded-full animate-bounce"
+                      style={{ animationDelay: "0ms" }}
+                    />
+                    <span
+                      className="w-2 h-2 bg-academic-navy rounded-full animate-bounce"
+                      style={{ animationDelay: "150ms" }}
+                    />
+                    <span
+                      className="w-2 h-2 bg-academic-navy rounded-full animate-bounce"
+                      style={{ animationDelay: "300ms" }}
+                    />
+                  </div>
+                  {(loadingStatus || isUploading) && (
+                    <p className="text-[11px] text-slate-400 font-medium italic">
+                      {isUploading
+                        ? "Uploading and indexing new record..."
+                        : loadingStatus}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
-          ))}
-          <div className="h-20"></div>
+          )}
+
+          {/* Scroll anchor */}
+          <div ref={messagesEndRef} className="h-4" />
         </main>
 
         <div className="p-6 bg-white border-t border-slate-100 shrink-0">
@@ -312,7 +519,7 @@ export default function AIChatPage({
                     <button
                       onClick={() => {
                         setIsDropdownOpen(false);
-                        navigate('/library');
+                        navigate("/library");
                       }}
                       className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-xl transition-colors text-left"
                     >
@@ -322,7 +529,7 @@ export default function AIChatPage({
                     <button
                       onClick={() => {
                         setIsDropdownOpen(false);
-                        navigate('/upload');
+                        fileInputRef.current?.click();
                       }}
                       className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-xl transition-colors text-left"
                     >
@@ -331,24 +538,39 @@ export default function AIChatPage({
                     </button>
                   </div>
                 )}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept=".pdf"
+                  onChange={handleFileUpload}
+                />
               </div>
 
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyPress}
-                placeholder={activeDocId ? "Formulate your inquiry regarding the document..." : "Please upload a document first to start chatting."}
+                placeholder={
+                  activeDocId
+                    ? "Formulate your inquiry regarding the document..."
+                    : "Please upload a document first to start chatting."
+                }
                 disabled={!activeDocId || isLoading}
                 className="w-full max-h-32 min-h-[48px] bg-transparent border-none outline-none resize-none py-3 text-sm text-slate-700 placeholder:text-slate-400 font-medium"
                 rows={1}
               />
 
-              <button 
+              <button
                 onClick={handleSend}
                 disabled={!input.trim() || !activeDocId || isLoading}
                 className="p-3.5 bg-academic-navy text-white hover:bg-academic-blue rounded-xl transition-all shrink-0 shadow-lg shadow-academic-navy/20 active:scale-95 disabled:opacity-50"
               >
-                {isLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Send className="w-5 h-5" />}
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Send className="w-5 h-5" />
+                )}
               </button>
             </div>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] text-center mt-4">

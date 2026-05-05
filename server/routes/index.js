@@ -1,16 +1,15 @@
-import express from 'express';
-import * as testController from '../controllers/testController.js';
-import * as uploadController from '../controllers/uploadController.js';
-import * as chatController from '../controllers/chatController.js';
-import * as documentController from '../controllers/documentController.js';
-import { mockAuth } from '../middlewares/authMiddleware.js';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
+import express from "express";
+import * as uploadController from "../controllers/uploadController.js";
+import * as chatController from "../controllers/chatController.js";
+import * as documentController from "../controllers/documentController.js";
+import { mockAuth } from "../middlewares/authMiddleware.js";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
 const router = express.Router();
 
-const uploadDir = 'uploads';
+const uploadDir = "uploads";
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
@@ -21,27 +20,31 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
-  }
+  },
 });
 
-const upload = multer({ 
+const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
-    if (path.extname(file.originalname) !== '.pdf') {
-      return cb(new Error('Only PDFs are allowed'));
+    if (path.extname(file.originalname) !== ".pdf") {
+      return cb(new Error("Only PDFs are allowed"));
     }
     cb(null, true);
-  }
+  },
 });
 
-router.get('/', (req, res) => {
-  res.json({ success: true, message: 'Server is running! API v1' });
+router.get("/", (req, res) => {
+  res.json({ success: true, message: "Server is running👌." });
 });
 
-router.get('/test-db', testController.testDb);
-
-router.get('/documents', mockAuth, documentController.getDocuments);
-router.post('/upload', mockAuth, upload.single('file'), uploadController.uploadDocument);
-router.post('/chat', mockAuth, chatController.askAI);
+router.get("/documents", mockAuth, documentController.getDocuments);
+router.post(
+  "/upload",
+  mockAuth,
+  upload.single("file"),
+  uploadController.uploadDocument,
+);
+router.post("/chat", mockAuth, chatController.askAI);
+router.get("/chat/:documentId", mockAuth, chatController.getChatHistory);
 
 export default router;

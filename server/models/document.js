@@ -29,6 +29,10 @@ const DocumentSchema = new Schema({
     type: String,
     enum: ['pending', 'processing', 'completed', 'failed'],
     default: 'pending'
+  },
+  is_secondary: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

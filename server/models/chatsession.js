@@ -11,6 +11,10 @@ const ChatSessionSchema = new Schema({
     ref: 'Document',
     required: true
   },
+  additional_documents: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Document'
+  }],
   title: {
     type: String,
     required: true,
