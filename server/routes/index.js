@@ -2,6 +2,7 @@ import express from "express";
 import * as uploadController from "../controllers/uploadController.js";
 import * as chatController from "../controllers/chatController.js";
 import * as documentController from "../controllers/documentController.js";
+import * as questionController from "../controllers/questionController.js";
 import { mockAuth } from "../middlewares/authMiddleware.js";
 import multer from "multer";
 import path from "path";
@@ -46,5 +47,6 @@ router.post(
 );
 router.post("/chat", mockAuth, chatController.askAI);
 router.get("/chat/:documentId", mockAuth, chatController.getChatHistory);
-
+router.post("/questions/generate", mockAuth, questionController.generateQuestions);
+router.get("/questions/:documentId", mockAuth, questionController.getQuestions);
 export default router;

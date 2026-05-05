@@ -21,7 +21,7 @@ const QuestionSchema = new Schema({
     default: 'multiple_choice'
   },
   options: {
-    type: Schema.Types.Mixed,
+    type: [String],
     default: []
   },
   correct_answer: {
