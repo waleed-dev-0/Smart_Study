@@ -36,26 +36,14 @@ export default function SummaryResultsPage({ isAdmin }: { isAdmin?: boolean }) {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="hidden lg:flex items-center gap-2">
-              <button className="p-3 text-slate-400 hover:text-academic-navy hover:bg-slate-50 rounded-xl transition-all">
-                <Share2 className="w-5 h-5" />
-              </button>
-              <button className="p-3 text-slate-400 hover:text-academic-navy hover:bg-slate-50 rounded-xl transition-all">
-                <Download className="w-5 h-5" />
-              </button>
-            </div>
             <div className="h-10 w-px bg-slate-100 mx-2 hidden lg:block"></div>
-            <button 
-              onClick={() => navigate('/chat')}
-              className="flex items-center justify-center gap-3 bg-white border border-slate-200 text-academic-navy px-6 py-3.5 rounded-2xl text-sm font-bold hover:bg-slate-50 transition-all shadow-sm group"
-            >
+            <button onClick={() => navigate('/chat')}
+              className="flex items-center justify-center gap-3 bg-white border border-slate-200 text-academic-navy px-6 py-3.5 rounded-2xl text-sm font-bold hover:bg-slate-50 transition-all shadow-sm group">
               <MessageSquare className="w-5 h-5 text-academic-blue" />
               <span className="hidden sm:inline">Semantic Inquiry</span>
             </button>
-            <button 
-              onClick={() => navigate('/question-bank')}
-              className="flex items-center justify-center gap-3 bg-academic-navy text-white px-6 py-3.5 rounded-2xl text-sm font-bold hover:bg-academic-blue transition-all shadow-xl shadow-academic-navy/20"
-            >
+            <button onClick={() => navigate('/question-bank')}
+              className="flex items-center justify-center gap-3 bg-academic-navy text-white px-6 py-3.5 rounded-2xl text-sm font-bold hover:bg-academic-blue transition-all shadow-xl shadow-academic-navy/20">
               <Brain className="w-5 h-5" />
               <span className="hidden sm:inline">Evaluate Mastery</span>
             </button>
