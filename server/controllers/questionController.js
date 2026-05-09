@@ -4,7 +4,7 @@ import questionService from "../services/questionService.js";
 
 export const generateQuestions = async (req, res) => {
   try {
-    const { document_id, text, count = 5 } = req.body;
+    const { document_id, text, count = 10 } = req.body;
     const userId = req.user?._id;
 
     if (!userId) {
@@ -21,8 +21,8 @@ export const generateQuestions = async (req, res) => {
       });
     }
 
-    // Limit count to maximum 20 to avoid exceeding processing limits
-    const numQuestions = Math.min(Math.max(parseInt(count) || 5, 1), 20);
+   
+    const numQuestions = Math.min(Math.max(parseInt(count) || 10, 1), 20);
 
     const questions = await questionService.extractQuestionsFromText(text, numQuestions);
 

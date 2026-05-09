@@ -1,7 +1,7 @@
 import textProcessor from "./aiService.js";
 
 class QuestionService {
-  async extractQuestionsFromText(text, count = 5) {
+  async extractQuestionsFromText(text, count = 10) {
     const formatInstruction = `
 Create ${count} multiple choice questions from the following text.
 
