@@ -144,17 +144,24 @@ export default function DocumentLibraryPage({ isAdmin }: { isAdmin?: boolean }) 
                               </div>
 
 
-                              <div className="flex items-center justify-between pt-4 border-t border-academic-blue/10">
+                              <div className="flex items-center pt-4 border-t border-academic-blue/10">
 
-                                  <span className="flex items-center gap-2 text-sm text-academic-blue font-medium">
-                                    <HardDrive className="w-5 h-5" />
-                                      {formatSize(item.file_size_bytes)}
-                                  </span>
-                                  <button onClick={e=>{e.stopPropagation(); handleDelete(item._id);}}
-                                          className="p-2 rounded-xl text-red-500 hover:bg-red-100 hover:text-red-700 hover:scale-110 transition-all duration-200">
-                                      <Trash2 className="w-5 h-5" />
-                                  </button>
-                                  <ChevronRight className="w-6 h-6 text-academic-blue/60 group-hover:text-academic-blue transition-colors" />
+                                    <span className="flex items-center gap-2 text-sm text-academic-blue font-medium">
+                                        <HardDrive className="w-5 h-5" />
+                                        {formatSize(item.file_size_bytes)}
+                                    </span>
+
+                                  <div className="flex items-center gap-2 ml-auto">
+
+                                      <button onClick={e => {e.stopPropagation();handleDelete(item._id);}}
+                                          className="p-2 rounded-xl text-red-500 hover:bg-red-100 hover:text-red-700 hover:scale-110
+                                          transition-all duration-200">
+                                          <Trash2 className="w-5 h-5" />
+                                      </button>
+
+                                      <ChevronRight className="w-6 h-6 text-academic-blue/60 group-hover:text-academic-blue transition-colors" />
+                                  </div>
+
                               </div>
 
                           </div>
