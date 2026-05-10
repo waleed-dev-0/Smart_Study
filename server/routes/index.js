@@ -44,6 +44,7 @@ router.post(
   upload.single("file"),
   uploadController.uploadDocument,
 );
+router.delete("/documents/:id",mockAuth,documentController.deleteDocument)
 router.post("/chat", mockAuth, chatController.askAI);
 router.get("/chat/:documentId", mockAuth, chatController.getChatHistory);
 
