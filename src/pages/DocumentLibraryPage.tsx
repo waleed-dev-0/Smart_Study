@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState } from 'react';
 import Sidebar from "../components/Sidebar";
-import { Search, FileText, Calendar, HardDrive, ChevronRight, ArrowLeft, Library} from 'lucide-react';
+import { Search, FileText, Calendar, HardDrive, ChevronRight, ArrowLeft, Library,Trash2} from 'lucide-react';
 import {useEffect} from "react";
 
 export default function DocumentLibraryPage({ isAdmin }: { isAdmin?: boolean }) {
@@ -47,13 +47,32 @@ export default function DocumentLibraryPage({ isAdmin }: { isAdmin?: boolean }) 
         return (bytes / (1024 * 1024)).toFixed(2) + " MB";
     };
 
+    const handleDelete=async(id:string)=>{
+        try{
+            const res=await fetch(`http://localhost:5000/api/documents/${id}`,{
+                method:"DELETE",
+            })
+
+            const data = await res.json();
+            if(data.success){
+                const updatedItems=items.filter(item=>item._id !== id)
+                setItems(updatedItems);
+            }else{
+                alert("Failed to delete document");
+            }
+        }catch(error){
+            console.error("Delete error:",error);
+        }
+
+    }
+
   return (
     <div className="flex min-h-screen bg-academic-paper">
       <Sidebar currentScreen="dashboard" isAdmin={isAdmin} />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <header className="h-20 bg-white/80 backdrop-blur-md border-b border-academic-navy/5 flex items-center px-6 md:px-10 shrink-0 z-10 gap-6">
-          <button 
+          <button
             onClick={() => navigate('/dashboard')}
             className="p-3 bg-slate-50 hover:bg-academic-navy hover:text-white rounded-xl text-slate-500 transition-all shrink-0 hover:shadow-lg"
           >
@@ -67,21 +86,21 @@ export default function DocumentLibraryPage({ isAdmin }: { isAdmin?: boolean }) 
 
         <main className="flex-1 overflow-y-auto p-6 md:p-10 pb-24 md:pb-10">
           <div className="max-w-7xl mx-auto">
-            
+
             <div className="mb-12 flex flex-col sm:flex-row gap-6">
               <div className="relative flex-1">
                 <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
                   <Search className="w-5 h-5 text-slate-300" />
                 </div>
-                <input 
-                  type="text" 
-                  placeholder="Query source materials by nomenclature or classification..." 
+                <input
+                  type="text"
+                  placeholder="Query source materials by nomenclature or classification..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-14 pr-6 py-4.5 bg-white border border-slate-200 rounded-[1.5rem] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue shadow-xl shadow-academic-navy/5 transition-all font-medium"
                 />
               </div>
-              
+
               {/*<button className="flex items-center justify-center gap-3 px-8 py-4.5 bg-white border border-slate-200 text-academic-navy rounded-[1.5rem] font-bold hover:bg-slate-50 transition-all shadow-xl shadow-academic-navy/5 shrink-0 uppercase tracking-widest text-xs">*/}
               {/*  <Filter className="w-4 h-4" />*/}
               {/*  Parameter Filter*/}
@@ -135,7 +154,10 @@ export default function DocumentLibraryPage({ isAdmin }: { isAdmin?: boolean }) 
                                     <HardDrive className="w-5 h-5" />
                                       {formatSize(item.file_size_bytes)}
                                   </span>
-
+                                  <button onClick={e=>{e.stopPropagation(); handleDelete(item._id);}}
+                                          className="p-2 rounded-xl text-red-500 hover:bg-red-100 hover:text-red-700 hover:scale-110 transition-all duration-200">
+                                      <Trash2 className="w-5 h-5" />
+                                  </button>
                                   <ChevronRight className="w-6 h-6 text-academic-blue/60 group-hover:text-academic-blue transition-colors" />
                               </div>
 
@@ -151,7 +173,7 @@ export default function DocumentLibraryPage({ isAdmin }: { isAdmin?: boolean }) 
                 </div>
                 <h3 className="text-2xl font-serif font-bold text-academic-navy mb-2">No Records Found</h3>
                 <p className="text-slate-500 font-medium">Your search query did not correlate with any archives in this repository.</p>
-                <button 
+                <button
                   onClick={() => setSearchQuery('')}
                   className="mt-8 text-academic-blue font-bold uppercase tracking-widest text-xs hover:text-academic-navy transition-colors"
                 >

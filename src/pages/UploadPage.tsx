@@ -117,9 +117,9 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
                   
                   <label className="bg-academic-navy text-white px-10 py-4 rounded-2xl text-sm font-bold hover:bg-academic-blue transition-all shadow-xl shadow-academic-navy/20 cursor-pointer active:scale-95">
                     Browse Local Archive
-                    <input 
-                      type="file" 
-                      className="hidden" 
+                    <input
+                      type="file"
+                      className="hidden"
                       accept=".pdf,application/pdf"
                       onChange={handleFileChange}
                     />
