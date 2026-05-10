@@ -101,10 +101,6 @@ export default function DocumentLibraryPage({ isAdmin }: { isAdmin?: boolean }) 
                 />
               </div>
 
-              {/*<button className="flex items-center justify-center gap-3 px-8 py-4.5 bg-white border border-slate-200 text-academic-navy rounded-[1.5rem] font-bold hover:bg-slate-50 transition-all shadow-xl shadow-academic-navy/5 shrink-0 uppercase tracking-widest text-xs">*/}
-              {/*  <Filter className="w-4 h-4" />*/}
-              {/*  Parameter Filter*/}
-              {/*</button>*/}
             </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
