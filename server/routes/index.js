@@ -1,8 +1,9 @@
 import express from "express";
+import authRoutes from "./authRoutes.js";
 import * as uploadController from "../controllers/uploadController.js";
 import * as chatController from "../controllers/chatController.js";
 import * as documentController from "../controllers/documentController.js";
-import { mockAuth } from "../middlewares/authMiddleware.js";
+import { auth } from "../middlewares/authMiddleware.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -37,15 +38,17 @@ router.get("/", (req, res) => {
   res.json({ success: true, message: "Server is running👌." });
 });
 
-router.get("/documents", mockAuth, documentController.getDocuments);
+router.use("/auth", authRoutes);
+
+router.get("/documents", auth, documentController.getDocuments);
 router.post(
   "/upload",
-  mockAuth,
+  auth,
   upload.single("file"),
   uploadController.uploadDocument,
 );
-router.delete("/documents/:id",mockAuth,documentController.deleteDocument)
-router.post("/chat", mockAuth, chatController.askAI);
-router.get("/chat/:documentId", mockAuth, chatController.getChatHistory);
 
+router.post("/chat", auth, chatController.askAI);
+router.get("/chat/:documentId", auth, chatController.getChatHistory);
+router.delete("/documents/:id", auth, documentController.deleteDocument);
 export default router;

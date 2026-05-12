@@ -1,13 +1,36 @@
 import { useNavigate } from "react-router-dom";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { GraduationCap, Mail, Lock, ArrowRight } from "lucide-react";
+import { authService } from "../services/authService";
 
-export default function LoginPage({
-  
-}: {
-  
-}) {
+export default function LoginPage() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      await authService.login(email, password);
+      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "Failed to login");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-academic-paper flex">
       <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:flex-none lg:w-[560px] lg:px-16 xl:px-24 border-r border-slate-200 bg-white shadow-lg shadow-slate-200/30">
@@ -34,7 +57,13 @@ export default function LoginPage({
           </div>
 
           <div className="mt-10">
-            <div className="space-y-6">
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 font-medium">
+                {error}
+              </div>
+            )}
+            
+            <form onSubmit={handleLogin} className="space-y-6">
               <div>
                 <label
                   htmlFor="email"
@@ -51,6 +80,8 @@ export default function LoginPage({
                     name="email"
                     type="email"
                     required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
                     placeholder="scholar@university.edu"
                   />
@@ -73,6 +104,8 @@ export default function LoginPage({
                     name="password"
                     type="password"
                     required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
                     placeholder="••••••••"
                   />
@@ -107,14 +140,15 @@ export default function LoginPage({
 
               <div>
                 <button
-                  onClick={() => navigate('/dashboard')}
-                  className="w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-2xl shadow-xl text-lg font-bold text-white bg-academic-navy hover:bg-academic-blue transition-all hover:shadow-academic-navy/30 active:scale-[0.98]"
+                  type="submit"
+                  disabled={loading}
+                  className="w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-2xl shadow-xl text-lg font-bold text-white bg-academic-navy hover:bg-academic-blue transition-all hover:shadow-academic-navy/30 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  Enter Portal
-                  <ArrowRight className="w-5 h-5" />
+                  {loading ? "Authenticating..." : "Enter Portal"}
+                  {!loading && <ArrowRight className="w-5 h-5" />}
                 </button>
               </div>
-            </div>
+            </form>
 
             <p className="mt-10 text-center text-sm text-slate-500 font-medium">
               New Research Applicant?{" "}

@@ -460,7 +460,6 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
             ))
           )}
 
-          {/* Animated typing indicator shown while AI is thinking */}
           {(isLoading || isUploading) && (
             <div className="flex gap-6 max-w-4xl">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-sm bg-academic-navy text-white">
@@ -499,7 +498,6 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
             </div>
           )}
 
-          {/* Scroll anchor */}
           <div ref={messagesEndRef} className="h-4" />
         </main>
 

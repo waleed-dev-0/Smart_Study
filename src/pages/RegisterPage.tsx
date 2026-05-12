@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   GraduationCap,
   Mail,
@@ -11,9 +11,37 @@ import {
   BookOpen,
   Search,
 } from "lucide-react";
+import { authService } from "../services/authService";
 
-export default function RegisterPage({}: {}) {
+export default function RegisterPage() {
   const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      await authService.register(username, email, password);
+      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "Failed to register");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-academic-paper flex">
       <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:flex-none lg:w-[520px] lg:px-16 xl:px-24 border-r border-slate-200 bg-white py-12">
@@ -40,7 +68,12 @@ export default function RegisterPage({}: {}) {
           </div>
 
           <div className="mt-10">
-            <div className="space-y-6">
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 font-medium">
+                {error}
+              </div>
+            )}
+            <form onSubmit={handleRegister} className="space-y-6">
               <div>
                 <label
                   htmlFor="name"
@@ -57,6 +90,8 @@ export default function RegisterPage({}: {}) {
                     name="name"
                     type="text"
                     required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
                     placeholder="Alex Johnson"
                   />
@@ -79,6 +114,8 @@ export default function RegisterPage({}: {}) {
                     name="email"
                     type="email"
                     required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
                     placeholder="scholar@university.edu"
                   />
@@ -101,6 +138,8 @@ export default function RegisterPage({}: {}) {
                     name="password"
                     type="password"
                     required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-300 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
                     placeholder="••••••••"
                   />
@@ -137,14 +176,15 @@ export default function RegisterPage({}: {}) {
 
               <div>
                 <button
-                  onClick={() => navigate("/dashboard")}
-                  className="w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-2xl shadow-xl text-lg font-bold text-white bg-academic-navy hover:bg-academic-blue transition-all hover:shadow-academic-navy/30 active:scale-[0.98]"
+                  type="submit"
+                  disabled={loading}
+                  className="w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-2xl shadow-xl text-lg font-bold text-white bg-academic-navy hover:bg-academic-blue transition-all hover:shadow-academic-navy/30 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  Confirm Registration
-                  <ArrowRight className="w-5 h-5" />
+                  {loading ? "Registering..." : "Confirm Registration"}
+                  {!loading && <ArrowRight className="w-5 h-5" />}
                 </button>
               </div>
-            </div>
+            </form>
 
             <p className="mt-10 text-center text-sm text-slate-500 font-medium">
               Already have an account?{" "}

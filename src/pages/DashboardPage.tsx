@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import api from "../services/api";
 import {
   Search,
   Upload,
@@ -19,40 +20,38 @@ import {
 export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
   const navigate = useNavigate();
 
-    const [items, setItems] = useState<Item[]>([]);
-    type Item = {
-        _id: string;
-        title: string;
-        file_path: string;
-        file_size_bytes?: number;
-        file_format?: string;
-        page_count?: number;
-        processing_status?: string;
-        is_secondary?: boolean;
-        createdAt:string;
-        updatedAt:string;
-    };
+  const [items, setItems] = useState<Item[]>([]);
+  type Item = {
+    _id: string;
+    title: string;
+    file_path: string;
+    file_size_bytes?: number;
+    file_format?: string;
+    page_count?: number;
+    processing_status?: string;
+    is_secondary?: boolean;
+    createdAt: string;
+    updatedAt: string;
+  };
 
-    useEffect(() => {
-        fetch("http://localhost:5000/api/documents")
-            .then(res => res.json())
-            .then((json) => {
-                setItems(json.data);
+  useEffect(() => {
+    api.get("/documents")
+      .then((res) => {
+        setItems(res.data.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
 
-            })
-            .catch(err => {
-                console.error(err);
-            });
-    }, []);
-
-    let Count=0;
-    items.forEach(items=>{
-        Count++;
-    })
-    const formatSize = (bytes?: number) => {
-        if (!bytes) return "0 MB";
-        return (bytes / (1024 * 1024)).toFixed(2) + " MB";
-    };
+  let Count = 0;
+  items.forEach((items) => {
+    Count++;
+  });
+  const formatSize = (bytes?: number) => {
+    if (!bytes) return "0 MB";
+    return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+  };
 
   return (
     <div className="flex min-h-screen bg-academic-paper">
@@ -60,8 +59,7 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <header className="h-20 bg-white/80 backdrop-blur-md border-b border-academic-navy/5 flex items-center justify-between px-6 md:px-10 shrink-0 z-10">
-
-            <div className="flex items-center gap-8 ml-auto">
+          <div className="flex items-center gap-8 ml-auto">
             <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-bold text-academic-navy leading-tight">
@@ -98,20 +96,23 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
                   archive.
                 </p>
               </div>
-              <button onClick={() => navigate("/upload")} className="w-full sm:w-auto flex items-center justify-center gap-3 bg-academic-navy text-white px-8 py-4 rounded-2xl text-sm font-bold hover:bg-academic-blue transition-all shadow-xl shadow-academic-navy/20 hover:-translate-y-1 active:translate-y-0">
+              <button
+                onClick={() => navigate("/upload")}
+                className="w-full sm:w-auto flex items-center justify-center gap-3 bg-academic-navy text-white px-8 py-4 rounded-2xl text-sm font-bold hover:bg-academic-blue transition-all shadow-xl shadow-academic-navy/20 hover:-translate-y-1 active:translate-y-0"
+              >
                 <Upload className="w-5 h-5 stroke-[2.5]" />
                 Archive New Source
               </button>
             </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 mb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 mb-12">
               <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 flex items-center gap-6 group hover:border-academic-blue/20 transition-all">
                 <div className="w-16 h-16 bg-academic-blue/5 text-academic-blue rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform border border-academic-blue/10">
                   <Library className="w-8 h-8" />
                 </div>
                 <div>
                   <p className="text-3xl font-serif font-bold text-academic-navy leading-none mb-1">
-                      {Count}
+                    {Count}
                   </p>
                   <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">
                     Digital Curricula
@@ -148,30 +149,41 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {items.slice(0,4).map((item: Item) => (
+              {items.slice(0, 4).map((item: Item) => (
                 <div
                   key={item._id}
-                  onClick={() => item.processing_status === "completed" && navigate("/summary")}
+                  onClick={() =>
+                    item.processing_status === "completed" &&
+                    navigate("/summary")
+                  }
                   className={`bg-white rounded-[2rem] border border-slate-100 p-7 transition-all group flex flex-col h-full relative overflow-hidden 
                   shadow-sm hover:shadow-2xl hover:shadow-academic-navy/5 hover:border-academic-blue/10 
-                  ${item.processing_status === "completed"
+                  ${
+                    item.processing_status === "completed"
                       ? "cursor-pointer hover:-translate-y-2"
-                      : "opacity-80 cursor-not-allowed"}`}>
-
+                      : "opacity-80 cursor-not-allowed"
+                  }`}
+                >
                   <div className="flex items-start gap-4 mb-6">
                     <div
                       className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border transition-all ${
                         item.processing_status === "completed"
                           ? "bg-academic-blue/5 text-academic-blue border-academic-blue/10 group-hover:bg-academic-navy group-hover:text-white"
                           : "bg-academic-gold/5 text-academic-gold border-academic-gold/10"
-                      }`}>
+                      }`}
+                    >
                       <FileText className="w-7 h-7" />
                     </div>
                     <div className="flex-1 min-w-0 pt-0.5">
-                      <h3 className={`text-lg font-serif font-bold truncate transition-colors leading-tight 
-                      ${item.processing_status === "completed"
-                            ? "text-academic-navy group-hover:text-academic-blue"
-                            : "text-slate-700"}`} title={item.title}>
+                      <h3
+                        className={`text-lg font-serif font-bold truncate transition-colors leading-tight 
+                      ${
+                        item.processing_status === "completed"
+                          ? "text-academic-navy group-hover:text-academic-blue"
+                          : "text-slate-700"
+                      }`}
+                        title={item.title}
+                      >
                         {item.title}
                       </h3>
                     </div>
@@ -181,15 +193,16 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
                     <div className="pt-6 border-t border-slate-50 flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">
                       <span className="flex items-center gap-1.5">
                         <Calendar className="w-3 h-3 text-slate-300" />
-                          Uploaded: {new Date(item.createdAt).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "short",
-                            day: "2-digit"
+                        Uploaded:{" "}
+                        {new Date(item.createdAt).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "2-digit",
                         })}
                       </span>
                       <span className="flex items-center gap-1.5">
                         <HardDrive className="w-3 h-3 text-slate-300" />
-                          {formatSize(item.file_size_bytes)}
+                        {formatSize(item.file_size_bytes)}
                       </span>
                     </div>
 
@@ -212,7 +225,7 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
                         )}
                       </div>
 
-                      {item.processing_status === "Completed" && (
+                      {item.processing_status === "completed" && (
                         <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-academic-blue/10 transition-colors">
                           <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-academic-blue transition-colors" />
                         </div>

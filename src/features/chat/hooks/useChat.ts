@@ -1,7 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../../../services/api";
 
-const API_URL = "http://localhost:5000/api";
 const REQUEST_TIMEOUT_MS = 60_000;
 
 export interface Message {
@@ -50,8 +49,8 @@ export const useChat = () => {
     );
 
     try {
-      const response = await axios.post(
-        `${API_URL}/chat`,
+      const response = await api.post(
+        "/chat",
         { query, documentId, provider },
         { timeout: REQUEST_TIMEOUT_MS },
       );
@@ -117,7 +116,7 @@ export const useChat = () => {
     if (!documentId) return;
     setIsFetchingHistory(true);
     try {
-      const response = await axios.get(`${API_URL}/chat/${documentId}`, {
+      const response = await api.get(`/chat/${documentId}`, {
         timeout: 10000,
       });
       if (response.data?.success && response.data.data?.length > 0) {

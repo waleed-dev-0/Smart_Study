@@ -1,8 +1,21 @@
-export const mockAuth = (req, res, next) => {
-  req.user = {
-    _id: "aaaaaaaaaaaaaaaaaaaaaaaa",
-    username: "test_account",
-    email: "test@gmail.com",
-  };
-  next();
+import jwt from "jsonwebtoken";
+import User from "../models/user.js";
+
+export const auth = async (req, res, next) => {
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    try {
+      token = req.headers.authorization.split(" ")[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || "default_secret_key");
+      req.user = await User.findById(decoded.id).select("-password_hash");
+      next();
+    } catch (error) {
+      console.error(error);
+      res.status(401).json({ success: false, message: "Not authorized, token failed" });
+    }
+  }
+
+  if (!token) {
+    res.status(401).json({ success: false, message: "Not authorized, no token" });
+  }
 };
