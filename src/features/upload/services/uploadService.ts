@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5000/api';
+import api from "../../../services/api";
 
 export const uploadFile = async (file: File, parentId?: string) => {
   const formData = new FormData();
@@ -10,7 +8,7 @@ export const uploadFile = async (file: File, parentId?: string) => {
   }
 
   try {
-    const response = await axios.post(`${API_URL}/upload`, formData, {
+    const response = await api.post('/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -24,7 +22,7 @@ export const uploadFile = async (file: File, parentId?: string) => {
 
 export const fetchDocuments = async () => {
   try {
-    const response = await axios.get(`${API_URL}/documents`);
+    const response = await api.get('/documents');
     return response.data;
   } catch (error: any) {
     console.error('Fetch documents error:', error);

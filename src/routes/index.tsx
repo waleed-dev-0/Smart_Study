@@ -5,6 +5,8 @@ import LandingPage from '../pages/LandingPage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
+import UpdatePasswordPage from '../pages/UpdatePasswordPage';
+import ProtectedRoute from '../components/ProtectedRoute';
 import DashboardPage from '../pages/DashboardPage';
 import UploadPage from '../pages/UploadPage';
 import DocumentLibraryPage from '../pages/DocumentLibraryPage';
@@ -25,15 +27,16 @@ export default function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/dashboard" element={<DashboardPage isAdmin={isAdmin} />} />
-        <Route path="/upload" element={<UploadPage isAdmin={isAdmin} />} />
-        <Route path="/library" element={<DocumentLibraryPage isAdmin={isAdmin} />} />
-        <Route path="/summary" element={<SummaryResultsPage isAdmin={isAdmin} />} />
-        <Route path="/question-bank" element={<QuestionBankPage isAdmin={isAdmin} />} />
-        <Route path="/chat" element={<AIChatPage isAdmin={isAdmin} />} />
-        <Route path="/settings" element={<SettingsPage isAdmin={isAdmin} />} />
-        <Route path="/about" element={<AboutUsPage isAdmin={isAdmin} />} />
-        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/update-password/:token" element={<UpdatePasswordPage />} />
+        <Route path="/dashboard" element={<ProtectedRoute><DashboardPage isAdmin={isAdmin} /></ProtectedRoute>} />
+        <Route path="/upload" element={<ProtectedRoute><UploadPage isAdmin={isAdmin} /></ProtectedRoute>} />
+        <Route path="/library" element={<ProtectedRoute><DocumentLibraryPage isAdmin={isAdmin} /></ProtectedRoute>} />
+        <Route path="/summary" element={<ProtectedRoute><SummaryResultsPage isAdmin={isAdmin} /></ProtectedRoute>} />
+        <Route path="/question-bank" element={<ProtectedRoute><QuestionBankPage isAdmin={isAdmin} /></ProtectedRoute>} />
+        <Route path="/chat" element={<ProtectedRoute><AIChatPage isAdmin={isAdmin} /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><SettingsPage isAdmin={isAdmin} /></ProtectedRoute>} />
+        <Route path="/about" element={<ProtectedRoute><AboutUsPage isAdmin={isAdmin} /></ProtectedRoute>} />
+        <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

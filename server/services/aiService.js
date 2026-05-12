@@ -1,8 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
 import axios from "axios";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const OPENROUTER_TIMEOUT = 45000;
 const OPENROUTER_CHAT_MODEL = "openrouter/free";

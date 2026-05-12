@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState } from 'react';
 import Sidebar from "../components/Sidebar";
+import api from "../services/api";
 import { Search, FileText, Calendar, HardDrive, ChevronRight, ArrowLeft, Library} from 'lucide-react';
 import {useEffect} from "react";
 
@@ -25,11 +26,9 @@ export default function DocumentLibraryPage({ isAdmin }: { isAdmin?: boolean }) 
 
 
     useEffect(() => {
-        fetch("http://localhost:5000/api/documents")
-            .then(res => res.json())
-            .then((json) => {
-                setItems(json.data);
-
+        api.get("/documents")
+            .then((res) => {
+                setItems(res.data.data);
             })
             .catch(err => {
                 console.error(err);
