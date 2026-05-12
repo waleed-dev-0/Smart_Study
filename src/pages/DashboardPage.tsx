@@ -120,19 +120,19 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
                 </div>
               </div>
 
-              <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 flex items-center gap-6 group hover:border-academic-gold/20 transition-all">
-                <div className="w-16 h-16 bg-academic-gold/5 text-academic-gold rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform border border-academic-gold/10">
-                  <BookOpen className="w-8 h-8" />
-                </div>
-                <div>
-                  <p className="text-3xl font-serif font-bold text-academic-navy leading-none mb-1">
-                    8
-                  </p>
-                  <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">
-                    Technical Syntheses
-                  </p>
-                </div>
-              </div>
+              {/*<div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 flex items-center gap-6 group hover:border-academic-gold/20 transition-all">*/}
+              {/*  <div className="w-16 h-16 bg-academic-gold/5 text-academic-gold rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform border border-academic-gold/10">*/}
+              {/*    <BookOpen className="w-8 h-8" />*/}
+              {/*  </div>*/}
+              {/*  /!*<div>*!/*/}
+              {/*  /!*  <p className="text-3xl font-serif font-bold text-academic-navy leading-none mb-1">*!/*/}
+              {/*  /!*    8*!/*/}
+              {/*  /!*  </p>*!/*/}
+              {/*  /!*  <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">*!/*/}
+              {/*  /!*    Technical Syntheses*!/*/}
+              {/*  /!*  </p>*!/*/}
+              {/*  /!*</div>*!/*/}
+              {/*</div>*/}
             </div>
 
             <div className="flex items-center justify-between mb-8">

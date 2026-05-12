@@ -49,5 +49,8 @@ router.post(
 );
 router.post("/chat", auth, chatController.askAI);
 router.get("/chat/:documentId", auth, chatController.getChatHistory);
+router.delete("/documents/:id", mockAuth, documentController.deleteDocument)
+router.post("/chat", mockAuth, chatController.askAI);
+router.get("/chat/:documentId", mockAuth, chatController.getChatHistory);
 
 export default router;
