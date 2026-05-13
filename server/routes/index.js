@@ -7,6 +7,7 @@ import { auth } from "../middlewares/authMiddleware.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import questionRoutes from "./questionRoutes.js";
 
 const router = express.Router();
 
@@ -51,4 +52,5 @@ router.post(
 router.post("/chat", auth, chatController.askAI);
 router.get("/chat/:documentId", auth, chatController.getChatHistory);
 router.delete("/documents/:id", auth, documentController.deleteDocument);
+router.use("/questions", questionRoutes);
 export default router;

@@ -27,6 +27,7 @@ import {
   fetchDocuments,
   uploadFile,
 } from "../features/upload/services/uploadService";
+import FloatingActionButton from "../components/FloatingActionButton";
 
 export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   const navigate = useNavigate();
@@ -613,6 +614,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
           </div>
         </div>
       </div>
+      <FloatingActionButton activeDocId={activeDocId} />
     </div>
   );
 }

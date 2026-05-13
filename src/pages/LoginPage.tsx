@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
 import { GraduationCap, Mail, Lock, ArrowRight } from "lucide-react";
 import { authService } from "../services/authService";
 
@@ -16,7 +16,7 @@ export default function LoginPage() {
     }
   }, [navigate]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
