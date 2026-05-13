@@ -61,6 +61,9 @@ export default function DocumentLibraryPage({
     try {
       const res = await fetch(`http://localhost:5000/api/documents/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
 
       const data = await res.json();

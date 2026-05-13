@@ -32,6 +32,61 @@ export const askAI = async (req, res) => {
   }
 };
 
+export const askAIStream = async (req, res) => {
+  try {
+    const { query, documentId, provider } = req.body;
+    const userId = req.user?._id;
+
+    if (!query || !documentId) {
+      return res.status(400).json({
+        success: false,
+        message: "Query and Document ID are required",
+      });
+    }
+
+    const { stream, sources, saveMessage } =
+      await chatService.askQuestionStream(
+        query,
+        documentId,
+        userId,
+        provider,
+      );
+
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    });
+
+    res.write(`data: ${JSON.stringify({ sources })}\n\n`);
+
+    let fullContent = "";
+    for await (const part of stream) {
+      const token = part.message?.content || "";
+      if (token) {
+        fullContent += token;
+        res.write(`data: ${JSON.stringify({ token })}\n\n`);
+      }
+    }
+
+    await saveMessage(fullContent);
+    res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+    res.end();
+  } catch (error) {
+    if (!res.headersSent) {
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      });
+    }
+    res.write(
+      `data: ${JSON.stringify({ error: error.message })}\n\n`,
+    );
+    res.end();
+  }
+};
+
 export const getChatHistory = async (req, res) => {
   try {
     const { documentId } = req.params;

@@ -50,6 +50,7 @@ router.post(
 );
 
 router.post("/chat", auth, chatController.askAI);
+router.post("/chat/stream", auth, chatController.askAIStream);
 router.get("/chat/:documentId", auth, chatController.getChatHistory);
 router.delete("/documents/:id", auth, documentController.deleteDocument);
 router.use("/questions", questionRoutes);
