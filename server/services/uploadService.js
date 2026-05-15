@@ -64,7 +64,7 @@ class UploadService {
         file_path: filePath,
         file_size_bytes: stats.size,
         file_format: "pdf",
-        page_count: data.total || 0,
+        page_count: data.numpages || 0,
         processing_status: "processing",
       });
 

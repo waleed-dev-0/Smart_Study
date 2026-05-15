@@ -149,9 +149,9 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
       } else {
         await fetchHistory(activeDocId);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("File upload failed", err);
-      alert("Failed to upload document. Please ensure it is a valid PDF.");
+      alert(err.message || "Failed to upload document. Please ensure it is a valid PDF.");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";

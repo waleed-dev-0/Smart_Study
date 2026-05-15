@@ -7,18 +7,12 @@ export const uploadFile = async (file: File, parentId?: string) => {
     formData.append('parentId', parentId);
   }
 
-  try {
-    const response = await api.post('/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data;
-  } catch (error: any) {
-    console.error('Upload error:', error);
-    throw new Error(error.response?.data?.message || 'Failed to upload file');
-  }
+  const response = await api.post('/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
 };
+
 
 export const fetchDocuments = async () => {
   try {
