@@ -106,7 +106,7 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
         <main className="flex-1 overflow-y-auto p-6 md:p-10 pb-24 md:pb-10 flex items-center justify-center">
           <div className="w-full max-w-3xl">
             <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-academic-navy/5 p-8 md:p-14 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-academic-navy via-academic-blue to-academic-gold opacity-30"></div>
+              <div className="absolute top-0 start-0 w-full h-1.5 bg-gradient-to-r from-academic-navy via-academic-blue to-academic-gold opacity-30"></div>
 
               <div className="text-center mb-12">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-academic-blue/5 rounded-full mb-6">
@@ -233,7 +233,7 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
                           className="h-full bg-academic-navy rounded-full transition-all duration-300 relative"
                           style={{ width: `${uploadProgress}%` }}
                         >
-                          <div className="absolute top-0 right-0 w-8 h-full bg-white/20 skew-x-12 animate-pulse"></div>
+                          <div className="absolute top-0 end-0 w-8 h-full bg-white/20 skew-x-12 animate-pulse"></div>
                         </div>
                       </div>
                     </div>

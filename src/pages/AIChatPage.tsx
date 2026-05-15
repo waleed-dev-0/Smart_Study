@@ -15,7 +15,8 @@ import {
   Plus,
   Upload,
 } from "lucide-react";
-import { useChat, FREE_WELCOME_MESSAGE } from "../features/chat/hooks/useChat";
+import { useAppContext } from "../context/AppContext";
+import { useChat, getFreeWelcomeMessage } from "../features/chat/hooks/useChat";
 import {
   fetchDocuments,
   uploadFile,
@@ -30,6 +31,7 @@ import FloatingActionButton from "../components/FloatingActionButton";
 
 export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   const navigate = useNavigate();
+  const { isArabic } = useAppContext();
   const location = useLocation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -44,7 +46,44 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
     fetchHistory,
     clearMessages,
     setInitialMessages,
-  } = useChat();
+  } = useChat(isArabic);
+
+  const t = {
+    chatHistory: isArabic ? "سجل المحادثة" : "Chat history",
+    activeAnalysis: isArabic ? "تحليل نشط" : "Active Analysis",
+    indexed: isArabic ? "مفهرس" : "Indexed",
+    noDocs: isArabic ? "لم تتم فهرسة مستندات بعد." : "No documents indexed yet.",
+    uploadNow: isArabic ? "ارفع الآن" : "Upload Now",
+    researchAssistant: isArabic ? "مساعد البحث" : "Research Assistant",
+    analysis: isArabic ? "التحليل:" : "Analysis:",
+    selectDoc: isArabic ? "اختر مستنداً" : "Select a document",
+    evaluations: isArabic ? "التقييمات" : "Evaluations",
+    academicSession: isArabic ? "الجلسة الأكاديمية" : "Academic Session",
+    scholar: isArabic ? "الطالب" : "Scholar",
+    referencePage: isArabic ? "المرجع: صفحة" : "Reference: Page",
+    uploadingIndexing: isArabic ? "جاري رفع وفهرسة السجل الجديد..." : "Uploading and indexing new record...",
+    academicArchive: isArabic ? "الأرشيف الأكاديمي" : "Academic Archive",
+    indexNewRecord: isArabic ? "فهرسة سجل جديد" : "Index New Record",
+    inputPlaceholderDoc: isArabic ? "صُغ استفسارك بخصوص المستند..." : "Formulate your inquiry regarding the document...",
+    inputPlaceholderNoDoc: isArabic ? "يرجى رفع مستند أولاً لبدء المحادثة." : "Please upload a document first to start chatting.",
+    autoAnalysisMsg: isArabic ? "تحليل آلي. يخضع للتدقيق الأكاديمي." : "Automated analysis. Subject to academic verification.",
+    evaluationsTitle: isArabic ? "التقييمات الأكاديمية" : "Academic Evaluations",
+    reviewResults: isArabic ? "مراجعة النتائج" : "Review Results",
+    freeChat: isArabic ? "المحادثة الحرة" : "Free Chat",
+    freeChatSubtitle: isArabic ? "اسألني أي شيء، أو ارفع مستنداً لتحليله" : "Ask me anything, or upload a document to analyze",
+    newChat: isArabic ? "محادثة جديدة" : "New Chat",
+    uploadDocument: isArabic ? "رفع مستند" : "Upload document",
+    docAlreadyIndexed: isArabic ? "المستند موجود مسبقاً" : "Document Already Indexed",
+    duplicateMsg: isArabic ? "هذا الملف موجود بالفعل في أرشيفك. هل تريد رفع نسخة مكررة؟" : "This file already exists in your archive. Upload a duplicate copy anyway?",
+    cancel: isArabic ? "إلغاء" : "Cancel",
+    uploadAnyway: isArabic ? "رفع على أي حال" : "Upload Anyway",
+    clickToRename: isArabic ? "انقر لإعادة التسمية" : "Click to rename",
+    failedDelete: isArabic ? "فشل في حذف المستند" : "Failed to delete document",
+    failedUpload: isArabic ? "فشل رفع المستند. يرجى التأكد من أنه PDF صالح." : "Failed to upload document. Please ensure it is a valid PDF.",
+    freeChatSession: isArabic ? "محادثة حرة" : "Free Chat",
+    failedUploadGeneric: isArabic ? "فشل رفع المستند." : "Failed to upload document.",
+    failedRename: isArabic ? "فشل إعادة التسمية" : "Failed to rename",
+  };
 
   const [provider, setProvider] = useState<"gemini" | "ollama">("gemini");
   const [documents, setDocuments] = useState<any[]>([]);
@@ -119,7 +158,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   const handleNewChat = () => {
     const id = `free-${Date.now()}`;
     setCurrentFreeChatId(id);
-    setInitialMessages([FREE_WELCOME_MESSAGE]);
+    setInitialMessages([getFreeWelcomeMessage(isArabic)]);
     setActiveDocId(null);
     localStorage.removeItem("activeDocumentId");
     setIsFreeChat(true);
@@ -133,7 +172,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
           return [
             {
               id: currentFreeChatId,
-              title: `Free Chat ${new Date().toLocaleDateString()}`,
+              title: `${t.freeChatSession} ${new Date().toLocaleDateString(isArabic ? "ar-EG" : "en-US")}`,
               messages,
               createdAt: new Date().toISOString(),
             },
@@ -151,7 +190,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
     const session = freeChatSessions.find((s: any) => s.id === sessionId);
     if (session) {
       setCurrentFreeChatId(sessionId);
-      setInitialMessages(session.messages || [FREE_WELCOME_MESSAGE]);
+      setInitialMessages(session.messages || [getFreeWelcomeMessage(isArabic)]);
       setActiveDocId(null);
       localStorage.removeItem("activeDocumentId");
       setIsFreeChat(true);
@@ -179,7 +218,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
       }
     } catch (err: any) {
       console.error("Delete failed", err);
-      alert(err.response?.data?.message || err.message || "Failed to delete document");
+      alert(err.response?.data?.message || err.message || t.failedDelete);
     }
   };
 
@@ -206,7 +245,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
         setDuplicateFile(file);
       } else {
         console.error("File upload failed", err);
-        alert("Failed to upload document. Please ensure it is a valid PDF.");
+        alert(t.failedUpload);
       }
     } finally {
       setIsUploading(false);
@@ -222,7 +261,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
       await loadDocs();
     } catch (err) {
       console.error("Force upload failed", err);
-      alert("Failed to upload document.");
+      alert(t.failedUploadGeneric);
     } finally {
       setIsUploading(false);
     }
@@ -257,7 +296,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
       }
     } catch (err: any) {
       console.error("Header rename failed", err);
-      alert(err.response?.data?.message || err.message || "Failed to rename");
+      alert(err.response?.data?.message || err.message || t.failedRename);
     }
     setHeaderRenameDocId(null);
   };
@@ -297,16 +336,16 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
               <div className="min-w-0">
                 <h1 className="text-lg font-serif font-bold text-academic-navy leading-tight flex items-center gap-2 truncate">
                   <span className="truncate">
-                    {isFreeChat ? "Free Chat" : "Research Assistant"}
+                    {isFreeChat ? t.freeChat : t.researchAssistant}
                   </span>
                 </h1>
                 {isFreeChat ? (
                   <p className="text-xs text-slate-500 font-medium">
-                    Ask me anything, or upload a document to analyze
+                    {t.freeChatSubtitle}
                   </p>
                 ) : (
                   <p className="text-xs text-slate-500 flex items-center gap-1 truncate font-medium">
-                    Analysis:{" "}
+                    {t.analysis}{" "}
                     {headerRenameDocId === activeDocId && activeDocId ? (
                       <span className="flex items-center gap-1 min-w-0">
                         <input
@@ -336,11 +375,11 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
                       <button
                         onClick={handleHeaderRenameStart}
                         className="text-academic-blue truncate hover:bg-accent-blue/10 rounded px-1 -mx-1 transition-colors flex items-center gap-1"
-                        title="Click to rename"
+                        title={t.clickToRename}
                       >
                         <span className="truncate">
                           {documents.find((d) => d._id === activeDocId)?.title ||
-                            "Select a document"}
+                            t.selectDoc}
                         </span>
                         <Pencil className="w-3 h-3 shrink-0 opacity-50" />
                       </button>
@@ -361,13 +400,13 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
               }`}
             >
               <Plus className="w-4 h-4" />
-              New Chat
+              {t.newChat}
             </button>
 
             <button
               onClick={() => navigate("/upload")}
               className="p-2 text-slate-400 hover:text-academic-navy hover:bg-slate-50 rounded-xl transition-colors border border-slate-200"
-              title="Upload document"
+              title={t.uploadDocument}
             >
               <Upload className="w-4 h-4" />
             </button>
@@ -389,6 +428,14 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
               </button>
             </div>
 
+            <button
+              onClick={() => setIsQuizzesOpen(true)}
+              className="px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-academic-navy transition-all flex items-center gap-2"
+            >
+              <BookOpen className="w-4 h-4" />
+              <span className="hidden md:inline">{t.evaluations}</span>
+            </button>
+
             <button className="p-2 text-slate-400 hover:text-academic-navy hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-100">
               <MoreHorizontal className="w-5 h-5" />
             </button>
@@ -398,8 +445,8 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
         <main className="flex-1 overflow-y-auto p-6 flex flex-col gap-8 scroll-smooth">
           <div className="text-center my-6">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] bg-slate-50 px-4 py-1.5 rounded-full border border-slate-100">
-              Academic Session •{" "}
-              {new Date().toLocaleDateString("en-US", {
+              {t.academicSession} •{" "}
+              {new Date().toLocaleDateString(isArabic ? "ar-EG" : "en-US", {
                 month: "long",
                 year: "numeric",
               })}
@@ -437,33 +484,34 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
                 <Copy className="w-8 h-8 text-amber-500" />
               </div>
               <h3 className="text-xl font-serif font-bold text-amber-900 mb-2">
-                Document Already Indexed
+                {t.docAlreadyIndexed}
               </h3>
               <p className="text-sm text-amber-700 mb-1">
                 <strong className="text-amber-900">{duplicateFile.name}</strong>
               </p>
               <p className="text-xs text-amber-600/80 mb-6">
-                This file already exists in your archive. Upload a duplicate
-                copy anyway?
+                {t.duplicateMsg}
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setDuplicateFile(null)}
                   className="flex-1 bg-white border border-amber-200 text-amber-700 px-6 py-3 rounded-xl text-sm font-bold hover:bg-amber-50 transition-all"
                 >
-                  Cancel
+                  {t.cancel}
                 </button>
                 <button
                   onClick={handleForceUpload}
                   className="flex-1 bg-amber-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-amber-700 transition-all shadow-md shadow-amber-600/20"
                 >
-                  Upload Anyway
+                  {t.uploadAnyway}
                 </button>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      <QuizPanel isOpen={isQuizzesOpen} onClose={() => setIsQuizzesOpen(false)} />
 
       <FloatingActionButton activeDocId={activeDocId} />
     </div>

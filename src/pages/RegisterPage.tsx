@@ -82,7 +82,7 @@ export default function RegisterPage() {
                   Full Name
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
                     <User className="h-5 w-5 text-slate-300" />
                   </div>
                   <input
@@ -92,7 +92,7 @@ export default function RegisterPage() {
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
+                    className="block w-full ps-12 pe-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
                     placeholder="Alex Johnson"
                   />
                 </div>
@@ -106,7 +106,7 @@ export default function RegisterPage() {
                   Email
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
                     <Mail className="h-5 w-5 text-slate-300" />
                   </div>
                   <input
@@ -116,7 +116,7 @@ export default function RegisterPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
+                    className="block w-full ps-12 pe-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
                     placeholder="scholar@university.edu"
                   />
                 </div>
@@ -130,7 +130,7 @@ export default function RegisterPage() {
                   Password
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-slate-300" />
                   </div>
                   <input
@@ -140,7 +140,7 @@ export default function RegisterPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-300 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
+                    className="block w-full ps-12 pe-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-300 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
                     placeholder="••••••••"
                   />
                 </div>
@@ -155,7 +155,7 @@ export default function RegisterPage() {
                 />
                 <label
                   htmlFor="terms"
-                  className="ml-2 block text-xs text-slate-500 font-medium"
+                  className="ms-2 block text-xs text-slate-500 font-medium"
                 >
                   I agree to the{" "}
                   <a
@@ -201,7 +201,7 @@ export default function RegisterPage() {
 
       <div className="hidden lg:block relative w-0 flex-1 bg-slate-50 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white to-slate-100" />
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-academic-navy via-academic-blue to-academic-gold opacity-50"></div>
+        <div className="absolute top-0 start-0 w-full h-1 bg-gradient-to-r from-academic-navy via-academic-blue to-academic-gold opacity-50"></div>
 
         <div className="absolute inset-0 flex flex-col justify-center px-16 xl:px-24">
           <div className="max-w-xl">

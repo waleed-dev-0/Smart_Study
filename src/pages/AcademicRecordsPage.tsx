@@ -3,11 +3,26 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from "../components/Sidebar";
 import { ArrowLeft, GraduationCap, ShieldCheck, Calendar, BookOpen, Target, ChevronRight, Award, Trophy, Loader2 } from 'lucide-react';
 import api from "../services/api";
+import { useAppContext } from "../context/AppContext";
 
 export default function AcademicRecordsPage({ isAdmin }: { isAdmin?: boolean }) {
   const navigate = useNavigate();
+  const { isArabic } = useAppContext();
   const [attempts, setAttempts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const t = {
+    title: isArabic ? "ملف الإنجاز الأكاديمي" : "Academic Achievement Dossier",
+    subtitle: isArabic ? "تحليلات الأداء" : "Performance Analytics",
+    retrieving: isArabic ? "جاري استرداد السجلات..." : "Retrieving Records...",
+    noEvaluations: isArabic ? "لم يتم العثور على تقييمات" : "No Evaluations Found",
+    noEvaluationsDesc: isArabic ? "أكمل تقييمك العلمي الأول للبدء في تتبع تقدمك الأكاديمي." : "Complete your first scholarly evaluation to begin tracking your academic progress.",
+    exploreArchives: isArabic ? "استكشاف الأرشيف" : "Explore Archives",
+    quizAttempt: isArabic ? "محاولة اختبار" : "Quiz Attempt",
+    untitledDocument: isArabic ? "مستند بدون عنوان" : "Untitled Document",
+    propositions: isArabic ? "افتراضات" : "Propositions",
+    masteryLevel: isArabic ? "مستوى الإتقان" : "Mastery Level"
+  };
 
   useEffect(() => {
     const fetchAttempts = async () => {
@@ -44,8 +59,8 @@ export default function AcademicRecordsPage({ isAdmin }: { isAdmin?: boolean }) 
                 <Award className="w-6 h-6" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-xl font-serif font-bold text-academic-navy leading-tight truncate">Academic Achievement Dossier</h1>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Performance Analytics</p>
+                <h1 className="text-xl font-serif font-bold text-academic-navy leading-tight truncate">{t.title}</h1>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{t.subtitle}</p>
               </div>
             </div>
           </div>
@@ -57,20 +72,20 @@ export default function AcademicRecordsPage({ isAdmin }: { isAdmin?: boolean }) 
             {loading ? (
               <div className="flex flex-col items-center justify-center h-64 gap-4">
                 <Loader2 className="w-10 h-10 text-academic-blue animate-spin" />
-                <p className="text-sm font-bold text-academic-navy uppercase tracking-widest">Retrieving Records...</p>
+                <p className="text-sm font-bold text-academic-navy uppercase tracking-widest">{t.retrieving}</p>
               </div>
             ) : attempts.length === 0 ? (
               <div className="bg-white rounded-[3rem] border border-slate-100 shadow-2xl p-16 text-center flex flex-col items-center">
                 <div className="w-20 h-20 bg-slate-50 text-slate-200 rounded-full flex items-center justify-center mb-6">
                   <Trophy className="w-10 h-10" />
                 </div>
-                <h2 className="text-2xl font-serif font-bold text-academic-navy mb-4">No Evaluations Found</h2>
-                <p className="text-slate-500 mb-8 max-w-sm">Complete your first scholarly evaluation to begin tracking your academic progress.</p>
+                <h2 className="text-2xl font-serif font-bold text-academic-navy mb-4">{t.noEvaluations}</h2>
+                <p className="text-slate-500 mb-8 max-w-sm">{t.noEvaluationsDesc}</p>
                 <button 
                   onClick={() => navigate('/library')}
                   className="px-8 py-4 bg-academic-navy text-white rounded-xl font-bold uppercase tracking-widest hover:bg-academic-blue transition-all shadow-xl shadow-academic-navy/20"
                 >
-                  Explore Archives
+                  {t.exploreArchives}
                 </button>
               </div>
             ) : (
@@ -81,7 +96,7 @@ export default function AcademicRecordsPage({ isAdmin }: { isAdmin?: boolean }) 
                       <div>
                         <div className="flex items-center gap-3 mb-4">
                           <div className="px-3 py-1 bg-academic-navy/5 text-academic-navy rounded-full text-[10px] font-bold uppercase tracking-widest border border-academic-navy/5">
-                            Quiz Attempt
+                            {t.quizAttempt}
                           </div>
                           <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
                             attempt.score / attempt.total_questions >= 0.8 ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
@@ -92,16 +107,16 @@ export default function AcademicRecordsPage({ isAdmin }: { isAdmin?: boolean }) 
                           </div>
                         </div>
                         <h3 className="text-2xl font-serif font-bold text-academic-navy mb-2 group-hover:text-academic-blue transition-colors">
-                          {attempt.document_id?.title || "Untitled Document"}
+                          {attempt.document_id?.title || t.untitledDocument}
                         </h3>
                         <div className="flex items-center gap-6 text-xs font-bold text-slate-400 uppercase tracking-widest">
                           <span className="flex items-center gap-2">
                             <Calendar className="w-4 h-4 text-slate-300" />
-                            {new Date(attempt.completedAt).toLocaleDateString()}
+                            {new Date(attempt.completedAt).toLocaleDateString(isArabic ? "ar-EG" : "en-US")}
                           </span>
                           <span className="flex items-center gap-2">
                             <BookOpen className="w-4 h-4 text-slate-300" />
-                            {attempt.total_questions} Propositions
+                            {attempt.total_questions} {t.propositions}
                           </span>
                         </div>
                       </div>
@@ -112,7 +127,7 @@ export default function AcademicRecordsPage({ isAdmin }: { isAdmin?: boolean }) 
                         <div className="text-4xl font-serif font-bold text-academic-navy mb-1">
                           {attempt.score}<span className="text-slate-300 mx-1">/</span>{attempt.total_questions}
                         </div>
-                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Mastery Level</div>
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t.masteryLevel}</div>
                         
                         <div className="mt-4 w-32 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                           <div 

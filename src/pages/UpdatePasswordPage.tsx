@@ -88,7 +88,7 @@ export default function UpdatePasswordPage() {
                     New Secret Key
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
                       <Lock className="h-5 w-5 text-slate-300" />
                     </div>
                     <input
@@ -98,7 +98,7 @@ export default function UpdatePasswordPage() {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
+                      className="block w-full ps-12 pe-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
                       placeholder="••••••••"
                     />
                   </div>
@@ -112,7 +112,7 @@ export default function UpdatePasswordPage() {
                     Confirm Secret Key
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <div className="absolute inset-y-0 start-0 ps-4 flex items-center pointer-events-none">
                       <Lock className="h-5 w-5 text-slate-300" />
                     </div>
                     <input
@@ -122,7 +122,7 @@ export default function UpdatePasswordPage() {
                       required
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
+                      className="block w-full ps-12 pe-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
                       placeholder="••••••••"
                     />
                   </div>

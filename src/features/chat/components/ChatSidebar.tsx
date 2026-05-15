@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText, X, Pencil, Check, MoreHorizontal, MessageSquare, Trash2 } from "lucide-react";
+import { useAppContext } from "../../../context/AppContext";
 import api from "../../../services/api";
 
 interface Document {
@@ -50,9 +51,24 @@ export default function ChatSidebar({
   freeChatSessions = [],
 }: ChatSidebarProps) {
   const navigate = useNavigate();
+  const { isArabic } = useAppContext();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [menuId, setMenuId] = useState<string | null>(null);
+
+  const t = {
+    chatHistory: isArabic ? "سجل المحادثة" : "Chat history",
+    freeChats: isArabic ? "محادثات حرة" : "Free Chats",
+    documents: isArabic ? "المستندات" : "Documents",
+    pressEnterToSave: isArabic ? "اضغط Enter للحفظ" : "Press Enter to save",
+    activeAnalysis: isArabic ? "تحليل نشط" : "Active Analysis",
+    indexed: isArabic ? "مفهرس" : "Indexed",
+    rename: isArabic ? "إعادة تسمية" : "Rename",
+    delete: isArabic ? "حذف" : "Delete",
+    noDocs: isArabic ? "لم تتم فهرسة مستندات بعد." : "No documents indexed yet.",
+    uploadNow: isArabic ? "ارفع الآن" : "Upload Now",
+    failedRename: isArabic ? "فشل إعادة التسمية" : "Failed to rename",
+  };
 
   const startRename = (doc: Document) => {
     setEditingId(doc._id);
@@ -69,7 +85,7 @@ export default function ChatSidebar({
       }
     } catch (err: any) {
       console.error("Rename failed", err);
-      alert(err.response?.data?.message || err.message || "Failed to rename");
+      alert(err.response?.data?.message || err.message || t.failedRename);
     }
     setEditingId(null);
   };
@@ -88,7 +104,7 @@ export default function ChatSidebar({
       >
         <div className="p-6 border-b border-slate-100 flex items-center justify-between">
           <h2 className="text-xs font-bold text-academic-navy uppercase tracking-widest">
-            Chat history
+            {t.chatHistory}
           </h2>
           <button
             onClick={onClose}
@@ -101,7 +117,7 @@ export default function ChatSidebar({
           {freeChatSessions.length > 0 && (
             <div className="mb-4">
               <p className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                Free Chats
+                {t.freeChats}
               </p>
               <div className="space-y-1 mt-1">
                 {freeChatSessions.map((session) => {
@@ -133,7 +149,7 @@ export default function ChatSidebar({
                               />
                             </div>
                             <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 mt-1">
-                              Press Enter to save
+                              {t.pressEnterToSave}
                             </p>
                           </div>
                           <button
@@ -183,7 +199,7 @@ export default function ChatSidebar({
                                   className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                                 >
                                   <Pencil className="w-3.5 h-3.5" />
-                                  Rename
+                                  {t.rename}
                                 </button>
                                 <button
                                   onClick={() => {
@@ -193,7 +209,7 @@ export default function ChatSidebar({
                                   className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
-                                  Delete
+                                  {t.delete}
                                 </button>
                               </div>
                             )}
@@ -209,7 +225,7 @@ export default function ChatSidebar({
 
           {documents.length > 0 && (
             <p className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-              Documents
+              {t.documents}
             </p>
           )}
 
@@ -249,7 +265,7 @@ export default function ChatSidebar({
                         )}
                       </div>
                       <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 mt-1">
-                        Press Enter to save
+                        {t.pressEnterToSave}
                       </p>
                     </div>
                     <button
@@ -284,7 +300,7 @@ export default function ChatSidebar({
                         <p
                           className={`text-[10px] font-bold uppercase tracking-wider mt-1 ${isActive ? "text-emerald-600" : "text-slate-400"}`}
                         >
-                          {isActive ? "Active Analysis" : "Indexed"}
+                          {isActive ? t.activeAnalysis : t.indexed}
                         </p>
                       </div>
                     </button>
@@ -305,7 +321,7 @@ export default function ChatSidebar({
                             className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                           >
                             <Pencil className="w-3.5 h-3.5" />
-                            Rename
+                            {t.rename}
                           </button>
                           <button
                             onClick={() => {
@@ -315,7 +331,7 @@ export default function ChatSidebar({
                             className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
-                            Delete
+                            {t.delete}
                           </button>
                         </div>
                       )}
@@ -328,13 +344,13 @@ export default function ChatSidebar({
           {documents.length === 0 && freeChatSessions.length === 0 && (
             <div className="text-center py-10">
               <p className="text-xs text-slate-400 font-medium">
-                No documents indexed yet.
+                {t.noDocs}
               </p>
               <button
                 onClick={() => navigate("/upload")}
                 className="mt-4 text-[10px] font-bold text-academic-blue uppercase tracking-widest hover:underline"
               >
-                Upload Now
+                {t.uploadNow}
               </button>
             </div>
           )}
