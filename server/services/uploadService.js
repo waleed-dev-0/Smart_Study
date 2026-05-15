@@ -34,18 +34,6 @@ class UploadService {
       }
       const stats = await fs.promises.stat(filePath);
 
-        const existingDocument = await DocumentModel.findOne({
-            title: originalName,
-            user_id: userId
-        });
-
-        if (existingDocument) {
-            return res.status(409).json({
-                success: false,
-                message: "File already exists"
-            });
-        }
-
       const document = await DocumentModel.create({
         user_id: new mongoose.Types.ObjectId(userId),
         title: originalName,

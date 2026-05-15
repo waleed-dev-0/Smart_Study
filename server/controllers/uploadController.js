@@ -14,6 +14,18 @@ export const uploadDocument = async (req, res) => {
 
     const { parentId } = req.body;
     const userId = req.user?._id;
+
+    const existingDocument = await DocumentModel.findOne({
+      title: req.file.originalname,
+      user_id: userId,
+    });
+    if (existingDocument) {
+      return res.status(409).json({
+        success: false,
+        message: "File already exists",
+      });
+    }
+
     const documentId = await uploadService.processPDF(
       req.file.path,
       req.file.originalname,

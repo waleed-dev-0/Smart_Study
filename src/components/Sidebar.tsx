@@ -13,7 +13,7 @@ import {
 
 interface SidebarProps {
   currentScreen: string;
-  
+
   isAdmin?: boolean;
 }
 
@@ -21,13 +21,13 @@ export default function Sidebar({ currentScreen, isAdmin }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const navItems = [
-    { id: "dashboard", label: "Monitor", icon: LayoutDashboard },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "my_documents", label: "Archives", icon: FileText },
     { id: "chat", label: "Chats", icon: Search },
     { id: "reports", label: "Reports", icon: BarChart3, isAdminOnly: true },
     { id: "settings", label: "Preferences", icon: Settings },
     { id: "about", label: "About Us", icon: Info },
-  ].filter(item => !item.isAdminOnly || isAdmin);
+  ].filter((item) => !item.isAdminOnly || isAdmin);
 
   return (
     <>
@@ -53,7 +53,13 @@ export default function Sidebar({ currentScreen, isAdmin }: SidebarProps) {
               <button
                 key={item.id}
                 onClick={() =>
-                  navigate(item.id === "my_documents" ? "/dashboard" : `/${Math.floor(Math.random()*10)}tmp` === item.id ? "" : `/${item.id === "landing" ? "" : item.id}`)
+                  navigate(
+                    item.id === "my_documents"
+                      ? "/dashboard"
+                      : `/${Math.floor(Math.random() * 10)}tmp` === item.id
+                        ? ""
+                        : `/${item.id === "landing" ? "" : item.id}`,
+                  )
                 }
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 w-full text-left group
                   ${
@@ -97,7 +103,13 @@ export default function Sidebar({ currentScreen, isAdmin }: SidebarProps) {
             <button
               key={item.id}
               onClick={() =>
-                navigate(item.id === "my_documents" ? "/dashboard" : `/${Math.floor(Math.random()*10)}tmp` === item.id ? "" : `/${item.id === "landing" ? "" : item.id}`)
+                navigate(
+                  item.id === "my_documents"
+                    ? "/dashboard"
+                    : `/${Math.floor(Math.random() * 10)}tmp` === item.id
+                      ? ""
+                      : `/${item.id === "landing" ? "" : item.id}`,
+                )
               }
               className={`flex flex-col items-center justify-center w-12 h-10 rounded-xl transition-all
                 ${isActive ? "text-academic-blue scale-110" : "text-slate-400 active:scale-95"}`}

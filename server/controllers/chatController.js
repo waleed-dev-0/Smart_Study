@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 
 export const askAI = async (req, res) => {
   try {
-    const { query, documentId, provider, model } = req.body;
+    const { query, documentId, provider } = req.body;
     const userId = req.user?._id;
 
     if (!query || !documentId) {
@@ -20,7 +20,6 @@ export const askAI = async (req, res) => {
       documentId,
       userId,
       provider,
-      model
     );
 
     res.status(200).json({

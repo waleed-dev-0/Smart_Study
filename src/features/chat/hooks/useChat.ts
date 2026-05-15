@@ -1,7 +1,12 @@
 import { useState } from "react";
 import api from "../../../services/api";
+import { SSE_STREAM_URL } from "../../../config";
+import { formatTime } from "../../../utils/formatTime";
 
 const REQUEST_TIMEOUT_MS = 60_000;
+
+export const WELCOME_MESSAGE =
+  "Welcome to the Research Portal. I have indexed your document. How may I assist your inquiry today?";
 
 export interface Message {
   id: string;
@@ -10,6 +15,34 @@ export interface Message {
   timestamp: string;
   isError?: boolean;
   citations?: { page: number; text: string }[];
+}
+
+function createUserMessage(text: string): Message {
+  return {
+    id: Date.now().toString(),
+    role: "user",
+    text,
+    timestamp: formatTime(),
+  };
+}
+
+function createAIMessage(text: string, isError = false): Message {
+  return {
+    id: (Date.now() + 1).toString(),
+    role: "ai",
+    text,
+    timestamp: formatTime(),
+    isError,
+  };
+}
+
+function createWelcomeMessage(): Message {
+  return {
+    id: "initial",
+    role: "ai",
+    text: WELCOME_MESSAGE,
+    timestamp: formatTime(),
+  };
 }
 
 export const useChat = () => {
@@ -26,17 +59,7 @@ export const useChat = () => {
   ) => {
     if (!query.trim()) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      text: query,
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, createUserMessage(query)]);
 
     if (provider === "ollama") {
       await streamMessage(query, documentId);
@@ -56,7 +79,7 @@ export const useChat = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/chat/stream", {
+      const response = await fetch(SSE_STREAM_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -99,48 +122,23 @@ export const useChat = () => {
           } else if (data.error) {
             setMessages((prev) => [
               ...prev,
-              {
-                id: (Date.now() + 1).toString(),
-                role: "ai" as const,
-                text: data.error,
-                timestamp: new Date().toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }),
-                isError: true,
-              },
+              createAIMessage(data.error, true),
             ]);
             return;
           }
         }
       }
 
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "ai",
-        text: fullText,
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      };
-      setMessages((prev) => [...prev, aiMessage]);
+      setMessages((prev) => [...prev, createAIMessage(fullText)]);
     } catch (error: any) {
       console.error("Stream error:", error);
       setMessages((prev) => [
         ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          role: "ai" as const,
-          text:
-            error.message ||
+        createAIMessage(
+          error.message ||
             "I encountered an error processing your request. Please try again.",
-          timestamp: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          isError: true,
-        },
+          true,
+        ),
       ]);
     } finally {
       clearTimeout(statusTimer);
@@ -173,17 +171,10 @@ export const useChat = () => {
       clearTimeout(statusTimer);
       clearTimeout(slowTimer);
 
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "ai",
-        text: response.data.data.answer,
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      };
-
-      setMessages((prev) => [...prev, aiMessage]);
+      setMessages((prev) => [
+        ...prev,
+        createAIMessage(response.data.data.answer),
+      ]);
     } catch (error: any) {
       clearTimeout(statusTimer);
       clearTimeout(slowTimer);
@@ -210,17 +201,7 @@ export const useChat = () => {
         errorText = error.response.data.message;
       }
 
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "ai",
-        text: errorText,
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        isError: true,
-      };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, createAIMessage(errorText, true)]);
     } finally {
       setIsLoading(false);
       setLoadingStatus("");
@@ -237,35 +218,17 @@ export const useChat = () => {
       if (response.data?.success && response.data.data?.length > 0) {
         setMessages(response.data.data);
       } else {
-        setMessages([
-          {
-            id: "initial",
-            role: "ai",
-            text: "Welcome to the Research Portal. I have indexed your document. How may I assist your inquiry today?",
-            timestamp: new Date().toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-          },
-        ]);
+        setMessages([createWelcomeMessage()]);
       }
     } catch (error) {
       console.error("Failed to fetch chat history:", error);
-      setMessages([
-        {
-          id: "initial",
-          role: "ai",
-          text: "Welcome to the Research Portal. I have indexed your document. How may I assist your inquiry today?",
-          timestamp: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        },
-      ]);
+      setMessages([createWelcomeMessage()]);
     } finally {
       setIsFetchingHistory(false);
     }
   };
+
+  const clearMessages = () => setMessages([]);
 
   return {
     messages,
@@ -275,6 +238,6 @@ export const useChat = () => {
     streamingText,
     sendMessage,
     fetchHistory,
-    setMessages,
+    clearMessages,
   };
 };
