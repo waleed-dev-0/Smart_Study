@@ -9,6 +9,7 @@ import {
   Info,
   BarChart3,
   LogOut,
+  History,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -24,7 +25,9 @@ export default function Sidebar({ currentScreen, isAdmin }: SidebarProps) {
     { id: "dashboard", label: "Monitor", icon: LayoutDashboard },
     { id: "my_documents", label: "Archives", icon: FileText },
     { id: "chat", label: "Chats", icon: Search },
-    { id: "reports", label: "Reports", icon: BarChart3, isAdminOnly: true },
+    { id: "academic-records", label: "Records", icon: BarChart3 },
+    { id: "quiz-history", label: "Quiz History", icon: History },
+    { id: "reports", label: "Admin Reports", icon: BarChart3, isAdminOnly: true },
     { id: "settings", label: "Preferences", icon: Settings },
     { id: "about", label: "About Us", icon: Info },
   ].filter(item => !item.isAdminOnly || isAdmin);
@@ -46,14 +49,13 @@ export default function Sidebar({ currentScreen, isAdmin }: SidebarProps) {
             const Icon = item.icon;
             const isActive =
               currentScreen === item.id ||
-              (currentScreen === "summary" && item.id === "dashboard") ||
               (currentScreen === "question_bank" && item.id === "dashboard");
 
             return (
               <button
                 key={item.id}
                 onClick={() =>
-                  navigate(item.id === "my_documents" ? "/dashboard" : `/${Math.floor(Math.random()*10)}tmp` === item.id ? "" : `/${item.id === "landing" ? "" : item.id}`)
+                  navigate(item.id === "my_documents" ? "/dashboard" : `/${item.id === "landing" ? "" : item.id}`)
                 }
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 w-full text-left group
                   ${
@@ -74,7 +76,7 @@ export default function Sidebar({ currentScreen, isAdmin }: SidebarProps) {
         <div className="p-4 mt-auto border-t border-slate-100">
           <button
             onClick={() => {
-              localStorage.removeItem("token");
+              localStorage.clear();
               navigate("/login");
             }}
             className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-all"
@@ -90,14 +92,13 @@ export default function Sidebar({ currentScreen, isAdmin }: SidebarProps) {
           const Icon = item.icon;
           const isActive =
             currentScreen === item.id ||
-            (currentScreen === "summary" && item.id === "dashboard") ||
             (currentScreen === "question_bank" && item.id === "dashboard");
 
           return (
             <button
               key={item.id}
               onClick={() =>
-                navigate(item.id === "my_documents" ? "/dashboard" : `/${Math.floor(Math.random()*10)}tmp` === item.id ? "" : `/${item.id === "landing" ? "" : item.id}`)
+                navigate(item.id === "my_documents" ? "/dashboard" : `/${item.id === "landing" ? "" : item.id}`)
               }
               className={`flex flex-col items-center justify-center w-12 h-10 rounded-xl transition-all
                 ${isActive ? "text-academic-blue scale-110" : "text-slate-400 active:scale-95"}`}
@@ -110,7 +111,7 @@ export default function Sidebar({ currentScreen, isAdmin }: SidebarProps) {
         })}
         <button
           onClick={() => {
-            localStorage.removeItem("token");
+            localStorage.clear();
             navigate("/login");
           }}
           className="flex flex-col items-center justify-center w-12 h-10 rounded-xl text-red-400 active:scale-95 transition-all"

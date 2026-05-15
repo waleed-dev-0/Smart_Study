@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, X, Settings2, Loader2, Target, Globe2, Plus, FileText } from 'lucide-react';
+import { BookOpen, X, Settings2, Loader2, Target, Globe2, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function FloatingActionButton({ activeDocId }: { activeDocId: string | null }) {
@@ -20,29 +20,20 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
     setIsModalOpen(true);
   };
 
-  const handleCreateSummary = () => {
-    if (!activeDocId) {
-      alert("Please select or upload a document first.");
-      return;
-    }
-    setIsOpen(false);
-    navigate('/summary'); // Assuming this is the route for summary generation
-  };
-
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/questions/generate', {
+      const response = await fetch('http://127.0.0.1:5000/api/questions/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          documentId: activeDocId,
+          document_id: activeDocId,
           difficulty,
-          numberOfQuestions: numQuestions,
+          count: numQuestions,
           language
         })
       });
@@ -69,16 +60,6 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
         {/* Expanded Options */}
         {isOpen && (
           <div className="flex flex-col items-end gap-3 mb-2 animate-in slide-in-from-bottom-4 fade-in duration-200">
-            <button
-              onClick={handleCreateSummary}
-              className="group flex items-center gap-3 px-5 py-2.5 rounded-full shadow-lg bg-white/95 backdrop-blur-sm border border-slate-200 text-academic-navy hover:bg-slate-50 transition-all hover:-translate-y-1 hover:shadow-xl"
-            >
-              <span className="font-bold text-sm tracking-wide">Generate Summary</span>
-              <div className="w-8 h-8 rounded-full bg-amber-800/10 flex items-center justify-center text-amber-800 group-hover:bg-amber-800 group-hover:text-white transition-colors">
-                <FileText className="w-4 h-4" />
-              </div>
-            </button>
-            
             <button
               onClick={handleCreateQuiz}
               className="group flex items-center gap-3 px-5 py-2.5 rounded-full shadow-lg bg-white/95 backdrop-blur-sm border border-slate-200 text-academic-navy hover:bg-slate-50 transition-all hover:-translate-y-1 hover:shadow-xl"
