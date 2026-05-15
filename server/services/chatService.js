@@ -126,6 +126,111 @@ class ChatService {
     }
   }
 
+  async askQuestionStream(query, documentId, userId, provider = "gemini") {
+    let session = await ChatSession.findOne({
+      user_id: new mongoose.Types.ObjectId(userId),
+      $or: [
+        { document_id: new mongoose.Types.ObjectId(documentId) },
+        { additional_documents: new mongoose.Types.ObjectId(documentId) }
+      ]
+    });
+
+    if (!session) {
+      session = await ChatSession.create({
+        user_id: new mongoose.Types.ObjectId(userId),
+        document_id: new mongoose.Types.ObjectId(documentId),
+        title: `Discussion about ${documentId.slice(-6)}`,
+      });
+    }
+
+    await ChatMessage.create({
+      session_id: session._id,
+      sender_type: "user",
+      message_content: query,
+    });
+
+    const queryEmbedding = await aiService.generateEmbedding(query);
+
+    const docIds = [session.document_id];
+    if (session.additional_documents && session.additional_documents.length > 0) {
+      docIds.push(...session.additional_documents);
+    }
+
+    const allChunks = await DocumentChunk.find(
+      { document_id: { $in: docIds } },
+      { chunk_content: 1, embedding: 1 },
+    ).limit(200);
+
+    if (allChunks.length === 0) {
+      throw new Error(
+        "No indexed content found for these documents. Please re-upload.",
+      );
+    }
+
+    const embeddedChunks = allChunks.filter(
+      (c) => c.embedding && c.embedding.length > 0,
+    );
+
+    let context = "";
+    let sources = [];
+    if (embeddedChunks.length > 0) {
+      const scoredChunks = embeddedChunks.map((chunk) => ({
+        content: chunk.chunk_content,
+        similarity: this.cosineSimilarity(queryEmbedding, chunk.embedding),
+      }));
+
+      const topChunks = scoredChunks
+        .sort((a, b) => b.similarity - a.similarity)
+        .slice(0, 5);
+
+      context = topChunks.map((c) => c.content).join("\n\n---\n\n");
+
+      sources = embeddedChunks
+        .filter((c) => {
+          const score = this.cosineSimilarity(queryEmbedding, c.embedding);
+          return score > 0.7;
+        })
+        .slice(0, 3)
+        .map((c) => c.chunk_content.slice(0, 150) + "...");
+    } else {
+      context = allChunks
+        .slice(0, 5)
+        .map((c) => c.chunk_content)
+        .join("\n\n---\n\n");
+    }
+
+    const pastMessages = await ChatMessage.find({ session_id: session._id })
+      .sort({ createdAt: -1 })
+      .limit(7);
+    pastMessages.reverse();
+    const historyStr = pastMessages
+      .slice(0, -1)
+      .map(
+        (m) =>
+          `${m.sender_type === "user" ? "Student" : "Assistant"}: ${m.message_content}`,
+      )
+      .join("\n\n");
+
+    const stream = aiService.askAIStream(
+      query,
+      context,
+      provider,
+      historyStr,
+    );
+
+    return {
+      stream,
+      sources,
+      async saveMessage(content) {
+        await ChatMessage.create({
+          session_id: session._id,
+          sender_type: "ai",
+          message_content: content,
+        });
+      },
+    };
+  }
+
   cosineSimilarity(vecA, vecB) {
     if (!vecA || !vecB || vecA.length !== vecB.length) return 0;
     let dotProduct = 0;

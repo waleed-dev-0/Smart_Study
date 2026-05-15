@@ -46,11 +46,12 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
     isLoading,
     isFetchingHistory,
     loadingStatus,
+    streamingText,
     sendMessage,
     fetchHistory,
     setMessages,
   } = useChat();
-  const [provider, setProvider] = useState<"gemini" | "openrouter">("gemini");
+  const [provider, setProvider] = useState<"gemini" | "ollama">("gemini");
   const [documents, setDocuments] = useState<any[]>([]);
   const [activeDocId, setActiveDocId] = useState<string | null>(
     localStorage.getItem("activeDocumentId"),
@@ -269,11 +270,11 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
                 Gemini
               </button>
               <button
-                onClick={() => setProvider("openrouter")}
-                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 ${provider === "openrouter" ? "bg-academic-navy text-white shadow-sm" : "text-slate-500 hover:text-academic-navy"}`}
+                onClick={() => setProvider("ollama")}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 ${provider === "ollama" ? "bg-academic-navy text-white shadow-sm" : "text-slate-500 hover:text-academic-navy"}`}
               >
                 <Bot className="w-3 h-3" />
-                OpenRouter
+                Ollama
               </button>
             </div>
             <button
@@ -479,7 +480,30 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
             ))
           )}
 
-          {(isLoading || isUploading) && (
+          {streamingText && (
+            <div className="flex gap-6 max-w-4xl">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-sm bg-academic-navy text-white">
+                <GraduationCap className="w-6 h-6" />
+              </div>
+              <div className="flex flex-col gap-2 items-start max-w-[85%]">
+                <div className="flex items-center gap-3 px-1">
+                  <span className="text-xs font-bold text-academic-navy uppercase tracking-wider">
+                    Research Assistant
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-medium">
+                    {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                </div>
+                <div className="p-5 rounded-2xl bg-white border border-slate-200 text-slate-800 rounded-tl-none shadow-sm">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {streamingText}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {(isLoading && !streamingText || isUploading) && (
             <div className="flex gap-6 max-w-4xl">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-sm bg-academic-navy text-white">
                 <GraduationCap className="w-6 h-6" />

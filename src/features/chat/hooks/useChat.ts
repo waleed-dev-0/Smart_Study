@@ -17,11 +17,12 @@ export const useChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingHistory, setIsFetchingHistory] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState<string>("");
+  const [streamingText, setStreamingText] = useState("");
 
   const sendMessage = async (
     query: string,
     documentId: string,
-    provider: "gemini" | "openrouter" = "gemini",
+    provider: "gemini" | "ollama" = "gemini",
   ) => {
     if (!query.trim()) return;
 
@@ -36,6 +37,120 @@ export const useChat = () => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+
+    if (provider === "ollama") {
+      await streamMessage(query, documentId);
+    } else {
+      await geminiMessage(query, documentId);
+    }
+  };
+
+  const streamMessage = async (query: string, documentId: string) => {
+    setIsLoading(true);
+    setLoadingStatus("Searching document...");
+
+    const statusTimer = setTimeout(
+      () => setLoadingStatus("Generating answer..."),
+      5000,
+    );
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:5000/api/chat/stream", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          query,
+          documentId,
+          provider: "ollama",
+        }),
+      });
+
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}));
+        throw new Error(
+          errBody.message || `Request failed (${response.status})`,
+        );
+      }
+
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let fullText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split("\n\n");
+        buffer = parts.pop() || "";
+
+        for (const part of parts) {
+          if (!part.startsWith("data: ")) continue;
+          const data = JSON.parse(part.slice(6));
+
+          if (data.token) {
+            fullText += data.token;
+            setStreamingText(fullText);
+          } else if (data.error) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: (Date.now() + 1).toString(),
+                role: "ai" as const,
+                text: data.error,
+                timestamp: new Date().toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
+                isError: true,
+              },
+            ]);
+            return;
+          }
+        }
+      }
+
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "ai",
+        text: fullText,
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error: any) {
+      console.error("Stream error:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: "ai" as const,
+          text:
+            error.message ||
+            "I encountered an error processing your request. Please try again.",
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          isError: true,
+        },
+      ]);
+    } finally {
+      clearTimeout(statusTimer);
+      setStreamingText("");
+      setIsLoading(false);
+      setLoadingStatus("");
+    }
+  };
+
+  const geminiMessage = async (query: string, documentId: string) => {
     setIsLoading(true);
     setLoadingStatus("Searching document...");
 
@@ -51,7 +166,7 @@ export const useChat = () => {
     try {
       const response = await api.post(
         "/chat",
-        { query, documentId, provider },
+        { query, documentId, provider: "gemini" },
         { timeout: REQUEST_TIMEOUT_MS },
       );
 
@@ -157,6 +272,7 @@ export const useChat = () => {
     isLoading,
     isFetchingHistory,
     loadingStatus,
+    streamingText,
     sendMessage,
     fetchHistory,
     setMessages,

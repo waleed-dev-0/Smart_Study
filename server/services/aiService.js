@@ -1,40 +1,45 @@
 import { GoogleGenAI } from "@google/genai";
-import axios from "axios";
+import { Ollama } from "ollama";
 import dotenv from "dotenv";
 dotenv.config();
 
-const OPENROUTER_TIMEOUT = 45000;
-const OPENROUTER_CHAT_MODEL = "openrouter/free";
-const OPENROUTER_EMBED_MODEL = "openai/text-embedding-3-small";
+const OLLAMA_CHAT_MODEL = process.env.OLLAMA_CHAT_MODEL || "kimi-k2:1t-cloud";
 
 class AIService {
   constructor() {
-    const key = process.env.GEMINI_API_KEY;
+    const geminiKey = process.env.GEMINI_API_KEY;
     this.hasGemini = false;
-    if (key && key.trim().length > 0) {
+    if (geminiKey && geminiKey.trim().length > 0) {
       try {
-        this.ai = new GoogleGenAI({ apiKey: key });
+        this.ai = new GoogleGenAI({ apiKey: geminiKey });
         this.hasGemini = true;
-        console.log("[AI] Gemini Initialized Successfully");
       } catch (err) {
-        console.error("[AI] Initialization Error:", err.message);
+        console.error("[AI] Gemini Init Error:", err.message);
+      }
+    }
+
+    const ollamaKey = process.env.OLLAMA_API_KEY;
+    if (ollamaKey && ollamaKey.trim().length > 0) {
+      try {
+        this.ollama = new Ollama({
+          host: "https://ollama.com",
+          headers: { Authorization: `Bearer ${ollamaKey}` },
+        });
+      } catch (err) {
+        console.error("[AI] Ollama Init Error:", err.message);
       }
     }
   }
 
   async generateEmbedding(text) {
-    if (this.hasGemini) {
-      try {
-        const result = await this.ai.models.embedContent({
-          model: "gemini-embedding-001",
-          contents: text,
-        });
-        return result.embeddings[0].values;
-      } catch (error) {
-        console.error("[AI] Gemini Embed Failed:", error.message);
-      }
+    if (!this.hasGemini) {
+      throw new Error("Gemini not configured - required for embeddings");
     }
-    return this.generateOpenRouterEmbedding(text);
+    const result = await this.ai.models.embedContent({
+      model: "gemini-embedding-001",
+      contents: text,
+    });
+    return result.embeddings[0].values;
   }
 
   async askAI(prompt, context, provider = "gemini", history = "") {
@@ -54,44 +59,50 @@ class AIService {
           err.message?.includes("quota");
 
         if (isQuotaError) {
-          console.warn(
-            "[AI] Gemini quota exhausted, falling back to OpenRouter...",
-          );
+          console.warn("[AI] Gemini quota exhausted, falling back to Ollama...");
         } else {
           console.error("[AI] Gemini Chat Failed:", err.message);
         }
       }
     }
-    return this.askOpenRouter(fullPrompt);
+
+    if (!this.ollama) {
+      throw new Error("Ollama provider not configured - missing OLLAMA_API_KEY");
+    }
+    const response = await this.ollama.chat({
+      model: OLLAMA_CHAT_MODEL,
+      messages: [{ role: "user", content: fullPrompt }],
+    });
+    return response.message.content;
   }
 
-  async generateOpenRouterEmbedding(text) {
-    const key = process.env.OPENROUTER_API_KEY;
-    const response = await axios.post(
-      "https://openrouter.ai/api/v1/embeddings",
-      { model: OPENROUTER_EMBED_MODEL, input: text },
-      {
-        headers: { Authorization: `Bearer ${key}` },
-        timeout: OPENROUTER_TIMEOUT,
-      },
-    );
-    return response.data.data[0].embedding;
-  }
+  async *askAIStream(prompt, context, provider = "gemini", history = "") {
+    const fullPrompt = `Context:\n${context}\nHistory:\n${history}\nQuery:\n${prompt}`;
 
-  async askOpenRouter(prompt) {
-    const key = process.env.OPENROUTER_API_KEY;
-    const response = await axios.post(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        model: OPENROUTER_CHAT_MODEL,
-        messages: [{ role: "user", content: prompt }],
-      },
-      {
-        headers: { Authorization: `Bearer ${key}` },
-        timeout: OPENROUTER_TIMEOUT,
-      },
-    );
-    return response.data.choices[0].message.content;
+    if (provider === "gemini" && this.hasGemini) {
+      const stream = await this.ai.models.generateContentStream({
+        model: "gemini-flash-latest",
+        contents: fullPrompt,
+      });
+      for await (const chunk of stream) {
+        if (chunk.text) {
+          yield { message: { content: chunk.text } };
+        }
+      }
+      return;
+    }
+
+    if (!this.ollama) {
+      throw new Error("Ollama provider not configured - missing OLLAMA_API_KEY");
+    }
+    const stream = await this.ollama.chat({
+      model: OLLAMA_CHAT_MODEL,
+      messages: [{ role: "user", content: fullPrompt }],
+      stream: true,
+    });
+    for await (const part of stream) {
+      yield part;
+    }
   }
 }
 
