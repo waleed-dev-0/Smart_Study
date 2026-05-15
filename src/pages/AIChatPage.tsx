@@ -1,20 +1,25 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import {
   ArrowLeft,
-  MessageSquare,
   Sparkles,
   Bot,
   MoreHorizontal,
   BookOpen,
   Search,
+  Copy,
+  Pencil,
+  Check,
+  X,
 } from "lucide-react";
 import { useChat } from "../features/chat/hooks/useChat";
 import {
   fetchDocuments,
   uploadFile,
+  UploadError,
 } from "../features/upload/services/uploadService";
+import api from "../services/api";
 import ChatSidebar from "../features/chat/components/ChatSidebar";
 import ChatMessageList from "../features/chat/components/ChatMessageList";
 import ChatInput from "../features/chat/components/ChatInput";
@@ -23,6 +28,7 @@ import FloatingActionButton from "../components/FloatingActionButton";
 
 export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -44,6 +50,17 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isQuizzesOpen, setIsQuizzesOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [duplicateFile, setDuplicateFile] = useState<File | null>(null);
+  const [headerRenameDocId, setHeaderRenameDocId] = useState<string | null>(null);
+  const [headerRenameTitle, setHeaderRenameTitle] = useState("");
+
+  useEffect(() => {
+    const docId = new URLSearchParams(location.search).get("docId");
+    if (docId) {
+      setActiveDocId(docId);
+      localStorage.setItem("activeDocumentId", docId);
+    }
+  }, [location.search]);
 
   const loadDocs = async () => {
     try {
@@ -81,9 +98,29 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
     setIsUploading(true);
     try {
       await uploadFile(file, activeDocId || undefined);
+      await loadDocs();
+    } catch (err: any) {
+      if (err instanceof UploadError && err.status === 409) {
+        setDuplicateFile(file);
+      } else {
+        console.error("File upload failed", err);
+        alert("Failed to upload document. Please ensure it is a valid PDF.");
+      }
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleForceUpload = async () => {
+    if (!duplicateFile) return;
+    setIsUploading(true);
+    setDuplicateFile(null);
+    try {
+      await uploadFile(duplicateFile, activeDocId || undefined, true);
+      await loadDocs();
     } catch (err) {
-      console.error("File upload failed", err);
-      alert("Failed to upload document. Please ensure it is a valid PDF.");
+      console.error("Force upload failed", err);
+      alert("Failed to upload document.");
     } finally {
       setIsUploading(false);
     }
@@ -98,6 +135,28 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
     setIsHistoryOpen(false);
   };
 
+  const handleHeaderRenameStart = () => {
+    const doc = documents.find((d) => d._id === activeDocId);
+    if (doc) {
+      setHeaderRenameDocId(doc._id);
+      setHeaderRenameTitle(doc.title);
+    }
+  };
+
+  const handleHeaderRenameSave = async () => {
+    if (!headerRenameTitle.trim() || !headerRenameDocId) return;
+    try {
+      const res = await api.put(`/chat/session/${headerRenameDocId}`, { title: headerRenameTitle.trim() });
+      if (res.data?.success) {
+        await loadDocs();
+      }
+    } catch (err: any) {
+      console.error("Header rename failed", err);
+      alert(err.response?.data?.message || err.message || "Failed to rename");
+    }
+    setHeaderRenameDocId(null);
+  };
+
   return (
     <div className="flex min-h-screen bg-academic-paper">
       <Sidebar currentScreen="chat" isAdmin={isAdmin} />
@@ -108,6 +167,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
         documents={documents}
         activeDocId={activeDocId}
         onSelectDocument={handleSelectDocument}
+        onDocsRefreshed={loadDocs}
       />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden bg-white relative">
@@ -129,10 +189,44 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
                 </h1>
                 <p className="text-xs text-slate-500 flex items-center gap-1 truncate font-medium">
                   Analysis:{" "}
-                  <span className="text-academic-blue truncate">
-                    {documents.find((d) => d._id === activeDocId)?.title ||
-                      "Select a document"}
-                  </span>
+                  {headerRenameDocId === activeDocId ? (
+                    <span className="flex items-center gap-1 min-w-0">
+                      <input
+                        autoFocus
+                        value={headerRenameTitle}
+                        onChange={(e) => setHeaderRenameTitle(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleHeaderRenameSave();
+                          if (e.key === "Escape") setHeaderRenameDocId(null);
+                        }}
+                        className="text-academic-blue text-xs font-medium bg-accent-blue/10 border border-academic-blue rounded px-1.5 py-0.5 outline-none min-w-0 w-full"
+                      />
+                      <button
+                        onClick={handleHeaderRenameSave}
+                        className="p-0.5 text-emerald-500 hover:text-emerald-600 shrink-0"
+                      >
+                        <Check className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => setHeaderRenameDocId(null)}
+                        className="p-0.5 text-slate-400 hover:text-slate-600 shrink-0"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ) : (
+                    <button
+                      onClick={handleHeaderRenameStart}
+                      className="text-academic-blue truncate hover:bg-accent-blue/10 rounded px-1 -mx-1 transition-colors flex items-center gap-1"
+                      title="Click to rename"
+                    >
+                      <span className="truncate">
+                        {documents.find((d) => d._id === activeDocId)?.title ||
+                          "Select a document"}
+                      </span>
+                      <Pencil className="w-3 h-3 shrink-0 opacity-50" />
+                    </button>
+                  )}
                 </p>
               </div>
             </div>
@@ -205,6 +299,41 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
         isOpen={isQuizzesOpen}
         onClose={() => setIsQuizzesOpen(false)}
       />
+
+      {duplicateFile && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden max-w-md w-full animate-in zoom-in-95 duration-300">
+            <div className="p-8 text-center">
+              <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-amber-100">
+                <Copy className="w-8 h-8 text-amber-500" />
+              </div>
+              <h3 className="text-xl font-serif font-bold text-amber-900 mb-2">
+                Document Already Indexed
+              </h3>
+              <p className="text-sm text-amber-700 mb-1">
+                <strong className="text-amber-900">{duplicateFile.name}</strong>
+              </p>
+              <p className="text-xs text-amber-600/80 mb-6">
+                This file already exists in your archive. Upload a duplicate copy anyway?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setDuplicateFile(null)}
+                  className="flex-1 bg-white border border-amber-200 text-amber-700 px-6 py-3 rounded-xl text-sm font-bold hover:bg-amber-50 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleForceUpload}
+                  className="flex-1 bg-amber-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-amber-700 transition-all shadow-md shadow-amber-600/20"
+                >
+                  Upload Anyway
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <FloatingActionButton activeDocId={activeDocId} />
     </div>

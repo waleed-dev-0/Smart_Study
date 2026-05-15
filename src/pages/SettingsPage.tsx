@@ -92,7 +92,7 @@ export default function SettingsPage({ isAdmin }: { isAdmin?: boolean }) {
               <p className="text-sm text-slate-500 mb-4">Log out of your account on this device.</p>
               <button 
                 onClick={() => {
-                  localStorage.removeItem("token");
+                  localStorage.clear();
                   navigate('/login');
                 }}
                 className="flex items-center gap-2 bg-red-50 text-red-600 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-red-100 transition-colors"

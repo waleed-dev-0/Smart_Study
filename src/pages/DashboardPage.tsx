@@ -154,7 +154,7 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
                   key={item._id}
                   onClick={() =>
                     item.processing_status === "completed" &&
-                    navigate("/summary")
+                    navigate(`/chat?docId=${item._id}`)
                   }
                   className={`bg-white rounded-[2rem] border border-slate-100 p-7 transition-all group flex flex-col h-full relative overflow-hidden 
                   shadow-sm hover:shadow-2xl hover:shadow-academic-navy/5 hover:border-academic-blue/10 

@@ -16,15 +16,28 @@ class UploadService {
     }
   }
 
-  async processPDF(filePath, originalName, userId) {
+  async processPDF(filePath, originalName, userId, force = false) {
     try {
       const dataBuffer = await fs.promises.readFile(filePath);
 
       const pdfParseModule = await import("pdf-parse");
       const pdfParse = pdfParseModule.default || pdfParseModule;
 
-      const parser = new pdfParse.PDFParse({ data: dataBuffer });
-      const data = await parser.getText();
+      let data;
+      try {
+        data = await pdfParse(dataBuffer);
+      } catch (innerErr) {
+        if (pdfParse.PDFParse) {
+          const parser = new pdfParse.PDFParse({ data: dataBuffer });
+          data = await parser.getText();
+        } else {
+          throw innerErr;
+        }
+      }
+
+      if (!data || !data.text) {
+        throw new Error("Failed to extract text from PDF.");
+      }
       const fullText = data.text;
 
       if (!fullText || fullText.trim().length === 0) {
@@ -33,6 +46,17 @@ class UploadService {
         );
       }
       const stats = await fs.promises.stat(filePath);
+
+      if (!force) {
+        const existingDocument = await DocumentModel.findOne({
+          title: originalName,
+          user_id: userId,
+        });
+
+        if (existingDocument) {
+          throw new Error("File already exists");
+        }
+      }
 
       const document = await DocumentModel.create({
         user_id: new mongoose.Types.ObjectId(userId),
@@ -56,7 +80,13 @@ class UploadService {
           batch.map(async (content, batchIdx) => {
             const globalIndex = i + batchIdx;
             try {
-              const embedding = await this.getEmbeddingWithRetry(content);
+              let embedding = [];
+              try {
+                embedding = await this.getEmbeddingWithRetry(content);
+              } catch (embedErr) {
+                console.error(`[Upload] Failed to embed chunk ${globalIndex}:`, embedErr.message);
+              }
+              
               await DocumentChunk.create({
                 document_id: document._id,
                 chunk_index: globalIndex,
@@ -65,11 +95,7 @@ class UploadService {
                 embedding,
               });
             } catch (err) {
-              console.error(
-                `[Upload] Failed to embed chunk ${globalIndex}:`,
-                err.message,
-              );
-              return;
+              console.error(`[Upload] Failed to save chunk ${globalIndex}:`, err.message);
             }
           }),
         );
@@ -86,6 +112,7 @@ class UploadService {
       );
       return document._id.toString();
     } catch (error) {
+      if (error.message === "File already exists") throw error;
       console.error("[Upload] Error processing PDF:", error.message);
       throw new Error("Failed to process and index PDF: " + error.message);
     }

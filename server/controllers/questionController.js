@@ -96,7 +96,6 @@ export const generateQuestions = async (req, res) => {
 
     const numQuestions = Math.min(Math.max(parseInt(count), 1), 25);
 
-    // Pass language to the service
     const questions = await questionService.extractQuestionsFromText(
       contentToProcess,
       numQuestions,
@@ -140,7 +139,6 @@ export const generateQuestions = async (req, res) => {
       })),
     );
 
-    // Only delete old questions AFTER successfully saving new ones
     await Question.deleteMany({
       document_id: document_id,
       user_id: userId,

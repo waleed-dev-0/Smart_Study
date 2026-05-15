@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileText, X } from "lucide-react";
+import { FileText, X, Pencil, Check, MoreHorizontal } from "lucide-react";
+import api from "../../../services/api";
 
 interface Document {
   _id: string;
@@ -12,6 +14,12 @@ interface ChatSidebarProps {
   documents: Document[];
   activeDocId: string | null;
   onSelectDocument: (id: string) => void;
+  onDocsRefreshed: () => void;
+}
+
+function getDuplicateBadge(title: string) {
+  const match = title.match(/^(.+?)\s\((\d+)\)\.[^.]+$/);
+  return match ? parseInt(match[2]) : null;
 }
 
 export default function ChatSidebar({
@@ -20,8 +28,32 @@ export default function ChatSidebar({
   documents,
   activeDocId,
   onSelectDocument,
+  onDocsRefreshed,
 }: ChatSidebarProps) {
   const navigate = useNavigate();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [menuId, setMenuId] = useState<string | null>(null);
+
+  const startRename = (doc: Document) => {
+    setEditingId(doc._id);
+    setEditTitle(doc.title);
+    setMenuId(null);
+  };
+
+  const saveRename = async (id: string) => {
+    if (!editTitle.trim()) return;
+    try {
+      const res = await api.put(`/chat/session/${id}`, { title: editTitle.trim() });
+      if (res.data?.success) {
+        onDocsRefreshed();
+      }
+    } catch (err: any) {
+      console.error("Rename failed", err);
+      alert(err.response?.data?.message || err.message || "Failed to rename");
+    }
+    setEditingId(null);
+  };
 
   return (
     <>
@@ -47,33 +79,108 @@ export default function ChatSidebar({
           </button>
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {documents.map((doc) => (
-            <button
-              key={doc._id}
-              onClick={() => onSelectDocument(doc._id)}
-              className={`w-full text-left p-4 rounded-2xl transition-all flex items-start gap-3 group ${
-                activeDocId === doc._id
-                  ? "bg-slate-50 border border-academic-blue/20 shadow-sm"
-                  : "bg-transparent hover:bg-slate-50 border border-transparent"
-              }`}
-            >
-              <FileText
-                className={`w-5 h-5 shrink-0 mt-0.5 ${activeDocId === doc._id ? "text-academic-blue" : "text-slate-400 group-hover:text-academic-navy"}`}
-              />
-              <div className="min-w-0">
-                <p
-                  className={`text-sm line-clamp-2 leading-tight mb-1 font-serif ${activeDocId === doc._id ? "font-bold text-academic-navy" : "font-medium text-slate-600"}`}
-                >
-                  {doc.title}
-                </p>
-                <p
-                  className={`text-[10px] font-bold uppercase tracking-wider ${activeDocId === doc._id ? "text-emerald-600" : "text-slate-400"}`}
-                >
-                  {activeDocId === doc._id ? "Active Analysis" : "Indexed"}
-                </p>
+          {documents.map((doc) => {
+            const dupNum = getDuplicateBadge(doc.title);
+            const isEditing = editingId === doc._id;
+            const isActive = activeDocId === doc._id;
+
+            return (
+              <div
+                key={doc._id}
+                className={`relative w-full rounded-2xl transition-all flex flex-col ${
+                  isActive
+                    ? "bg-slate-50 border border-academic-blue/20 shadow-sm"
+                    : "bg-transparent hover:bg-slate-50 border border-transparent"
+                }`}
+              >
+                {isEditing ? (
+                  <div className="p-4 flex items-start gap-3">
+                    <FileText className="w-5 h-5 shrink-0 mt-0.5 text-academic-blue" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <input
+                          autoFocus
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") saveRename(doc._id);
+                            if (e.key === "Escape") setEditingId(null);
+                          }}
+                          className="text-sm font-serif font-bold text-academic-navy bg-white border border-academic-blue rounded-lg px-2 py-1 w-full outline-none"
+                        />
+                        {dupNum !== null && (
+                          <span className="shrink-0 w-5 h-5 flex items-center justify-center bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full border border-amber-200">
+                            {dupNum}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 mt-1">
+                        Press Enter to save
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => saveRename(doc._id)}
+                      className="p-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all shrink-0"
+                    >
+                      <Check className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-3 p-4">
+                    <button
+                      onClick={() => onSelectDocument(doc._id)}
+                      className="flex items-start gap-3 min-w-0 flex-1"
+                    >
+                      <FileText
+                        className={`w-5 h-5 shrink-0 mt-0.5 ${isActive ? "text-academic-blue" : "text-slate-400 group-hover:text-academic-navy"}`}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p
+                            className={`text-sm line-clamp-2 leading-tight font-serif ${isActive ? "font-bold text-academic-navy" : "font-medium text-slate-600"}`}
+                          >
+                            {doc.title}
+                          </p>
+                          {dupNum !== null && (
+                            <span className="shrink-0 w-5 h-5 flex items-center justify-center bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full border border-amber-200">
+                              {dupNum}
+                            </span>
+                          )}
+                        </div>
+                        <p
+                          className={`text-[10px] font-bold uppercase tracking-wider mt-1 ${isActive ? "text-emerald-600" : "text-slate-400"}`}
+                        >
+                          {isActive ? "Active Analysis" : "Indexed"}
+                        </p>
+                      </div>
+                    </button>
+                    <div className="relative shrink-0">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMenuId(menuId === doc._id ? null : doc._id);
+                        }}
+                        className="p-1 text-slate-300 hover:text-academic-navy rounded-lg transition-colors"
+                      >
+                        <MoreHorizontal className="w-4 h-4" />
+                      </button>
+                      {menuId === doc._id && (
+                        <div className="absolute right-0 top-8 w-40 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden z-50 py-1">
+                          <button
+                            onClick={() => startRename(doc)}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                            Rename
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
-            </button>
-          ))}
+            );
+          })}
           {documents.length === 0 && (
             <div className="text-center py-10">
               <p className="text-xs text-slate-400 font-medium">

@@ -1,10 +1,22 @@
 import api from "../../../services/api";
 
-export const uploadFile = async (file: File, parentId?: string) => {
+export class UploadError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "UploadError";
+    this.status = status;
+  }
+}
+
+export const uploadFile = async (file: File, parentId?: string, force = false) => {
   const formData = new FormData();
   formData.append('file', file);
   if (parentId) {
     formData.append('parentId', parentId);
+  }
+  if (force) {
+    formData.append('force', 'true');
   }
 
   try {
@@ -16,7 +28,9 @@ export const uploadFile = async (file: File, parentId?: string) => {
     return response.data;
   } catch (error: any) {
     console.error('Upload error:', error);
-    throw new Error(error.response?.data?.message || 'Failed to upload file');
+    const status = error.response?.status || 500;
+    const message = error.response?.data?.message || 'Failed to upload file';
+    throw new UploadError(message, status);
   }
 };
 
