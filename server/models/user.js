@@ -7,6 +7,11 @@ const UserSchema = new Schema(
       required: [true, "Full name is required"],
       trim: true,
     },
+    name: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     email: {
       type: String,
       required: [true, "Email is required"],
@@ -29,6 +34,14 @@ const UserSchema = new Schema(
     points: {
       type: Number,
       default: 0,
+    },
+    avatar: {
+      type: String,
+      default: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
+    },
+    language: {
+      type: String,
+      default: "English",
     },
     resetPasswordToken: String,
     resetPasswordExpires: Date,

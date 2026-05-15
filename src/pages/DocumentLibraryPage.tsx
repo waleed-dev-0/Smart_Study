@@ -1,6 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
+<<<<<<< HEAD
+=======
+import api from "../services/api";
+import { API_BASE_URL } from "../config";
+import { useAppContext } from "../context/AppContext";
+>>>>>>> dab8ccbf1e9308b705706a8dfce33177cbb807ad
 import {
   Search,
   FileText,
@@ -14,9 +20,24 @@ import { useEffect } from "react";
 
 export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) {
   const navigate = useNavigate();
+  const { isArabic } = useAppContext();
   const [searchQuery, setSearchQuery] = useState("");
 
+<<<<<<< HEAD
   type document = {
+=======
+  const t = {
+    title: isArabic ? "الأرشيف الأكاديمي" : "Scholarly Archive",
+    searchPlaceholder: isArabic ? "ابحث عن المواد المصدرية حسب التسمية أو التصنيف..." : "Query source materials by nomenclature or classification...",
+    uploaded: isArabic ? "تاريخ الرفع:" : "Uploaded:",
+    deleteFailed: isArabic ? "فشل في حذف المستند" : "Failed to delete document",
+    noRecords: isArabic ? "لم يتم العثور على سجلات" : "No Records Found",
+    noRecordsDesc: isArabic ? "لم يتطابق استعلام البحث الخاص بك مع أي أرشيف في هذا المستودع." : "Your search query did not correlate with any archives in this repository.",
+    clearParams: isArabic ? "مسح جميع المعايير" : "Clear All Parameters",
+  };
+
+  type Item = {
+>>>>>>> dab8ccbf1e9308b705706a8dfce33177cbb807ad
     _id: string;
     title: string;
     file_path: string;
@@ -61,6 +82,7 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
             },
         });
 
+<<<<<<< HEAD
         const data = await res.json();
         if (data.success) {
             const updatedDocuments = documents.filter((document) => document._id !== id);
@@ -68,6 +90,15 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
         } else {
             alert("Failed to delete document");
         }
+=======
+      const data = await res.json();
+      if (data.success) {
+        const updatedItems = items.filter((item) => item._id !== id);
+        setItems(updatedItems);
+      } else {
+        alert(t.deleteFailed);
+      }
+>>>>>>> dab8ccbf1e9308b705706a8dfce33177cbb807ad
     } catch (error) {
         console.error("Delete error:", error);
     }
@@ -88,7 +119,7 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
           <div className="flex items-center gap-3">
             <Library className="w-6 h-6 text-academic-navy" />
             <h1 className="text-2xl font-serif font-bold text-academic-navy tracking-tight">
-              Scholarly Archive
+              {t.title}
             </h1>
           </div>
         </header>
@@ -97,15 +128,15 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
           <div className="max-w-7xl mx-auto">
             <div className="mb-12 flex flex-col sm:flex-row gap-6">
               <div className="relative flex-1">
-                <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 start-0 ps-6 flex items-center pointer-events-none">
                   <Search className="w-5 h-5 text-slate-300" />
                 </div>
                 <input
                   type="text"
-                  placeholder="Query source materials by nomenclature or classification..."
+                  placeholder={t.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-14 pr-6 py-4.5 bg-white border border-slate-200 rounded-[1.5rem] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue shadow-xl shadow-academic-navy/5 transition-all font-medium"
+                  className="w-full ps-14 pe-6 py-4.5 bg-white border border-slate-200 rounded-[1.5rem] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue shadow-xl shadow-academic-navy/5 transition-all font-medium"
                 />
               </div>
             </div>
@@ -117,7 +148,7 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
                   onClick={() => navigate("/chat")}
                   className="bg-white rounded-3xl border border-slate-100 p-7 hover:border-academic-blue/30 hover:shadow-2xl transition-all cursor-pointer group flex flex-col justify-between h-full relative overflow-hidden"
                 >
-                  <div className="absolute top-0 left-0 w-1.5 h-full bg-academic-blue -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+                  <div className="absolute top-0 start-0 w-1.5 h-full bg-academic-blue -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
 
                   <div className="flex items-start gap-4 mb-6">
                     <div className="w-14 h-14 rounded-xl bg-academic-blue/10 text-academic-blue flex items-center justify-center group-hover:bg-academic-blue group-hover:text-white transition-all">
@@ -141,8 +172,13 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
                   <div className="mt-auto space-y-4">
                     <div className="flex flex-col gap-1 text-sm text-academic-blue/70">
                       <span>
+<<<<<<< HEAD
                         Uploaded:{" "}
                         {new Date(document.createdAt).toLocaleDateString("en-US", {
+=======
+                        {t.uploaded}{" "}
+                        {new Date(item.createdAt).toLocaleDateString(isArabic ? "ar-EG" : "en-US", {
+>>>>>>> dab8ccbf1e9308b705706a8dfce33177cbb807ad
                           year: "numeric",
                           month: "short",
                           day: "2-digit",
@@ -156,7 +192,7 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
                         {formatSize(document.file_size_bytes)}
                       </span>
 
-                      <div className="flex items-center gap-2 ml-auto">
+                      <div className="flex items-center gap-2 ms-auto">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -168,7 +204,7 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
                           <Trash2 className="w-5 h-5" />
                         </button>
 
-                        <ChevronRight className="w-6 h-6 text-academic-blue/60 group-hover:text-academic-blue transition-colors" />
+                        <ChevronRight className={`w-6 h-6 text-academic-blue/60 group-hover:text-academic-blue transition-colors ${isArabic ? 'rotate-180' : ''}`} />
                       </div>
                     </div>
                   </div>
@@ -182,17 +218,16 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
                   <Search className="w-10 h-10 text-slate-300" />
                 </div>
                 <h3 className="text-2xl font-serif font-bold text-academic-navy mb-2">
-                  No Records Found
+                  {t.noRecords}
                 </h3>
                 <p className="text-slate-500 font-medium">
-                  Your search query did not correlate with any archives in this
-                  repository.
+                  {t.noRecordsDesc}
                 </p>
                 <button
                   onClick={() => setSearchQuery("")}
                   className="mt-8 text-academic-blue font-bold uppercase tracking-widest text-xs hover:text-academic-navy transition-colors"
                 >
-                  Clear All Parameters
+                  {t.clearParams}
                 </button>
               </div>
             )}

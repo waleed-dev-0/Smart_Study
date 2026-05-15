@@ -1,43 +1,126 @@
 import { useNavigate } from "react-router-dom";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useAppContext } from "../context/AppContext";
 import Sidebar from "../components/Sidebar";
+import api from "../services/api";
 import {
   Users,
   FileUp,
-  TrendingUp,
   HardDrive,
   ArrowUpRight,
   UserCheck,
-  Calendar,
-  MoreVertical,
+  Loader2,
+  TrendingUp,
   Download,
+  MoreVertical,
 } from "lucide-react";
 
-export default function ReportsPage({
-  
-}: {
-  
-}) {
+export default function ReportsPage() {
   const navigate = useNavigate();
+  const { isArabic } = useAppContext();
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const isAdmin = (() => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return false;
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      return JSON.parse(atob(base64)).role === "admin";
+    } catch {
+      return false;
+    }
+  })();
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const response = await api.get("/reports");
+        if (response.data.success) {
+          setData(response.data.data);
+        } else {
+          setError(response.data.message || "Failed to fetch reports");
+        }
+      } catch (err: any) {
+        setError(err.message || "An error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchReports();
+  }, []);
+
+  const t = {
+    totalScholars: isArabic ? "إجمالي الطلاب" : "Total Scholars",
+    archivedSources: isArabic ? "المصادر المؤرشفة" : "Archived Sources",
+    weeklyGrowth: isArabic ? "النمو الأسبوعي" : "Weekly Growth",
+    digitalStorage: isArabic ? "التخزين الرقمي" : "Digital Storage",
+    used: isArabic ? "مستخدم" : "used",
+    adminOversight: isArabic ? "الإشراف الإداري" : "Admin Oversight",
+    systemAnalytics: isArabic ? "تحليلات النظام ومراجعة الطلاب" : "System Analytics & User Audit",
+    downloadDossier: isArabic ? "تحميل الملف الكامل" : "Download Dossier",
+    scholarActivityAudit: isArabic ? "مراجعة نشاط الطلاب" : "Scholar Activity Audit",
+    scholar: isArabic ? "الطالب" : "Scholar",
+    archivedFiles: isArabic ? "الملفات المؤرشفة" : "Archived Files",
+    lastSignal: isArabic ? "آخر إشارة" : "Last Signal",
+    units: isArabic ? "وحدات" : "Units",
+    enrollmentVelocity: isArabic ? "سرعة التسجيل" : "Enrollment Velocity",
+    past7Days: isArabic ? "آخر 7 أيام" : "Past 7 Days",
+    stabilizedStat: isArabic ? "استقر المدخول الأسبوعي عند " : "Weekly intake has stabilized at ",
+    stabilizedStat2: isArabic ? " نسبة إلى فترة الأرشفة السابقة." : " relative to the previous archival period.",
+    active: isArabic ? "نشط" : "Active",
+    inactive: isArabic ? "غير نشط" : "Inactive",
+  };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-academic-paper">
+        <Sidebar currentScreen="reports" isAdmin={isAdmin} />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 text-academic-navy animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen bg-academic-paper">
+        <Sidebar currentScreen="reports" isAdmin={isAdmin} />
+        <div className="flex-1 flex items-center justify-center flex-col gap-4">
+          <p className="text-red-500 font-bold">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-academic-navy text-white rounded-lg font-bold"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const stats = [
     {
-      label: "Total Scholars",
-      value: "1,284",
-      growth: "+12%",
+      label: t.totalScholars,
+      value: data?.totalUsers?.toLocaleString() || "0",
+      growth: "Active",
       icon: Users,
       color: "text-academic-blue",
       bg: "bg-academic-blue/5",
     },
     {
-      label: "Archived Sources",
-      value: "45,902",
-      growth: "+8.4%",
+      label: t.archivedSources,
+      value: data?.archivedSources?.toLocaleString() || "0",
+      growth: "Growing",
       icon: FileUp,
       color: "text-academic-gold",
       bg: "bg-academic-gold/5",
     },
     {
-      label: "Weekly Growth",
+      label: t.weeklyGrowth,
       value: "248",
       growth: "+18%",
       icon: TrendingUp,
@@ -45,80 +128,38 @@ export default function ReportsPage({
       bg: "bg-emerald-50",
     },
     {
-      label: "Digital Storage",
-      value: "1.2 TB",
-      growth: "45% used",
+      label: t.digitalStorage,
+      value: data?.digitalStorage || "0 B",
+      growth: t.used,
       icon: HardDrive,
       color: "text-academic-navy",
       bg: "bg-academic-navy/5",
     },
   ];
 
-  const scholarActivity = [
-    {
-      id: 1,
-      name: "Alex Johnson",
-      email: "alex.j@university.edu",
-      files: 124,
-      lastActive: "2 hours ago",
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Dr. Elena Moretti",
-      email: "e.moretti@research.org",
-      files: 89,
-      lastActive: "5 hours ago",
-      status: "Active",
-    },
-    {
-      id: 3,
-      name: "Marcus Aurelius",
-      email: "marcus.a@stoic.edu",
-      files: 56,
-      lastActive: "1 day ago",
-      status: "Inactive",
-    },
-    {
-      id: 4,
-      name: "Sarah Jenkins",
-      email: "s.jenkins@academy.edu",
-      files: 212,
-      lastActive: "Just now",
-      status: "Active",
-    },
-    {
-      id: 5,
-      name: "Prof. Robert Langdon",
-      email: "r.langdon@harvard.edu",
-      files: 45,
-      lastActive: "3 days ago",
-      status: "Active",
-    },
-  ];
-
+  const userActivity = data?.scholarActivity || [];
   const weeklyTrends = [45, 52, 38, 65, 48, 72, 58];
   const maxTrend = Math.max(...weeklyTrends);
 
   return (
     <div className="flex min-h-screen bg-academic-paper">
-      <Sidebar currentScreen="reports" />
+      <Sidebar currentScreen="reports" isAdmin={isAdmin} />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <header className="h-20 bg-white/80 backdrop-blur-md border-b border-academic-navy/5 flex items-center justify-between px-6 md:px-10 shrink-0 z-10">
           <div>
             <h1 className="text-2xl font-serif font-bold text-academic-navy">
-              Administrative Oversight
+              {t.adminOversight}
             </h1>
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">
-              System Analytics & Scholar Audit
+              {t.systemAnalytics}
             </p>
           </div>
 
           <div className="flex items-center gap-4">
             <button className="flex items-center gap-2 px-4 py-2.5 bg-slate-50 text-slate-600 border border-slate-200 rounded-xl text-xs font-bold hover:bg-white transition-all shadow-sm group">
               <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
-              Download Full Dossier
+              {t.downloadDossier}
             </button>
           </div>
         </header>
@@ -162,7 +203,7 @@ export default function ReportsPage({
                       <UserCheck className="w-5 h-5" />
                     </div>
                     <h2 className="text-xl font-serif font-bold text-academic-navy">
-                      Scholar Activity Audit
+                      {t.scholarActivityAudit}
                     </h2>
                   </div>
                   <button className="p-2 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-slate-100">
@@ -171,40 +212,37 @@ export default function ReportsPage({
                 </div>
 
                 <div className="flex-1 overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
+                  <table className="w-full text-start border-collapse">
                     <thead>
                       <tr className="bg-white">
                         <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50">
-                          Scholar
+                          {t.scholar}
                         </th>
                         <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50">
-                          Archived Files
+                          {t.archivedFiles}
                         </th>
-                        <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50">
-                          Status
-                        </th>
-                        <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50 text-right">
-                          Last Signal
+                        <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50 text-end">
+                          {t.lastSignal}
                         </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
-                      {scholarActivity.map((scholar) => (
+                      {userActivity.map((user: any) => (
                         <tr
-                          key={scholar.id}
+                          key={user.id}
                           className="hover:bg-slate-50/50 transition-colors group"
                         >
                           <td className="px-8 py-5">
                             <div className="flex items-center gap-4">
                               <div className="w-10 h-10 rounded-xl bg-academic-navy/5 flex items-center justify-center text-academic-navy font-bold text-xs uppercase border border-academic-navy/10 flex-shrink-0 group-hover:bg-academic-navy group-hover:text-white transition-all">
-                                {scholar.name.charAt(0)}
+                                {user.name ? user.name.charAt(0) : "?"}
                               </div>
                               <div className="min-w-0">
                                 <p className="font-bold text-academic-navy truncate">
-                                  {scholar.name}
+                                  {user.name}
                                 </p>
                                 <p className="text-xs text-slate-400 truncate">
-                                  {scholar.email}
+                                  {user.email}
                                 </p>
                               </div>
                             </div>
@@ -213,27 +251,16 @@ export default function ReportsPage({
                             <div className="flex items-center gap-2">
                               <FileUp className="w-4 h-4 text-slate-300" />
                               <span className="font-bold text-slate-700">
-                                {scholar.files}{" "}
+                                {user.files}{" "}
                                 <span className="text-[10px] text-slate-400 font-medium">
-                                  Units
+                                  {t.units}
                                 </span>
                               </span>
                             </div>
                           </td>
-                          <td className="px-8 py-5">
-                            <span
-                              className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                                scholar.status === "Active"
-                                  ? "bg-emerald-50 text-emerald-600"
-                                  : "bg-slate-100 text-slate-400"
-                              }`}
-                            >
-                              {scholar.status}
-                            </span>
-                          </td>
-                          <td className="px-8 py-5 text-right">
+                          <td className="px-8 py-5 text-end">
                             <span className="text-xs font-semibold text-slate-500 italic">
-                              {scholar.lastActive}
+                              {user.lastActive}
                             </span>
                           </td>
                         </tr>
@@ -246,40 +273,44 @@ export default function ReportsPage({
               <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 p-8 flex flex-col">
                 <div className="flex items-center gap-3 mb-10">
                   <div className="w-10 h-10 bg-academic-gold/10 text-academic-gold rounded-xl flex items-center justify-center">
-                    <Calendar className="w-5 h-5" />
+                    <TrendingUp className="w-5 h-5" />
                   </div>
                   <div>
                     <h2 className="text-lg font-serif font-bold text-academic-navy leading-tight">
-                      Enrollment Velocity
+                      {t.enrollmentVelocity}
                     </h2>
                     <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">
-                      Past 7 Calendar Days
+                      {t.past7Days}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex-1 flex items-end justify-between gap-4 h-64 mb-6">
+                <div className="flex items-end justify-between gap-1.5 h-32">
                   {weeklyTrends.map((val, i) => (
-                    <div key={i} className="flex-1 flex flex-col items-center gap-3 group">
-                       <span className="opacity-0 group-hover:opacity-100 text-[10px] font-bold text-academic-gold transition-opacity mb-2">
+                    <div
+                      key={i}
+                      className="flex-1 rounded-t-lg bg-academic-blue/10 hover:bg-academic-blue/20 transition-all relative group/chart"
+                      style={{ height: `${(val / maxTrend) * 100}%` }}
+                    >
+                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-academic-navy opacity-0 group-hover/chart:opacity-100 transition-opacity">
                         {val}
-                      </span>
-                      <div 
-                        className="w-full bg-academic-gold/10 rounded-full relative overflow-hidden transition-all group-hover:bg-academic-gold/20 flex flex-col justify-end"
-                        style={{ height: `${(val / maxTrend) * 100}%` }}
-                      >
-                         <div className="w-full h-1/2 bg-academic-gold rounded-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">
-                        D0{i + 1}
-                      </span>
                     </div>
                   ))}
                 </div>
+                <div className="flex justify-between mt-2">
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, i) => (
+                    <span key={i} className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                      {isArabic
+                        ? ["الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت", "الأحد"][i]
+                        : day}
+                    </span>
+                  ))}
+                </div>
 
-                <div className="pt-6 border-t border-slate-50">
+                <div className="pt-6 mt-auto border-t border-slate-50">
                   <p className="text-sm text-slate-600 leading-relaxed italic">
-                    "Weekly intake has stabilized at <span className="font-bold text-academic-blue">+12%</span> relative to the previous archival period."
+                    {t.stabilizedStat}<span className="font-bold text-academic-blue">+12%</span>{t.stabilizedStat2}
                   </p>
                 </div>
               </div>

@@ -254,7 +254,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
                             key={index}
                             onClick={() => handleOptionSelect(index)}
                             disabled={answered}
-                            className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center justify-between gap-4 ${optionClass}`}
+                            className={`w-full text-start p-4 rounded-xl border-2 transition-all flex items-center justify-between gap-4 ${optionClass}`}
                           >
                             <div className="flex items-center gap-4">
                               <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold shrink-0 ${isSelected && !answered ? 'bg-blue-600 text-white' :

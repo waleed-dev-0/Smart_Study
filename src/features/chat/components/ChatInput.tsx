@@ -7,6 +7,7 @@ import {
   Upload,
   Menu,
 } from "lucide-react";
+import { useAppContext } from "../../../context/AppContext";
 import { uploadFile } from "../../../features/upload/services/uploadService";
 import { fetchDocuments } from "../../../features/upload/services/uploadService";
 
@@ -17,6 +18,7 @@ interface ChatInputProps {
   onDocumentUpload: (file: File) => Promise<void>;
   onLoadDocs: () => Promise<void>;
   onToggleHistory: () => void;
+  isFreeChat?: boolean;
 }
 
 export default function ChatInput({
@@ -26,15 +28,26 @@ export default function ChatInput({
   onDocumentUpload,
   onLoadDocs,
   onToggleHistory,
+  isFreeChat,
 }: ChatInputProps) {
   const navigate = useNavigate();
+  const { isArabic } = useAppContext();
   const [input, setInput] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const t = {
+    academicArchive: isArabic ? "الأرشيف الأكاديمي" : "Academic Archive",
+    indexNewRecord: isArabic ? "فهرسة سجل جديد" : "Index New Record",
+    inputPlaceholderDoc: isArabic ? "صُغ استفسارك بخصوص المستند..." : "Formulate your inquiry regarding the document...",
+    inputPlaceholderNoDoc: isArabic ? "يرجى رفع مستند أولاً لبدء المحادثة." : "Please upload a document first to start chatting.",
+    autoAnalysisMsg: isArabic ? "تحليل آلي. يخضع للتدقيق الأكاديمي." : "Automated analysis. Subject to academic verification.",
+    freeChatPlaceholder: isArabic ? "اسألني أي شيء..." : "Ask me anything...",
+  };
+
   const handleSend = () => {
-    if (!input.trim() || !activeDocId) return;
+    if (!input.trim() || (!activeDocId && !isFreeChat)) return;
     onSend(input);
     setInput("");
   };
@@ -70,26 +83,26 @@ export default function ChatInput({
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute bottom-full left-0 mb-4 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50 p-2 animate-in fade-in slide-in-from-bottom-2">
+              <div className={`absolute bottom-full ${isArabic ? "right-0" : "left-0"} mb-4 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50 p-2 animate-in fade-in slide-in-from-bottom-2`}>
                 <button
                   onClick={() => {
                     setIsDropdownOpen(false);
                     navigate("/library");
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-xl transition-colors text-left"
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-xl transition-colors ${isArabic ? "text-right" : "text-left"}`}
                 >
                   <Database className="w-4 h-4 text-academic-blue" />
-                  Academic Archive
+                  {t.academicArchive}
                 </button>
                 <button
                   onClick={() => {
                     setIsDropdownOpen(false);
                     fileInputRef.current?.click();
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-xl transition-colors text-left"
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-xl transition-colors ${isArabic ? "text-right" : "text-left"}`}
                 >
                   <Upload className="w-4 h-4 text-academic-gold" />
-                  Index New Record
+                  {t.indexNewRecord}
                 </button>
               </div>
             )}
@@ -108,17 +121,19 @@ export default function ChatInput({
             onKeyDown={handleKeyPress}
             placeholder={
               activeDocId
-                ? "Formulate your inquiry regarding the document..."
-                : "Please upload a document first to start chatting."
+                ? t.inputPlaceholderDoc
+                : isFreeChat
+                  ? t.freeChatPlaceholder
+                  : t.inputPlaceholderNoDoc
             }
-            disabled={!activeDocId || isLoading}
+            disabled={(!activeDocId && !isFreeChat) || isLoading}
             className="w-full max-h-32 min-h-[48px] bg-transparent border-none outline-none resize-none py-3 text-sm text-slate-700 placeholder:text-slate-400 font-medium"
             rows={1}
           />
 
           <button
             onClick={handleSend}
-            disabled={!input.trim() || !activeDocId || isLoading}
+            disabled={!input.trim() || (!activeDocId && !isFreeChat) || isLoading}
             className="p-3.5 bg-academic-navy text-white hover:bg-academic-blue rounded-xl transition-all shrink-0 shadow-lg shadow-academic-navy/20 active:scale-95 disabled:opacity-50"
           >
             {isLoading ? (
@@ -129,7 +144,7 @@ export default function ChatInput({
           </button>
         </div>
         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] text-center mt-4">
-          Automated analysis. Subject to academic verification.
+          {t.autoAnalysisMsg}
         </p>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { X, Search } from "lucide-react";
+import { useAppContext } from "../../../context/AppContext";
 
 interface QuizPanelProps {
   isOpen: boolean;
@@ -6,13 +7,20 @@ interface QuizPanelProps {
 }
 
 export default function QuizPanel({ isOpen, onClose }: QuizPanelProps) {
+  const { isArabic } = useAppContext();
+
+  const t = {
+    evaluationsTitle: isArabic ? "التقييمات الأكاديمية" : "Academic Evaluations",
+    reviewResults: isArabic ? "مراجعة النتائج" : "Review Results",
+  };
+
   return (
     <div
       className={`fixed inset-y-0 right-0 z-[70] w-80 bg-white border-l border-slate-200 transform transition-transform duration-300 flex flex-col h-screen shadow-2xl ${isOpen ? "translate-x-0" : "translate-x-full"}`}
     >
       <div className="p-6 border-b border-slate-100 flex items-center justify-between">
         <h2 className="text-xs font-bold text-academic-navy uppercase tracking-widest">
-          Academic Evaluations
+          {t.evaluationsTitle}
         </h2>
         <button
           onClick={onClose}
@@ -37,7 +45,7 @@ export default function QuizPanel({ isOpen, onClose }: QuizPanelProps) {
             </div>
           </div>
           <button className="w-full py-2 bg-academic-navy text-white rounded-lg text-xs font-bold hover:bg-academic-blue transition-colors">
-            Review Results
+            {t.reviewResults}
           </button>
         </div>
       </div>

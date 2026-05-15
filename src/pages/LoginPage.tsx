@@ -1,20 +1,45 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect, FormEvent } from "react";
-import { GraduationCap, Mail, Lock, ArrowRight } from "lucide-react";
+import { GraduationCap, Mail, Lock, ArrowRight, ArrowLeft } from "lucide-react";
+import { useAppContext } from "../context/AppContext";
 import { authService } from "../services/authService";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { isArabic } = useAppContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const t = {
+    institutionalAccess: isArabic ? "الدخول المؤسسي" : "Institutional Access",
+    secureAuth: isArabic ? "توثيق آمن للباحثين" : "Secure Scholar Authentication",
+    academicEmail: isArabic ? "البريد الأكاديمي" : "Academic Email",
+    emailPlaceholder: isArabic ? "باحث@الجامعة. edu" : "scholar@university.edu",
+    secretKey: isArabic ? "المفتاح السري" : "Secret Key",
+    passwordPlaceholder: isArabic ? "••••••••" : "••••••••",
+    stayAuthenticated: isArabic ? "البقاء مسجلاً" : "Stay authenticated",
+    resetCredentials: isArabic ? "إعادة تعيين البيانات" : "Reset Credentials",
+    authenticating: isArabic ? "جاري التحقق..." : "Authenticating...",
+    enterPortal: isArabic ? "دخول البوابة" : "Enter Portal",
+    newApplicant: isArabic ? "باحث جديد؟" : "New Research Applicant?",
+    applyForAccess: isArabic ? "طلب الدخول" : "Apply for Access",
+    failedLogin: isArabic ? "فشل تسجيل الدخول" : "Failed to login",
+    smartStudy: isArabic ? "الدراسة الذكية" : "Smart Study",
+  };
+
+  const ArrowIcon = isArabic ? ArrowLeft : ArrowRight;
 
   useEffect(() => {
     if (localStorage.getItem("token")) {
       navigate("/dashboard", { replace: true });
     }
   }, [navigate]);
+
+  useEffect(() => {
+    document.documentElement.dir = isArabic ? 'rtl' : 'ltr';
+  }, [isArabic]);
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -25,14 +50,14 @@ export default function LoginPage() {
       await authService.login(email, password);
       navigate("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Failed to login");
+      setError(err.message || t.failedLogin);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-academic-paper flex">
+    <div className="min-h-screen bg-academic-paper flex" dir={isArabic ? "rtl" : "ltr"}>
       <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:flex-none lg:w-[560px] lg:px-16 xl:px-24 border-r border-slate-200 bg-white shadow-lg shadow-slate-200/30">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div
@@ -43,16 +68,16 @@ export default function LoginPage() {
               <GraduationCap className="w-6 h-6 text-white" />
             </div>
             <span className="text-2xl font-serif font-bold text-academic-navy tracking-tight">
-              Smart Study
+              {t.smartStudy}
             </span>
           </div>
 
           <div>
             <h2 className="text-3xl font-serif font-bold text-academic-navy tracking-tight">
-              Institutional Access
+              {t.institutionalAccess}
             </h2>
             <p className="mt-2 mb-2 text-sm text-slate-500 font-medium uppercase tracking-wider">
-              Secure Scholar Authentication
+              {t.secureAuth}
             </p>
           </div>
 
@@ -69,10 +94,10 @@ export default function LoginPage() {
                   htmlFor="email"
                   className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2"
                 >
-                  Academic Email
+                  {t.academicEmail}
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <div className={`absolute inset-y-0 ${isArabic ? "end-0 pe-4" : "start-0 ps-4"} flex items-center pointer-events-none`}>
                     <Mail className="h-5 w-5 text-slate-300" />
                   </div>
                   <input
@@ -82,8 +107,8 @@ export default function LoginPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
-                    placeholder="scholar@university.edu"
+                    className={`block w-full ${isArabic ? "pe-12 ps-4" : "ps-12 pe-4"} py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all`}
+                    placeholder={t.emailPlaceholder}
                   />
                 </div>
               </div>
@@ -93,10 +118,10 @@ export default function LoginPage() {
                   htmlFor="password"
                   className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2"
                 >
-                  Secret Key
+                  {t.secretKey}
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <div className={`absolute inset-y-0 ${isArabic ? "end-0 pe-4" : "start-0 ps-4"} flex items-center pointer-events-none`}>
                     <Lock className="h-5 w-5 text-slate-300" />
                   </div>
                   <input
@@ -106,8 +131,8 @@ export default function LoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-12 pr-4 py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all"
-                    placeholder="••••••••"
+                    className={`block w-full ${isArabic ? "pe-12 ps-4" : "ps-12 pe-4"} py-3.5 border border-slate-200 rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue transition-all`}
+                    placeholder={t.passwordPlaceholder}
                   />
                 </div>
               </div>
@@ -121,9 +146,9 @@ export default function LoginPage() {
                   />
                   <label
                     htmlFor="remember-me"
-                    className="ml-2 block text-sm text-slate-500 font-medium cursor-pointer"
+                    className={`${isArabic ? "me-2" : "ms-2"} block text-sm text-slate-500 font-medium cursor-pointer`}
                   >
-                    Stay authenticated
+                    {t.stayAuthenticated}
                   </label>
                 </div>
 
@@ -133,7 +158,7 @@ export default function LoginPage() {
                     onClick={() => navigate('/reset-password')}
                     className="font-bold text-academic-blue hover:text-academic-navy transition-colors bg-transparent border-none p-0 cursor-pointer"
                   >
-                    Reset Credentials
+                    {t.resetCredentials}
                   </button>
                 </div>
               </div>
@@ -144,19 +169,19 @@ export default function LoginPage() {
                   disabled={loading}
                   className="w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-2xl shadow-xl text-lg font-bold text-white bg-academic-navy hover:bg-academic-blue transition-all hover:shadow-academic-navy/30 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  {loading ? "Authenticating..." : "Enter Portal"}
-                  {!loading && <ArrowRight className="w-5 h-5" />}
+                  {loading ? t.authenticating : t.enterPortal}
+                  {!loading && <ArrowIcon className="w-5 h-5" />}
                 </button>
               </div>
             </form>
 
             <p className="mt-10 text-center text-sm text-slate-500 font-medium">
-              New Research Applicant?{" "}
+              {t.newApplicant}{" "}
               <button
                 onClick={() => navigate('/register')}
                 className="font-bold text-academic-blue hover:text-academic-navy transition-colors bg-transparent border-none p-0 cursor-pointer"
               >
-                Apply for Access
+                {t.applyForAccess}
               </button>
             </p>
           </div>
@@ -178,9 +203,9 @@ export default function LoginPage() {
               ))}
             </div>
             <blockquote className="text-2xl font-serif font-light text-white leading-relaxed mb-8 italic">
-              "The precision and fidelity of the research synthesis provided by
-              this portal is unparalleled. It has become an essential component
-              of my doctoral studies."
+              {isArabic
+                ? '"دقة وإتقان التوليف البحثي الذي توفره هذه البوابة لا مثيل له. لقد أصبحت جزءاً أساسياً من دراساتي الدكتوراه."'
+                : '"The precision and fidelity of the research synthesis provided by this portal is unparalleled. It has become an essential component of my doctoral studies."'}
             </blockquote>
             <div className="flex items-center gap-5">
               <div className="w-14 h-14 rounded-2xl bg-academic-gold/20 border border-academic-gold/30 flex items-center justify-center text-academic-gold font-bold text-xl uppercase">
@@ -188,10 +213,10 @@ export default function LoginPage() {
               </div>
               <div>
                 <div className="text-white font-bold text-lg">
-                  Dr. Elena Moretti
+                  {isArabic ? "د. إلينا موريتي" : "Dr. Elena Moretti"}
                 </div>
                 <div className="text-slate-400 text-sm font-medium tracking-wide">
-                  University Research Fellow
+                  {isArabic ? "زميل أبحاث جامعي" : "University Research Fellow"}
                 </div>
               </div>
             </div>
