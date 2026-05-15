@@ -1,16 +1,14 @@
-import logger from "../utils/logger.js";
-
 export const validateGenerateQuestions = (req, res, next) => {
   const { document_id, count, difficulty, language } = req.body;
 
   if (!document_id) {
-    logger.warn(`Validation failed: Missing document_id for user ${req.user?._id}`);
+    console.error(`Validation failed: Missing document_id for user ${req.user?._id}`);
     return res.status(400).json({ success: false, message: "Missing required data: document_id" });
   }
 
   const requestedCount = parseInt(count || 10);
   if (isNaN(requestedCount) || requestedCount <= 0 || requestedCount > 50) {
-    logger.warn(`Validation failed: Invalid count ${count} for user ${req.user?._id}`);
+    console.error(`Validation failed: Invalid count ${count} for user ${req.user?._id}`);
     return res.status(400).json({ success: false, message: "Invalid question count. Must be between 1 and 50." });
   }
 

@@ -1,7 +1,6 @@
 import DocumentChunk from "../models/documentchunk.js";
 import Question from "../models/question.js";
 import mongoose from "mongoose";
-import logger from "../utils/logger.js";
 
 export class QuestionService {
   // Dependency Injection: injecting the AI processor
@@ -79,7 +78,6 @@ Give me a JSON array only, like this:
     }
 
     // 3. Process with AI
-    logger.info(`Sending ${totalLength} chars to AI for document ${documentId}`);
     const generatedQuiz = await this.extractQuestionsFromText(allText, count, difficulty, language);
 
     if (!generatedQuiz || generatedQuiz.length === 0) {
@@ -116,10 +114,9 @@ Give me a JSON array only, like this:
         await Question.deleteMany({ document_id: documentId, user_id: userId }, { session });
         result = await Question.insertMany(finalArray, { session });
       });
-      logger.info(`Successfully saved ${result.length} questions for doc ${documentId}`);
     } catch (dbError) {
       if (dbError.message.includes('Transaction') || dbError.message.includes('replica set')) {
-        logger.warn("Transactions not supported, falling back to standard operations");
+        console.warn("Transactions not supported, falling back to standard operations");
         await Question.deleteMany({ document_id: documentId, user_id: userId });
         result = await Question.insertMany(finalArray);
       } else {
