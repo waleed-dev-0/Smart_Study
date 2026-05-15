@@ -51,7 +51,9 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   const [isQuizzesOpen, setIsQuizzesOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [duplicateFile, setDuplicateFile] = useState<File | null>(null);
-  const [headerRenameDocId, setHeaderRenameDocId] = useState<string | null>(null);
+  const [headerRenameDocId, setHeaderRenameDocId] = useState<string | null>(
+    null,
+  );
   const [headerRenameTitle, setHeaderRenameTitle] = useState("");
 
   useEffect(() => {
@@ -146,7 +148,9 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   const handleHeaderRenameSave = async () => {
     if (!headerRenameTitle.trim() || !headerRenameDocId) return;
     try {
-      const res = await api.put(`/chat/session/${headerRenameDocId}`, { title: headerRenameTitle.trim() });
+      const res = await api.put(`/chat/session/${headerRenameDocId}`, {
+        title: headerRenameTitle.trim(),
+      });
       if (res.data?.success) {
         await loadDocs();
       }
@@ -295,11 +299,6 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
         />
       </div>
 
-      <QuizPanel
-        isOpen={isQuizzesOpen}
-        onClose={() => setIsQuizzesOpen(false)}
-      />
-
       {duplicateFile && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in">
           <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden max-w-md w-full animate-in zoom-in-95 duration-300">
@@ -314,7 +313,8 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
                 <strong className="text-amber-900">{duplicateFile.name}</strong>
               </p>
               <p className="text-xs text-amber-600/80 mb-6">
-                This file already exists in your archive. Upload a duplicate copy anyway?
+                This file already exists in your archive. Upload a duplicate
+                copy anyway?
               </p>
               <div className="flex gap-3">
                 <button

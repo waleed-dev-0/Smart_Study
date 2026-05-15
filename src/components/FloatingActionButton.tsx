@@ -32,9 +32,9 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          documentId: activeDocId,
+          document_id: activeDocId,
           difficulty,
-          numberOfQuestions: numQuestions,
+          count: numQuestions,
           language
         })
       });
