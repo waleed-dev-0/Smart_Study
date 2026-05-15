@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import api from "../services/api";
+import { API_BASE_URL } from "../config";
 import {
   Search,
   FileText,
@@ -12,7 +13,6 @@ import {
   Library,
   Trash2,
 } from "lucide-react";
-import { useEffect } from "react";
 
 export default function DocumentLibraryPage({
   isAdmin,
@@ -59,7 +59,7 @@ export default function DocumentLibraryPage({
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/documents/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/documents/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

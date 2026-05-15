@@ -1,11 +1,12 @@
 import chatService from '../services/chatService.js';
 import ChatSession from '../models/chatsession.js';
 import ChatMessage from '../models/chatmessage.js';
+import DocumentModel from '../models/document.js';
 import mongoose from 'mongoose';
 
 export const askAI = async (req, res) => {
   try {
-    const { query, documentId, provider, model } = req.body;
+    const { query, documentId, provider } = req.body;
     const userId = req.user?._id;
 
     if (!query || !documentId) {
@@ -20,7 +21,6 @@ export const askAI = async (req, res) => {
       documentId,
       userId,
       provider,
-      model
     );
 
     res.status(200).json({
@@ -84,6 +84,43 @@ export const askAIStream = async (req, res) => {
       `data: ${JSON.stringify({ error: error.message })}\n\n`,
     );
     res.end();
+  }
+};
+
+export const renameSession = async (req, res) => {
+  try {
+    const { documentId } = req.params;
+    const { title } = req.body;
+    const userId = req.user?._id;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Title is required",
+      });
+    }
+
+    const doc = await DocumentModel.findOne({
+      _id: new mongoose.Types.ObjectId(documentId),
+      user_id: userId,
+    });
+
+    if (!doc) {
+      return res.status(404).json({
+        success: false,
+        message: "Document not found",
+      });
+    }
+
+    doc.title = title.trim();
+    await doc.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Document renamed",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 

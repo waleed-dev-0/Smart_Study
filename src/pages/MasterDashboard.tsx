@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { QuestionList } from '../features/questions/components/QuestionList';
-import { FileUploader } from '../features/upload/components/FileUploader';
-import { FileList } from '../features/upload/components/FileList';
-import { ChatWindow } from '../features/chat/components/ChatWindow';
-import { Card } from '../shared/components/Card';
+// Legacy: These modules no longer exist — page is not routed
+// import { QuestionList } from '../features/questions/components/QuestionList';
+// import { FileUploader } from '../features/upload/components/FileUploader';
+// import { FileList } from '../features/upload/components/FileList';
+// import { ChatWindow } from '../features/chat/components/ChatWindow';
+// import { Card } from '../shared/components/Card';
 import { motion } from 'motion/react';
 import { BookOpen, Upload, MessageSquare, LayoutDashboard } from 'lucide-react';
 
@@ -71,18 +72,17 @@ const Dashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {activeTab === 'questions' && <QuestionList />}
+          {activeTab === 'questions' && <p className="text-slate-500">Question Bank (legacy)</p>}
           
           {activeTab === 'uploads' && (
             <div className="max-w-4xl mx-auto">
-              <FileUploader onUploadSuccess={() => setRefreshUploads(prev => prev + 1)} />
-              <FileList refreshTrigger={refreshUploads} />
+              <p className="text-slate-500">Study Files (legacy)</p>
             </div>
           )}
 
           {activeTab === 'chat' && (
             <div className="max-w-5xl mx-auto">
-              <ChatWindow conversationId="general-study" currentUser="Walid_Al_Oumi" />
+              <p className="text-slate-500">Discussions (legacy)</p>
             </div>
           )}
         </motion.div>

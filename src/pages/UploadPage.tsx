@@ -11,8 +11,9 @@ import {
   ShieldCheck,
   GraduationCap,
   Clock,
+  Copy,
 } from "lucide-react";
-import { uploadFile } from "../features/upload/services/uploadService";
+import { uploadFile, UploadError } from "../features/upload/services/uploadService";
 
 export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
     "idle" | "uploading" | "success" | "error"
   >("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -79,9 +81,14 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
       setTimeout(() => {
         navigate("/chat");
       }, 1500);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Upload failed:", error);
-      setUploadStatus("error");
+      if (error instanceof UploadError && error.status === 409) {
+        setShowDuplicateDialog(true);
+        setUploadStatus("idle");
+      } else {
+        setUploadStatus("error");
+      }
     }
   };
 
@@ -264,6 +271,52 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
                           Initiate Synthesis
                         </>
                       )}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {showDuplicateDialog && (
+                <div className="mt-8 border-2 border-amber-200 bg-amber-50/60 rounded-[2rem] p-10 flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg mb-6 border border-amber-100">
+                    <Copy className="w-10 h-10 text-amber-500" />
+                  </div>
+                  <h3 className="text-2xl font-serif font-bold text-amber-900 mb-3">
+                    Document Already Indexed
+                  </h3>
+                  <p className="text-sm text-amber-700 font-medium mb-2 leading-relaxed max-w-md">
+                    A file named <strong className="text-amber-900">{selectedFile?.name}</strong> already exists in your archive.
+                  </p>
+                  <p className="text-xs text-amber-600/80 font-medium mb-8">
+                    Re-uploading will create a duplicate entry. Would you like to continue anyway?
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
+                    <button
+                      onClick={() => {
+                        setShowDuplicateDialog(false);
+                        setSelectedFile(null);
+                      }}
+                      className="flex-1 bg-white border border-amber-200 text-amber-700 px-8 py-4 rounded-2xl text-sm font-bold hover:bg-amber-100 transition-all shadow-sm"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowDuplicateDialog(false);
+                        setUploadStatus("uploading");
+                        setUploadProgress(30);
+                        uploadFile(selectedFile!, parentId || undefined, true)
+                          .then((result) => {
+                            setUploadProgress(100);
+                            setUploadStatus("success");
+                            localStorage.setItem("activeDocumentId", result.data.documentId);
+                            setTimeout(() => navigate("/chat"), 1500);
+                          })
+                          .catch(() => setUploadStatus("error"));
+                      }}
+                      className="flex-1 bg-amber-600 text-white px-8 py-4 rounded-2xl text-sm font-bold hover:bg-amber-700 transition-all shadow-lg shadow-amber-600/20 active:scale-95"
+                    >
+                      Upload Anyway
                     </button>
                   </div>
                 </div>

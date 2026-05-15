@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BookOpen, X, Settings2, Loader2, Target, Globe2, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 
 export default function FloatingActionButton({ activeDocId }: { activeDocId: string | null }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,16 +25,16 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
     setIsGenerating(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://127.0.0.1:5000/api/questions/generate', {
+      const response = await fetch(`${API_BASE_URL}/questions/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          document_id: activeDocId,
+          documentId: activeDocId,
           difficulty,
-          count: numQuestions,
+          numberOfQuestions: numQuestions,
           language
         })
       });

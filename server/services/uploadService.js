@@ -16,7 +16,7 @@ class UploadService {
     }
   }
 
-  async processPDF(filePath, originalName, userId) {
+  async processPDF(filePath, originalName, userId, force = false) {
     try {
       const dataBuffer = await fs.promises.readFile(filePath);
 
@@ -25,10 +25,8 @@ class UploadService {
 
       let data;
       try {
-
         data = await pdfParse(dataBuffer);
       } catch (innerErr) {
-
         if (pdfParse.PDFParse) {
           const parser = new pdfParse.PDFParse({ data: dataBuffer });
           data = await parser.getText();
@@ -49,13 +47,15 @@ class UploadService {
       }
       const stats = await fs.promises.stat(filePath);
 
-      const existingDocument = await DocumentModel.findOne({
-        title: originalName,
-        user_id: userId
-      });
+      if (!force) {
+        const existingDocument = await DocumentModel.findOne({
+          title: originalName,
+          user_id: userId,
+        });
 
-      if (existingDocument) {
-        throw new Error("File already exists");
+        if (existingDocument) {
+          throw new Error("File already exists");
+        }
       }
 
       const document = await DocumentModel.create({
@@ -85,7 +85,6 @@ class UploadService {
                 embedding = await this.getEmbeddingWithRetry(content);
               } catch (embedErr) {
                 console.error(`[Upload] Failed to embed chunk ${globalIndex}:`, embedErr.message);
-                // Continue saving chunk with empty embedding so quiz generation still works
               }
               
               await DocumentChunk.create({
@@ -113,6 +112,7 @@ class UploadService {
       );
       return document._id.toString();
     } catch (error) {
+      if (error.message === "File already exists") throw error;
       console.error("[Upload] Error processing PDF:", error.message);
       throw new Error("Failed to process and index PDF: " + error.message);
     }
