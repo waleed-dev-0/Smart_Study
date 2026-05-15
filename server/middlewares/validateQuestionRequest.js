@@ -17,7 +17,7 @@ export const validateGenerateQuestions = (req, res, next) => {
     return res.status(400).json({ success: false, message: "Invalid difficulty level." });
   }
 
-  // Attach sanitized data to request
+
   req.validatedData = {
     documentId: document_id,
     count: requestedCount,
