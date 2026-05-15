@@ -12,8 +12,10 @@ import {
   Pencil,
   Check,
   X,
+  Plus,
+  Upload,
 } from "lucide-react";
-import { useChat } from "../features/chat/hooks/useChat";
+import { useChat, FREE_WELCOME_MESSAGE } from "../features/chat/hooks/useChat";
 import {
   fetchDocuments,
   uploadFile,
@@ -38,8 +40,10 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
     loadingStatus,
     streamingText,
     sendMessage,
+    sendFreeMessage,
     fetchHistory,
     clearMessages,
+    setInitialMessages,
   } = useChat();
 
   const [provider, setProvider] = useState<"gemini" | "ollama">("gemini");
@@ -47,6 +51,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   const [activeDocId, setActiveDocId] = useState<string | null>(
     localStorage.getItem("activeDocumentId"),
   );
+  const [isFreeChat, setIsFreeChat] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isQuizzesOpen, setIsQuizzesOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -55,6 +60,17 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
     null,
   );
   const [headerRenameTitle, setHeaderRenameTitle] = useState("");
+
+  const [freeChatSessions, setFreeChatSessions] = useState<any[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("freeChatSessions") || "[]");
+    } catch { return []; }
+  });
+  const [currentFreeChatId, setCurrentFreeChatId] = useState<string | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem("freeChatSessions", JSON.stringify(freeChatSessions));
+  }, [freeChatSessions]);
 
   useEffect(() => {
     const docId = new URLSearchParams(location.search).get("docId");
@@ -93,14 +109,98 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   }, [activeDocId]);
 
   const handleSend = (input: string) => {
-    sendMessage(input, activeDocId!, provider);
+    if (isFreeChat) {
+      sendFreeMessage(input, provider);
+    } else {
+      sendMessage(input, activeDocId!, provider);
+    }
+  };
+
+  const handleNewChat = () => {
+    const id = `free-${Date.now()}`;
+    setCurrentFreeChatId(id);
+    setInitialMessages([FREE_WELCOME_MESSAGE]);
+    setActiveDocId(null);
+    localStorage.removeItem("activeDocumentId");
+    setIsFreeChat(true);
+  };
+
+  useEffect(() => {
+    if (isFreeChat && currentFreeChatId && messages.length > 1) {
+      setFreeChatSessions((prev: any[]) => {
+        const exists = prev.some((s: any) => s.id === currentFreeChatId);
+        if (!exists) {
+          return [
+            {
+              id: currentFreeChatId,
+              title: `Free Chat ${new Date().toLocaleDateString()}`,
+              messages,
+              createdAt: new Date().toISOString(),
+            },
+            ...prev,
+          ];
+        }
+        return prev.map((s: any) =>
+          s.id === currentFreeChatId ? { ...s, messages } : s,
+        );
+      });
+    }
+  }, [messages, isFreeChat, currentFreeChatId]);
+
+  const handleSelectFreeChat = (sessionId: string) => {
+    const session = freeChatSessions.find((s: any) => s.id === sessionId);
+    if (session) {
+      setCurrentFreeChatId(sessionId);
+      setInitialMessages(session.messages || [FREE_WELCOME_MESSAGE]);
+      setActiveDocId(null);
+      localStorage.removeItem("activeDocumentId");
+      setIsFreeChat(true);
+    }
+    setIsHistoryOpen(false);
+  };
+
+  const handleDeleteFreeChat = (sessionId: string) => {
+    setFreeChatSessions((prev: any[]) => prev.filter((s: any) => s.id !== sessionId));
+    if (currentFreeChatId === sessionId) {
+      setCurrentFreeChatId(null);
+      clearMessages();
+      setIsFreeChat(false);
+    }
+  };
+
+  const handleDeleteDocument = async (docId: string) => {
+    try {
+      await api.delete(`/documents/${docId}`);
+      await loadDocs();
+      if (activeDocId === docId) {
+        setActiveDocId(null);
+        localStorage.removeItem("activeDocumentId");
+        clearMessages();
+      }
+    } catch (err: any) {
+      console.error("Delete failed", err);
+      alert(err.response?.data?.message || err.message || "Failed to delete document");
+    }
+  };
+
+  const handleRenameFreeChat = (sessionId: string, title: string) => {
+    setFreeChatSessions((prev: any[]) =>
+      prev.map((s: any) =>
+        s.id === sessionId ? { ...s, title } : s,
+      ),
+    );
   };
 
   const handleDocumentUpload = async (file: File) => {
     setIsUploading(true);
     try {
-      await uploadFile(file, activeDocId || undefined);
+      const res = await uploadFile(file, activeDocId || undefined);
       await loadDocs();
+      if (isFreeChat && res?.data?.documentId) {
+        setActiveDocId(res.data.documentId);
+        localStorage.setItem("activeDocumentId", res.data.documentId);
+        setIsFreeChat(false);
+      }
     } catch (err: any) {
       if (err instanceof UploadError && err.status === 409) {
         setDuplicateFile(file);
@@ -129,9 +229,10 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   };
 
   const handleSelectDocument = (id: string) => {
-    if (activeDocId !== id) {
+    if (activeDocId !== id || isFreeChat) {
       setActiveDocId(id);
       localStorage.setItem("activeDocumentId", id);
+      setIsFreeChat(false);
       clearMessages();
     }
     setIsHistoryOpen(false);
@@ -170,8 +271,14 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
         onClose={() => setIsHistoryOpen(false)}
         documents={documents}
         activeDocId={activeDocId}
+        activeFreeChatId={currentFreeChatId}
         onSelectDocument={handleSelectDocument}
+        onSelectFreeChat={handleSelectFreeChat}
+        onDeleteDocument={handleDeleteDocument}
+        onDeleteFreeChat={handleDeleteFreeChat}
+        onRenameFreeChat={handleRenameFreeChat}
         onDocsRefreshed={loadDocs}
+        freeChatSessions={freeChatSessions}
       />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden bg-white relative">
@@ -189,54 +296,82 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
               </div>
               <div className="min-w-0">
                 <h1 className="text-lg font-serif font-bold text-academic-navy leading-tight flex items-center gap-2 truncate">
-                  <span className="truncate">Research Assistant</span>
+                  <span className="truncate">
+                    {isFreeChat ? "Free Chat" : "Research Assistant"}
+                  </span>
                 </h1>
-                <p className="text-xs text-slate-500 flex items-center gap-1 truncate font-medium">
-                  Analysis:{" "}
-                  {headerRenameDocId === activeDocId ? (
-                    <span className="flex items-center gap-1 min-w-0">
-                      <input
-                        autoFocus
-                        value={headerRenameTitle}
-                        onChange={(e) => setHeaderRenameTitle(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleHeaderRenameSave();
-                          if (e.key === "Escape") setHeaderRenameDocId(null);
-                        }}
-                        className="text-academic-blue text-xs font-medium bg-accent-blue/10 border border-academic-blue rounded px-1.5 py-0.5 outline-none min-w-0 w-full"
-                      />
-                      <button
-                        onClick={handleHeaderRenameSave}
-                        className="p-0.5 text-emerald-500 hover:text-emerald-600 shrink-0"
-                      >
-                        <Check className="w-3 h-3" />
-                      </button>
-                      <button
-                        onClick={() => setHeaderRenameDocId(null)}
-                        className="p-0.5 text-slate-400 hover:text-slate-600 shrink-0"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ) : (
-                    <button
-                      onClick={handleHeaderRenameStart}
-                      className="text-academic-blue truncate hover:bg-accent-blue/10 rounded px-1 -mx-1 transition-colors flex items-center gap-1"
-                      title="Click to rename"
-                    >
-                      <span className="truncate">
-                        {documents.find((d) => d._id === activeDocId)?.title ||
-                          "Select a document"}
+                {isFreeChat ? (
+                  <p className="text-xs text-slate-500 font-medium">
+                    Ask me anything, or upload a document to analyze
+                  </p>
+                ) : (
+                  <p className="text-xs text-slate-500 flex items-center gap-1 truncate font-medium">
+                    Analysis:{" "}
+                    {headerRenameDocId === activeDocId && activeDocId ? (
+                      <span className="flex items-center gap-1 min-w-0">
+                        <input
+                          autoFocus
+                          value={headerRenameTitle}
+                          onChange={(e) => setHeaderRenameTitle(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") handleHeaderRenameSave();
+                            if (e.key === "Escape") setHeaderRenameDocId(null);
+                          }}
+                          className="text-academic-blue text-xs font-medium bg-accent-blue/10 border border-academic-blue rounded px-1.5 py-0.5 outline-none min-w-0 w-full"
+                        />
+                        <button
+                          onClick={handleHeaderRenameSave}
+                          className="p-0.5 text-emerald-500 hover:text-emerald-600 shrink-0"
+                        >
+                          <Check className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={() => setHeaderRenameDocId(null)}
+                          className="p-0.5 text-slate-400 hover:text-slate-600 shrink-0"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
                       </span>
-                      <Pencil className="w-3 h-3 shrink-0 opacity-50" />
-                    </button>
-                  )}
-                </p>
+                    ) : (
+                      <button
+                        onClick={handleHeaderRenameStart}
+                        className="text-academic-blue truncate hover:bg-accent-blue/10 rounded px-1 -mx-1 transition-colors flex items-center gap-1"
+                        title="Click to rename"
+                      >
+                        <span className="truncate">
+                          {documents.find((d) => d._id === activeDocId)?.title ||
+                            "Select a document"}
+                        </span>
+                        <Pencil className="w-3 h-3 shrink-0 opacity-50" />
+                      </button>
+                    )}
+                  </p>
+                )}
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={handleNewChat}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                isFreeChat
+                  ? "bg-academic-navy text-white shadow-sm"
+                  : "text-slate-500 hover:text-academic-navy hover:bg-slate-50 border border-slate-200"
+              }`}
+            >
+              <Plus className="w-4 h-4" />
+              New Chat
+            </button>
+
+            <button
+              onClick={() => navigate("/upload")}
+              className="p-2 text-slate-400 hover:text-academic-navy hover:bg-slate-50 rounded-xl transition-colors border border-slate-200"
+              title="Upload document"
+            >
+              <Upload className="w-4 h-4" />
+            </button>
+
             <div className="hidden sm:flex bg-slate-50 border border-slate-200 rounded-xl p-1 gap-1">
               <button
                 onClick={() => setProvider("gemini")}
@@ -253,13 +388,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
                 Ollama
               </button>
             </div>
-            <button
-              onClick={() => setIsQuizzesOpen(true)}
-              className="px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-academic-navy transition-all flex items-center gap-2"
-            >
-              <BookOpen className="w-4 h-4" />
-              <span className="hidden md:inline">Evaluations</span>
-            </button>
+
             <button className="p-2 text-slate-400 hover:text-academic-navy hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-100">
               <MoreHorizontal className="w-5 h-5" />
             </button>
@@ -296,6 +425,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
           onDocumentUpload={handleDocumentUpload}
           onLoadDocs={loadDocs}
           onToggleHistory={() => setIsHistoryOpen(true)}
+          isFreeChat={isFreeChat}
         />
       </div>
 

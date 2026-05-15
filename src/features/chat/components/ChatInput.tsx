@@ -17,6 +17,7 @@ interface ChatInputProps {
   onDocumentUpload: (file: File) => Promise<void>;
   onLoadDocs: () => Promise<void>;
   onToggleHistory: () => void;
+  isFreeChat?: boolean;
 }
 
 export default function ChatInput({
@@ -26,6 +27,7 @@ export default function ChatInput({
   onDocumentUpload,
   onLoadDocs,
   onToggleHistory,
+  isFreeChat,
 }: ChatInputProps) {
   const navigate = useNavigate();
   const [input, setInput] = useState("");
@@ -34,7 +36,7 @@ export default function ChatInput({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleSend = () => {
-    if (!input.trim() || !activeDocId) return;
+    if (!input.trim() || (!activeDocId && !isFreeChat)) return;
     onSend(input);
     setInput("");
   };
@@ -109,16 +111,18 @@ export default function ChatInput({
             placeholder={
               activeDocId
                 ? "Formulate your inquiry regarding the document..."
-                : "Please upload a document first to start chatting."
+                : isFreeChat
+                  ? "Ask me anything..."
+                  : "Please upload a document first to start chatting."
             }
-            disabled={!activeDocId || isLoading}
+            disabled={(!activeDocId && !isFreeChat) || isLoading}
             className="w-full max-h-32 min-h-[48px] bg-transparent border-none outline-none resize-none py-3 text-sm text-slate-700 placeholder:text-slate-400 font-medium"
             rows={1}
           />
 
           <button
             onClick={handleSend}
-            disabled={!input.trim() || !activeDocId || isLoading}
+            disabled={!input.trim() || (!activeDocId && !isFreeChat) || isLoading}
             className="p-3.5 bg-academic-navy text-white hover:bg-academic-blue rounded-xl transition-all shrink-0 shadow-lg shadow-academic-navy/20 active:scale-95 disabled:opacity-50"
           >
             {isLoading ? (

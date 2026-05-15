@@ -87,6 +87,62 @@ export const askAIStream = async (req, res) => {
   }
 };
 
+export const freeChat = async (req, res) => {
+  try {
+    const { query, provider } = req.body;
+
+    if (!query) {
+      return res.status(400).json({ success: false, message: 'Query is required' });
+    }
+
+    const answer = await chatService.freeQuestion(query, provider);
+
+    res.status(200).json({ success: true, data: { answer } });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const freeChatStream = async (req, res) => {
+  try {
+    const { query, provider } = req.body;
+
+    if (!query) {
+      return res.status(400).json({ success: false, message: 'Query is required' });
+    }
+
+    const stream = chatService.freeQuestionStream(query, provider);
+
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    });
+
+    let fullContent = "";
+    for await (const part of stream) {
+      const token = part.message?.content || "";
+      if (token) {
+        fullContent += token;
+        res.write(`data: ${JSON.stringify({ token })}\n\n`);
+      }
+    }
+
+    res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+    res.end();
+  } catch (error) {
+    if (!res.headersSent) {
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      });
+    }
+    res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+    res.end();
+  }
+};
+
 export const renameSession = async (req, res) => {
   try {
     const { documentId } = req.params;

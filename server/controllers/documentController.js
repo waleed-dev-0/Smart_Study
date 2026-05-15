@@ -1,4 +1,7 @@
 import DocumentModel from '../models/document.js';
+import DocumentChunk from '../models/documentchunk.js';
+import ChatSession from '../models/chatsession.js';
+import ChatMessage from '../models/chatmessage.js';
 import fs from 'fs';
 
 
@@ -31,6 +34,21 @@ import fs from 'fs';
         const filePath = document?.file_path;
         if (filePath && fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
+        }
+
+        await DocumentChunk.deleteMany({ document_id: docId });
+
+        const sessions = await ChatSession.find({
+            user_id: userId,
+            $or: [
+                { document_id: docId },
+                { additional_documents: docId }
+            ]
+        });
+        const sessionIds = sessions.map(s => s._id);
+        if (sessionIds.length > 0) {
+            await ChatMessage.deleteMany({ session_id: { $in: sessionIds } });
+            await ChatSession.deleteMany({ _id: { $in: sessionIds } });
         }
 
         await DocumentModel.deleteOne({_id:docId,user_id:userId});

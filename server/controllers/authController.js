@@ -13,7 +13,7 @@ export const register = async (req, res) => {
     }
 
     const existingUser = await User.findOne({
-      $or: [{ email }, { username }],
+      $or: [{ email }],
     });
 
     if (existingUser) {
@@ -30,7 +30,11 @@ export const register = async (req, res) => {
       password_hash: hashedPassword,
     });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "default_secret_key", { expiresIn: "30d" });
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET || "default_secret_key",
+      { expiresIn: "30d" },
+    );
 
     res.status(201).json({
       token,
@@ -68,7 +72,11 @@ export const login = async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "default_secret_key", { expiresIn: "30d" });
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET || "default_secret_key",
+      { expiresIn: "30d" },
+    );
 
     res.json({ token, user });
   } catch (error) {

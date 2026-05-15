@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import routes from './routes/index.js';
+import reportRoutes from './routes/reportRoutes.js';
 import errorHandler from './middlewares/errorHandler.js';
 
 dotenv.config();
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', routes);
+app.use('/api/reports', reportRoutes);
 
 app.use(errorHandler);
 

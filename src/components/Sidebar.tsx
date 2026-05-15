@@ -22,20 +22,21 @@ export default function Sidebar({ currentScreen, isAdmin }: SidebarProps) {
   const location = useLocation();
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "my_documents", label: "Archives", icon: FileText },
     { id: "chat", label: "Chats", icon: Search },
-    { id: "academic-records", label: "Records", icon: BarChart3 },
     { id: "quiz-history", label: "Quiz History", icon: History },
-    { id: "reports", label: "Admin Reports", icon: BarChart3, isAdminOnly: true },
+    {
+      id: "reports",
+      label: "Admin Reports",
+      icon: BarChart3,
+      isAdminOnly: true,
+    },
     { id: "settings", label: "Preferences", icon: Settings },
     { id: "about", label: "About Us", icon: Info },
   ].filter((item) => !item.isAdminOnly || isAdmin);
 
   const routeMap: Record<string, string> = {
     dashboard: "/dashboard",
-    my_documents: "/dashboard",
     chat: "/chat",
-    "academic-records": "/academic-records",
     "quiz-history": "/quiz-history",
     reports: "/reports",
     settings: "/settings",

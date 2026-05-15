@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileText, X, Pencil, Check, MoreHorizontal } from "lucide-react";
+import { FileText, X, Pencil, Check, MoreHorizontal, MessageSquare, Trash2 } from "lucide-react";
 import api from "../../../services/api";
 
 interface Document {
@@ -8,13 +8,26 @@ interface Document {
   title: string;
 }
 
+interface FreeChatSession {
+  id: string;
+  title: string;
+  messages: any[];
+  createdAt: string;
+}
+
 interface ChatSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   documents: Document[];
   activeDocId: string | null;
+  activeFreeChatId?: string | null;
   onSelectDocument: (id: string) => void;
+  onSelectFreeChat?: (id: string) => void;
+  onDeleteDocument?: (id: string) => void;
+  onDeleteFreeChat?: (id: string) => void;
+  onRenameFreeChat?: (id: string, title: string) => void;
   onDocsRefreshed: () => void;
+  freeChatSessions?: FreeChatSession[];
 }
 
 function getDuplicateBadge(title: string) {
@@ -27,8 +40,14 @@ export default function ChatSidebar({
   onClose,
   documents,
   activeDocId,
+  activeFreeChatId,
   onSelectDocument,
+  onSelectFreeChat,
+  onDeleteDocument,
+  onDeleteFreeChat,
+  onRenameFreeChat,
   onDocsRefreshed,
+  freeChatSessions = [],
 }: ChatSidebarProps) {
   const navigate = useNavigate();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -79,6 +98,121 @@ export default function ChatSidebar({
           </button>
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          {freeChatSessions.length > 0 && (
+            <div className="mb-4">
+              <p className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                Free Chats
+              </p>
+              <div className="space-y-1 mt-1">
+                {freeChatSessions.map((session) => {
+                  const isActive = activeFreeChatId === session.id;
+                  const isEditing = editingId === session.id;
+
+                  return (
+                    <div
+                      key={session.id}
+                      className="group relative"
+                    >
+                      {isEditing ? (
+                        <div className="p-3 flex items-start gap-3">
+                          <MessageSquare className="w-5 h-5 shrink-0 mt-0.5 text-academic-blue" />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <input
+                                autoFocus
+                                value={editTitle}
+                                onChange={(e) => setEditTitle(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    onRenameFreeChat?.(session.id, editTitle);
+                                    setEditingId(null);
+                                  }
+                                  if (e.key === "Escape") setEditingId(null);
+                                }}
+                                className="text-sm font-serif font-bold text-academic-navy bg-white border border-academic-blue rounded-lg px-2 py-1 w-full outline-none"
+                              />
+                            </div>
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 mt-1">
+                              Press Enter to save
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => {
+                              onRenameFreeChat?.(session.id, editTitle);
+                              setEditingId(null);
+                            }}
+                            className="p-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all shrink-0"
+                          >
+                            <Check className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-start gap-3 p-3">
+                          <button
+                            onClick={() => onSelectFreeChat?.(session.id)}
+                            className="flex items-start gap-3 min-w-0 flex-1"
+                          >
+                            <MessageSquare className={`w-5 h-5 shrink-0 mt-0.5 ${isActive ? "text-academic-blue" : "text-slate-400"}`} />
+                            <div className="min-w-0 flex-1">
+                              <p className={`text-sm line-clamp-2 leading-tight font-serif ${isActive ? "font-bold text-academic-navy" : "font-medium text-slate-600"}`}>
+                                {session.title}
+                              </p>
+                              <p className="text-[10px] font-bold uppercase tracking-wider mt-1 text-slate-400">
+                                {new Date(session.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </button>
+                          <div className="relative shrink-0">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setMenuId(menuId === session.id ? null : session.id);
+                              }}
+                              className="p-1 text-slate-300 hover:text-academic-navy rounded-lg transition-colors"
+                            >
+                              <MoreHorizontal className="w-4 h-4" />
+                            </button>
+                            {menuId === session.id && (
+                              <div className="absolute right-0 top-8 w-40 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden z-50 py-1">
+                                <button
+                                  onClick={() => {
+                                    setEditingId(session.id);
+                                    setEditTitle(session.title);
+                                    setMenuId(null);
+                                  }}
+                                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                  Rename
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setMenuId(null);
+                                    onDeleteFreeChat?.(session.id);
+                                  }}
+                                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  Delete
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {documents.length > 0 && (
+            <p className="px-2 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              Documents
+            </p>
+          )}
+
           {documents.map((doc) => {
             const dupNum = getDuplicateBadge(doc.title);
             const isEditing = editingId === doc._id;
@@ -173,6 +307,16 @@ export default function ChatSidebar({
                             <Pencil className="w-3.5 h-3.5" />
                             Rename
                           </button>
+                          <button
+                            onClick={() => {
+                              setMenuId(null);
+                              onDeleteDocument?.(doc._id);
+                            }}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Delete
+                          </button>
                         </div>
                       )}
                     </div>
@@ -181,7 +325,7 @@ export default function ChatSidebar({
               </div>
             );
           })}
-          {documents.length === 0 && (
+          {documents.length === 0 && freeChatSessions.length === 0 && (
             <div className="text-center py-10">
               <p className="text-xs text-slate-400 font-medium">
                 No documents indexed yet.

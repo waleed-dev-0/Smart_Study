@@ -136,6 +136,14 @@ class ChatService {
     };
   }
 
+  async freeQuestion(query, provider = "gemini") {
+    return await aiService.askAI(query, "", provider, "");
+  }
+
+  async freeQuestionStream(query, provider = "gemini") {
+    return aiService.askAIStream(query, "", provider, "");
+  }
+
   cosineSimilarity(vecA, vecB) {
     if (!vecA || !vecB || vecA.length !== vecB.length) return 0;
     let dot = 0,

@@ -52,6 +52,8 @@ router.post(
 
 router.post("/chat", auth, chatController.askAI);
 router.post("/chat/stream", auth, chatController.askAIStream);
+router.post("/chat/free", auth, chatController.freeChat);
+router.post("/chat/free/stream", auth, chatController.freeChatStream);
 router.get("/chat/:documentId", auth, chatController.getChatHistory);
 router.put("/chat/session/:documentId", auth, chatController.renameSession);
 router.delete("/documents/:id", auth, documentController.deleteDocument);

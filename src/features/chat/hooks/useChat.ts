@@ -45,6 +45,13 @@ function createWelcomeMessage(): Message {
   };
 }
 
+export const FREE_WELCOME_MESSAGE: Message = {
+  id: "free-initial",
+  role: "ai",
+  text: "Hello! I'm your AI assistant. Ask me anything, or upload a document to analyze.",
+  timestamp: formatTime(),
+};
+
 export const useChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -229,6 +236,122 @@ export const useChat = () => {
   };
 
   const clearMessages = () => setMessages([]);
+  const setInitialMessages = (msgs: Message[]) => setMessages(msgs);
+
+  const sendFreeMessage = async (
+    query: string,
+    provider: "gemini" | "ollama" = "gemini",
+  ) => {
+    if (!query.trim()) return;
+
+    setMessages((prev) => [...prev, createUserMessage(query)]);
+
+    if (provider === "ollama") {
+      await freeStreamMessage(query);
+    } else {
+      await freeGeminiMessage(query);
+    }
+  };
+
+  const freeGeminiMessage = async (query: string) => {
+    setIsLoading(true);
+    setLoadingStatus("Thinking...");
+    try {
+      const response = await api.post(
+        "/chat/free",
+        { query, provider: "gemini" },
+        { timeout: REQUEST_TIMEOUT_MS },
+      );
+      setMessages((prev) => [
+        ...prev,
+        createAIMessage(response.data.data.answer),
+      ]);
+    } catch (error: any) {
+      console.error("Free chat error:", error);
+      setMessages((prev) => [
+        ...prev,
+        createAIMessage(
+          error.response?.data?.message ||
+            error.message ||
+            "I encountered an error processing your request.",
+          true,
+        ),
+      ]);
+    } finally {
+      setIsLoading(false);
+      setLoadingStatus("");
+    }
+  };
+
+  const freeStreamMessage = async (query: string) => {
+    setIsLoading(true);
+    setLoadingStatus("Thinking...");
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${api.defaults.baseURL}/chat/free/stream`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ query, provider: "ollama" }),
+        },
+      );
+
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}));
+        throw new Error(errBody.message || `Request failed (${response.status})`);
+      }
+
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let fullText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split("\n\n");
+        buffer = parts.pop() || "";
+
+        for (const part of parts) {
+          if (!part.startsWith("data: ")) continue;
+          const data = JSON.parse(part.slice(6));
+
+          if (data.token) {
+            fullText += data.token;
+            setStreamingText(fullText);
+          } else if (data.error) {
+            setMessages((prev) => [
+              ...prev,
+              createAIMessage(data.error, true),
+            ]);
+            return;
+          }
+        }
+      }
+
+      setMessages((prev) => [...prev, createAIMessage(fullText)]);
+    } catch (error: any) {
+      console.error("Free stream error:", error);
+      setMessages((prev) => [
+        ...prev,
+        createAIMessage(
+          error.message || "Failed to get response.",
+          true,
+        ),
+      ]);
+    } finally {
+      setStreamingText("");
+      setIsLoading(false);
+      setLoadingStatus("");
+    }
+  };
 
   return {
     messages,
@@ -237,7 +360,9 @@ export const useChat = () => {
     loadingStatus,
     streamingText,
     sendMessage,
+    sendFreeMessage,
     fetchHistory,
     clearMessages,
+    setInitialMessages,
   };
 };
