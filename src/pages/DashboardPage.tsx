@@ -20,8 +20,8 @@ import {
 export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
   const navigate = useNavigate();
 
-  const [items, setItems] = useState<Item[]>([]);
-  type Item = {
+  const [documents, setDocuments] = useState<document[]>([]);
+  type document = {
     _id: string;
     title: string;
     file_path: string;
@@ -32,12 +32,13 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
     is_secondary?: boolean;
     createdAt: string;
     updatedAt: string;
+   extracted_text:string
   };
 
   useEffect(() => {
     api.get("/documents")
       .then((res) => {
-        setItems(res.data.data);
+        setDocuments(res.data.data);
       })
       .catch((err) => {
         console.error(err);
@@ -45,7 +46,7 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
   }, []);
 
   let Count = 0;
-  items.forEach((items) => {
+  documents.forEach((items) => {
     Count++;
   });
   const formatSize = (bytes?: number) => {
@@ -92,8 +93,8 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
                   Research Hub
                 </h1>
                 <p className="text-slate-500 font-medium">
-                  Welcome back, Scholar. You have 4 repositories active in your
-                  archive.
+                  Welcome back, Scholar. You have 4 newest repositories in your
+                  dashboard.
                 </p>
               </div>
               <button
@@ -119,20 +120,6 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
                   </p>
                 </div>
               </div>
-
-              {/*<div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/40 flex items-center gap-6 group hover:border-academic-gold/20 transition-all">*/}
-              {/*  <div className="w-16 h-16 bg-academic-gold/5 text-academic-gold rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform border border-academic-gold/10">*/}
-              {/*    <BookOpen className="w-8 h-8" />*/}
-              {/*  </div>*/}
-              {/*  /!*<div>*!/*/}
-              {/*  /!*  <p className="text-3xl font-serif font-bold text-academic-navy leading-none mb-1">*!/*/}
-              {/*  /!*    8*!/*/}
-              {/*  /!*  </p>*!/*/}
-              {/*  /!*  <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">*!/*/}
-              {/*  /!*    Technical Syntheses*!/*/}
-              {/*  /!*  </p>*!/*/}
-              {/*  /!*</div>*!/*/}
-              {/*</div>*/}
             </div>
 
             <div className="flex items-center justify-between mb-8">
@@ -149,17 +136,17 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {items.slice(0, 4).map((item: Item) => (
+              {documents.slice(0, 4).map((document: document) => (
                 <div
-                  key={item._id}
+                  key={document._id}
                   onClick={() =>
-                    item.processing_status === "completed" &&
-                    navigate("/summary")
+                    document.processing_status === "completed" &&
+                    navigate(`/summary/${document._id}`)
                   }
                   className={`bg-white rounded-[2rem] border border-slate-100 p-7 transition-all group flex flex-col h-full relative overflow-hidden 
                   shadow-sm hover:shadow-2xl hover:shadow-academic-navy/5 hover:border-academic-blue/10 
                   ${
-                    item.processing_status === "completed"
+                    document.processing_status === "completed"
                       ? "cursor-pointer hover:-translate-y-2"
                       : "opacity-80 cursor-not-allowed"
                   }`}
@@ -167,7 +154,7 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
                   <div className="flex items-start gap-4 mb-6">
                     <div
                       className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border transition-all ${
-                        item.processing_status === "completed"
+                        document.processing_status === "completed"
                           ? "bg-academic-blue/5 text-academic-blue border-academic-blue/10 group-hover:bg-academic-navy group-hover:text-white"
                           : "bg-academic-gold/5 text-academic-gold border-academic-gold/10"
                       }`}
@@ -178,13 +165,13 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
                       <h3
                         className={`text-lg font-serif font-bold truncate transition-colors leading-tight 
                       ${
-                        item.processing_status === "completed"
+                        document.processing_status === "completed"
                           ? "text-academic-navy group-hover:text-academic-blue"
                           : "text-slate-700"
                       }`}
-                        title={item.title}
+                        title={document.title}
                       >
-                        {item.title}
+                        {document.title}
                       </h3>
                     </div>
                   </div>
@@ -194,7 +181,7 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
                       <span className="flex items-center gap-1.5">
                         <Calendar className="w-3 h-3 text-slate-300" />
                         Uploaded:{" "}
-                        {new Date(item.createdAt).toLocaleDateString("en-US", {
+                        {new Date(document.createdAt).toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "short",
                           day: "2-digit",
@@ -202,13 +189,13 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
                       </span>
                       <span className="flex items-center gap-1.5">
                         <HardDrive className="w-3 h-3 text-slate-300" />
-                        {formatSize(item.file_size_bytes)}
+                        {formatSize(document.file_size_bytes)}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        {item.processing_status === "completed" ? (
+                        {document.processing_status === "completed" ? (
                           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-full">
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             <span className="text-[10px] font-bold uppercase tracking-wider">
@@ -225,7 +212,7 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
                         )}
                       </div>
 
-                      {item.processing_status === "completed" && (
+                      {document.processing_status === "completed" && (
                         <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-academic-blue/10 transition-colors">
                           <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-academic-blue transition-colors" />
                         </div>

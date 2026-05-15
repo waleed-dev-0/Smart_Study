@@ -31,7 +31,7 @@ export default function AppRoutes() {
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage isAdmin={isAdmin} /></ProtectedRoute>} />
         <Route path="/upload" element={<ProtectedRoute><UploadPage isAdmin={isAdmin} /></ProtectedRoute>} />
         <Route path="/library" element={<ProtectedRoute><DocumentLibraryPage isAdmin={isAdmin} /></ProtectedRoute>} />
-        <Route path="/summary" element={<ProtectedRoute><SummaryResultsPage isAdmin={isAdmin} /></ProtectedRoute>} />
+        <Route path="/summary/:documentId" element={<ProtectedRoute><SummaryResultsPage isAdmin={isAdmin} /></ProtectedRoute>} />
         <Route path="/question-bank" element={<ProtectedRoute><QuestionBankPage isAdmin={isAdmin} /></ProtectedRoute>} />
         <Route path="/chat" element={<ProtectedRoute><AIChatPage isAdmin={isAdmin} /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SettingsPage isAdmin={isAdmin} /></ProtectedRoute>} />

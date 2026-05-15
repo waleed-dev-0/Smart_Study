@@ -5,7 +5,6 @@ const DocumentSummarySchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Document',
     required: true,
-    unique: true
   },
   summary_content: {
     type: String,
@@ -19,6 +18,10 @@ const DocumentSummarySchema = new Schema({
 }, {
   timestamps: true
 });
+DocumentSummarySchema.index(
+    { document_id: 1, summary_type: 1 },
+    { unique: true }
+);
 
 const DocumentSummary = mongoose.model('DocumentSummary', DocumentSummarySchema);
 

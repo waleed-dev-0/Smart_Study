@@ -21,7 +21,7 @@ export default function Sidebar({ currentScreen, isAdmin }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const navItems = [
-    { id: "dashboard", label: "Monitor", icon: LayoutDashboard },
+    { id: "dashboard", label: "dashboard", icon: LayoutDashboard },
     { id: "my_documents", label: "Archives", icon: FileText },
     { id: "chat", label: "Chats", icon: Search },
     { id: "reports", label: "Reports", icon: BarChart3, isAdminOnly: true },
