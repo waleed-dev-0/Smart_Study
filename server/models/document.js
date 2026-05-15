@@ -15,6 +15,10 @@ const DocumentSchema = new Schema({
     type: String,
     required: true
   },
+    extracted_text: {
+    type: String,
+    default: ""
+  },
   file_size_bytes: {
     type: Number
   },

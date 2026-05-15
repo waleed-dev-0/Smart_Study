@@ -50,7 +50,7 @@ class UploadService {
       if (!force) {
         const existingDocument = await DocumentModel.findOne({
           title: originalName,
-          user_id: userId,
+          user_id: userId
         });
 
         if (existingDocument) {
@@ -66,6 +66,7 @@ class UploadService {
         file_format: "pdf",
         page_count: data.numpages || 0,
         processing_status: "processing",
+        extracted_text: fullText
       });
 
       const chunks = this.chunkText(fullText, 1000, 200);
@@ -86,7 +87,7 @@ class UploadService {
               } catch (embedErr) {
                 console.error(`[Upload] Failed to embed chunk ${globalIndex}:`, embedErr.message);
               }
-              
+
               await DocumentChunk.create({
                 document_id: document._id,
                 chunk_index: globalIndex,

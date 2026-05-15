@@ -59,6 +59,7 @@ export default function Sidebar({ currentScreen, isAdmin }: SidebarProps) {
             const Icon = item.icon;
             const isActive =
               currentScreen === item.id ||
+              (currentScreen === "summary" && item.id === "dashboard") ||
               (currentScreen === "question_bank" && item.id === "dashboard");
 
             return (
@@ -100,6 +101,7 @@ export default function Sidebar({ currentScreen, isAdmin }: SidebarProps) {
           const Icon = item.icon;
           const isActive =
             currentScreen === item.id ||
+            (currentScreen === "summary" && item.id === "dashboard") ||
             (currentScreen === "question_bank" && item.id === "dashboard");
 
           return (

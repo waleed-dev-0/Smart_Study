@@ -1,28 +1,22 @@
 import { useNavigate } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
-import api from "../services/api";
-import { API_BASE_URL } from "../config";
 import {
   Search,
   FileText,
-  Calendar,
   HardDrive,
   ChevronRight,
   ArrowLeft,
   Library,
   Trash2,
 } from "lucide-react";
+import { useEffect } from "react";
 
-export default function DocumentLibraryPage({
-  isAdmin,
-}: {
-  isAdmin?: boolean;
-}) {
+export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
 
-  type Item = {
+  type document = {
     _id: string;
     title: string;
     file_path: string;
@@ -33,23 +27,24 @@ export default function DocumentLibraryPage({
     is_secondary?: boolean;
     createdAt: string;
     updatedAt: string;
+      extracted_text:string;
   };
 
-  const [items, setItems] = useState<Item[]>([]);
+  const [documents, setDocuments] = useState<document[]>([]);
 
   useEffect(() => {
-    api
-      .get("/documents")
-      .then((res) => {
-        setItems(res.data.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+   fetch("http://localhost:5000/api/documents",{
+       headers: {
+           Authorization: `Bearer ${localStorage.getItem("token")}`,
+       }
+   }).then(res=>res.json())
+       .then(data=>{
+           setDocuments(data.data)
+       })
   }, []);
 
-  const filteredDocs = items.filter((item) =>
-    item.title.toLowerCase().includes(searchQuery.toLowerCase()),
+  const filteredDocs = documents.filter((document) =>
+    document.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const formatSize = (bytes?: number) => {
@@ -57,26 +52,26 @@ export default function DocumentLibraryPage({
     return (bytes / (1024 * 1024)).toFixed(2) + " MB";
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/documents/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+    const handleDelete = async (id: string) => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/documents/${id}`, {
+            method: "DELETE",
+                headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        });
 
-      const data = await res.json();
-      if (data.success) {
-        const updatedItems = items.filter((item) => item._id !== id);
-        setItems(updatedItems);
-      } else {
-        alert("Failed to delete document");
-      }
+        const data = await res.json();
+        if (data.success) {
+            const updatedDocuments = documents.filter((document) => document._id !== id);
+            setDocuments(updatedDocuments);
+        } else {
+            alert("Failed to delete document");
+        }
     } catch (error) {
-      console.error("Delete error:", error);
+        console.error("Delete error:", error);
     }
-  };
+};
 
   return (
     <div className="flex min-h-screen bg-academic-paper">
@@ -116,9 +111,9 @@ export default function DocumentLibraryPage({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {items.map((item: Item) => (
+              {documents.map((document: document) => (
                 <div
-                  key={item._id}
+                  key={document._id}
                   onClick={() => navigate("/chat")}
                   className="bg-white rounded-3xl border border-slate-100 p-7 hover:border-academic-blue/30 hover:shadow-2xl transition-all cursor-pointer group flex flex-col justify-between h-full relative overflow-hidden"
                 >
@@ -132,13 +127,13 @@ export default function DocumentLibraryPage({
                     <div className="flex flex-col min-w-0">
                       <h3
                         className="text-2xl font-bold text-academic-blue truncate"
-                        title={item.title}
+                        title={document.title}
                       >
-                        {item.title}
+                        {document.title}
                       </h3>
 
                       <span className="text-sm font-medium text-academic-blue/70 uppercase tracking-widest mt-1">
-                        {item.file_format}
+                        {document.file_format}
                       </span>
                     </div>
                   </div>
@@ -147,7 +142,7 @@ export default function DocumentLibraryPage({
                     <div className="flex flex-col gap-1 text-sm text-academic-blue/70">
                       <span>
                         Uploaded:{" "}
-                        {new Date(item.createdAt).toLocaleDateString("en-US", {
+                        {new Date(document.createdAt).toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "short",
                           day: "2-digit",
@@ -158,14 +153,14 @@ export default function DocumentLibraryPage({
                     <div className="flex items-center pt-4 border-t border-academic-blue/10">
                       <span className="flex items-center gap-2 text-sm text-academic-blue font-medium">
                         <HardDrive className="w-5 h-5" />
-                        {formatSize(item.file_size_bytes)}
+                        {formatSize(document.file_size_bytes)}
                       </span>
 
                       <div className="flex items-center gap-2 ml-auto">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDelete(item._id);
+                            handleDelete(document._id);
                           }}
                           className="p-2 rounded-xl text-red-500 hover:bg-red-100 hover:text-red-700 hover:scale-110
                                           transition-all duration-200"
@@ -205,5 +200,5 @@ export default function DocumentLibraryPage({
         </main>
       </div>
     </div>
-  );
+  )
 }

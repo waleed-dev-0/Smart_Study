@@ -1,8 +1,10 @@
 import express from "express";
 import authRoutes from "./authRoutes.js";
+import summaryRoutes from "./summaryRoutes.js";
 import * as uploadController from "../controllers/uploadController.js";
 import * as chatController from "../controllers/chatController.js";
 import * as documentController from "../controllers/documentController.js";
+import * as profileController from "../controllers/profileController.js";
 import { auth } from "../middlewares/authMiddleware.js";
 import multer from "multer";
 import path from "path";
@@ -41,14 +43,17 @@ router.get("/", (req, res) => {
 });
 
 router.use("/auth", authRoutes);
+router.use("/summary",auth,summaryRoutes);
 
 router.get("/documents", auth, documentController.getDocuments);
+router.get("/userProfile",auth,profileController.getProfile);
 router.post(
   "/upload",
   auth,
   upload.single("file"),
   uploadController.uploadDocument,
 );
+
 
 router.post("/chat", auth, chatController.askAI);
 router.post("/chat/stream", auth, chatController.askAIStream);

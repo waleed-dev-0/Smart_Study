@@ -10,6 +10,7 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import DashboardPage from '../pages/DashboardPage';
 import UploadPage from '../pages/UploadPage';
 import DocumentLibraryPage from '../pages/DocumentLibraryPage';
+import SummaryResultsPage from '../pages/SummaryResultsPage';
 import QuestionBankPage from '../pages/QuestionBankPage';
 import AIChatPage from '../pages/AIChatPage';
 import SettingsPage from '../pages/SettingsPage';
@@ -32,6 +33,7 @@ export default function AppRoutes() {
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage isAdmin={isAdmin} /></ProtectedRoute>} />
         <Route path="/upload" element={<ProtectedRoute><UploadPage isAdmin={isAdmin} /></ProtectedRoute>} />
         <Route path="/library" element={<ProtectedRoute><DocumentLibraryPage isAdmin={isAdmin} /></ProtectedRoute>} />
+        <Route path="/summary/:documentId" element={<ProtectedRoute><SummaryResultsPage isAdmin={isAdmin} /></ProtectedRoute>} />
         <Route path="/question-bank" element={<ProtectedRoute><QuestionBankPage isAdmin={isAdmin} /></ProtectedRoute>} />
         <Route path="/chat" element={<ProtectedRoute><AIChatPage isAdmin={isAdmin} /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SettingsPage isAdmin={isAdmin} /></ProtectedRoute>} />
