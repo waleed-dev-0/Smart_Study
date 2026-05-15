@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -31,6 +31,7 @@ import FloatingActionButton from "../components/FloatingActionButton";
 
 export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [input, setInput] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -54,6 +55,26 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   const [activeDocId, setActiveDocId] = useState<string | null>(
     localStorage.getItem("activeDocumentId"),
   );
+
+  useEffect(() => {
+    const docId = new URLSearchParams(location.search).get("docId");
+    if (docId) {
+      setActiveDocId(docId);
+      localStorage.setItem("activeDocumentId", docId);
+    }
+  }, [location.search]);
+
+  const [recentAttempts, setRecentAttempts] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (isQuizzesOpen) {
+      api.get('/attempts').then(res => {
+        if (res.data.success) {
+          setRecentAttempts(res.data.data.slice(0, 5));
+        }
+      }).catch(err => console.error(err));
+    }
+  }, [isQuizzesOpen]);
 
   const loadDocs = async () => {
     try {
@@ -172,11 +193,10 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
                   setMessages([]);
                 }
               }}
-              className={`w-full text-left p-4 rounded-2xl transition-all flex items-start gap-3 group ${
-                activeDocId === doc._id
+              className={`w-full text-left p-4 rounded-2xl transition-all flex items-start gap-3 group ${activeDocId === doc._id
                   ? "bg-slate-50 border border-academic-blue/20 shadow-sm"
                   : "bg-transparent hover:bg-slate-50 border border-transparent"
-              }`}
+                }`}
             >
               <FileText
                 className={`w-5 h-5 shrink-0 mt-0.5 ${activeDocId === doc._id ? "text-academic-blue" : "text-slate-400 group-hover:text-academic-navy"}`}
@@ -302,13 +322,12 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
                 className={`flex gap-6 max-w-4xl ${msg.role === "user" ? "ml-auto flex-row-reverse" : ""}`}
               >
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-sm ${
-                    msg.role === "ai"
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-sm ${msg.role === "ai"
                       ? msg.isError
                         ? "bg-red-500 text-white"
                         : "bg-academic-navy text-white"
                       : "bg-slate-100 text-slate-600"
-                  }`}
+                    }`}
                 >
                   {msg.role === "ai" ? (
                     <GraduationCap className="w-6 h-6" />
@@ -330,13 +349,12 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
                   </div>
 
                   <div
-                    className={`p-5 rounded-2xl text-sm leading-relaxed ${
-                      msg.role === "user"
+                    className={`p-5 rounded-2xl text-sm leading-relaxed ${msg.role === "user"
                         ? "bg-academic-blue text-white rounded-tr-none shadow-lg shadow-academic-blue/10"
                         : msg.isError
                           ? "bg-red-50 border border-red-200 text-red-800 rounded-tl-none shadow-sm"
                           : "bg-white border border-slate-200 text-slate-800 rounded-tl-none shadow-sm"
-                    }`}
+                      }`}
                   >
                     {msg.role === "user" ? (
                       <p>{msg.text}</p>
