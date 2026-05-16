@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import api from "../services/api";
-import { API_BASE_URL } from "../config";
 import { useAppContext } from "../context/AppContext";
 import {
   Search,
@@ -21,12 +20,12 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
   const [searchQuery, setSearchQuery] = useState("");
 
   const t = {
-    title: isArabic ? "الأرشيف الأكاديمي" : "Archives",
-    searchPlaceholder: isArabic ? "ابحث عن المواد المصدرية حسب التسمية أو التصنيف..." : "Search archives...",
+    title: isArabic ? "الملفات الأكاديمي" : "Documents",
+    searchPlaceholder: isArabic ? "ابحث عن المواد المصدرية حسب التسمية" : "Search documents...",
     uploaded: isArabic ? "تاريخ الرفع:" : "Uploaded:",
     deleteFailed: isArabic ? "فشل في حذف المستند" : "Failed to delete document",
-    noRecords: isArabic ? "لم يتم العثور على سجلات" : "No Archives Found",
-    noRecordsDesc: isArabic ? "لم يتطابق استعلام البحث الخاص بك مع أي أرشيف في هذا المستودع." : "We couldn't find any archives matching your search.",
+    noRecords: isArabic ? "لم يتم العثور على سجلات" : "No Documents Found",
+    noRecordsDesc: isArabic ? "لم يتطابق استعلام البحث الخاص بك مع أي أرشيف في هذا المستودع." : "We couldn't find any documents matching your search.",
     clearParams: isArabic ? "مسح جميع المعايير" : "Clear Search",
   };
 
