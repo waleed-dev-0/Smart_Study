@@ -265,7 +265,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
 
                         if (answered) {
                           if (isCorrect) {
-                            bgClass = "border-green-400 dark:border-green-800 bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300";
+                            optionClass = "border-green-400 dark:border-green-800 bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300";
                             icon = <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />;
                           } else if (isSelected && !isCorrect) {
                             optionClass = "border-red-400 dark:border-red-800 bg-red-50 text-red-800 dark:text-red-300";
