@@ -46,6 +46,7 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
   const [documents, setDocuments] = useState<document[]>([]);
 
   useEffect(() => {
+
    fetch("http://localhost:5000/api/documents",{
        headers: {
            Authorization: `Bearer ${localStorage.getItem("token")}`,

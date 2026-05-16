@@ -111,7 +111,7 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
                   {t.researchHub}
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-cafe-text-dark-muted font-medium">
-                  {t.welcome} {Count} {t.reposActive}
+                  {t.welcome} at least 4 {t.reposActive}
                 </p>
               </div>
               <button
