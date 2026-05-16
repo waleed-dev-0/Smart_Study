@@ -143,13 +143,6 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
               <h2 className="text-xl sm:text-2xl font-display font-bold text-cafe-primary dark:text-white">
                 {t.activeArchive}
               </h2>
-              {/*<button*/}
-              {/*  onClick={() => navigate("/library")}*/}
-              {/*  className="text-xs font-bold text-cafe-primary-light hover:text-cafe-primary flex items-center gap-2 transition-all uppercase tracking-widest group"*/}
-              {/*>*/}
-              {/*  {t.viewFullLibrary}*/}
-              {/*  <ArrowRight className={`w-4 h-4 transition-transform ${isArabic ? 'group-hover:-translate-x-1 rotate-180' : 'group-hover:translate-x-1'}`} />*/}
-              {/*</button>*/}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
