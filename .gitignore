@@ -9,3 +9,4 @@ server/uploads/
 .env.*
 !.env.example
 uploads/
+.idea/
