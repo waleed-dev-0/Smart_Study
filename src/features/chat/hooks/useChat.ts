@@ -5,7 +5,7 @@ import { formatTime } from "../../../utils/formatTime";
 
 const REQUEST_TIMEOUT_MS = 60_000;
 
-export function getWelcomeMessage(isArabic?: boolean): string {
+function getWelcomeMessage(isArabic?: boolean): string {
   return isArabic
     ? "مرحباً بك في بوابة البحث. لقد قمت بفهرسة مستندك. كيف يمكنني مساعدتك اليوم؟"
     : "Welcome to the Research Portal. I have indexed your document. How may I assist your inquiry today?";
@@ -30,14 +30,16 @@ export interface Message {
   timestamp: string;
   isError?: boolean;
   citations?: { page: number; text: string }[];
+  userName?: string;
 }
 
-function createUserMessage(text: string): Message {
+function createUserMessage(text: string, userName?: string): Message {
   return {
     id: Date.now().toString(),
     role: "user",
     text,
     timestamp: formatTime(),
+    userName,
   };
 }
 

@@ -84,7 +84,7 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
           <div className="flex flex-col items-end gap-3 mb-2 animate-in slide-in-from-bottom-4 fade-in duration-200">
             <button
               onClick={handleCreateQuiz}
-              className="group flex items-center gap-3 px-5 py-2.5 rounded-full shadow-lg bg-white/95 backdrop-blur-sm border border-slate-200 text-academic-navy hover:bg-slate-50 transition-all hover:-translate-y-1 hover:shadow-xl"
+              className="group flex items-center gap-3 px-5 py-2.5 rounded-full shadow-lg bg-white/95/95 backdrop-blur-sm border border-slate-200 dark:border-cafe-surface-dark text-cafe-primary hover:bg-slate-50 transition-all hover:-translate-y-1 hover:shadow-xl"
             >
               <span className="font-bold text-sm tracking-wide">{t.generateQuiz}</span>
               <div className="w-8 h-8 rounded-full bg-amber-800/10 flex items-center justify-center text-amber-800 group-hover:bg-amber-800 group-hover:text-white transition-colors">
@@ -117,20 +117,20 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
 
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-white w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden">
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+          <div className="bg-white w-full max-w-md rounded-[2rem] shadow-2xl dark:shadow-black/30 overflow-hidden">
+            <div className="p-6 border-b border-slate-100 dark:border-cafe-surface-dark flex justify-between items-center bg-slate-50/50/50">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-academic-navy text-white flex items-center justify-center shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-cafe-primary text-white flex items-center justify-center shadow-sm">
                   <Settings2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-serif font-bold text-academic-navy text-lg leading-tight">{t.quizConfig}</h3>
+                  <h3 className="font-display font-bold text-cafe-primary text-lg leading-tight">{t.quizConfig}</h3>
                   <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">{t.academicAssessment}</p>
                 </div>
               </div>
-              <button 
+                <button 
                 onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:text-cafe-text-dark transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -138,8 +138,8 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
             
             <div className="p-6 space-y-6">
               <div className="space-y-3">
-                <label className="flex items-center gap-2 text-xs font-bold text-academic-navy uppercase tracking-wider">
-                  <Target className="w-4 h-4 text-academic-blue" />
+                <label className="flex items-center gap-2 text-xs font-bold text-cafe-primary uppercase tracking-wider">
+                  <Target className="w-4 h-4 text-cafe-primary-light" />
                   {t.difficultyLevel}
                 </label>
                 <div className="grid grid-cols-3 gap-3">
@@ -149,8 +149,8 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
                       onClick={() => setDifficulty(level)}
                       className={`py-3 rounded-xl text-sm font-bold capitalize transition-all border ${
                         difficulty === level 
-                          ? 'bg-academic-navy text-white border-academic-navy shadow-md shadow-academic-navy/20' 
-                          : 'bg-white text-slate-500 border-slate-200 hover:border-academic-blue hover:bg-slate-50'
+                          ? 'bg-cafe-primary text-white border-cafe-primary shadow-md shadow-cafe-primary/20' 
+                          : 'bg-white text-slate-500 border-slate-200 dark:border-cafe-surface-dark hover:border-cafe-primary-light hover:bg-slate-50'
                       }`}
                     >
                       {level === 'easy' ? t.easy : level === 'medium' ? t.medium : t.hard}
@@ -161,11 +161,11 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-2 text-xs font-bold text-academic-navy uppercase tracking-wider">
-                    <BookOpen className="w-4 h-4 text-academic-blue" />
+                  <label className="flex items-center gap-2 text-xs font-bold text-cafe-primary uppercase tracking-wider">
+                    <BookOpen className="w-4 h-4 text-cafe-primary-light" />
                     {t.numQuestions}
                   </label>
-                  <span className="text-lg font-serif font-bold text-academic-navy">{numQuestions}</span>
+                  <span className="text-lg font-display font-bold text-cafe-primary">{numQuestions}</span>
                 </div>
                 <input 
                   type="range" 
@@ -173,7 +173,7 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
                   max="25" 
                   value={numQuestions} 
                   onChange={(e) => setNumQuestions(Number(e.target.value))}
-                  className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-academic-blue"
+                  className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-cafe-primary-light"
                 />
                 <div className="flex justify-between text-[10px] font-bold text-slate-400">
                   <span>{t.min}</span>
@@ -182,8 +182,8 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
               </div>
 
               <div className="space-y-3">
-                <label className="flex items-center gap-2 text-xs font-bold text-academic-navy uppercase tracking-wider">
-                  <Globe2 className="w-4 h-4 text-academic-blue" />
+                <label className="flex items-center gap-2 text-xs font-bold text-cafe-primary uppercase tracking-wider">
+                  <Globe2 className="w-4 h-4 text-cafe-primary-light" />
                   {t.explanationLang}
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -193,8 +193,8 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
                       onClick={() => setLanguage(lang)}
                       className={`py-3 rounded-xl text-sm font-bold capitalize transition-all border ${
                         language === lang 
-                          ? 'bg-academic-blue text-white border-academic-blue shadow-md shadow-academic-blue/20' 
-                          : 'bg-white text-slate-500 border-slate-200 hover:border-academic-blue hover:bg-slate-50'
+                          ? 'bg-cafe-primary-light text-white border-cafe-primary-light shadow-md shadow-cafe-primary-light/20' 
+                          : 'bg-white text-slate-500 border-slate-200 dark:border-cafe-surface-dark hover:border-cafe-primary-light hover:bg-slate-50'
                       }`}
                     >
                       {lang}
@@ -204,11 +204,11 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
               </div>
             </div>
 
-            <div className="p-6 border-t border-slate-100 bg-slate-50/50">
+              <div className="p-6 border-t border-slate-100 dark:border-cafe-surface-dark bg-slate-50/50/50">
               <button 
                 onClick={handleGenerate}
                 disabled={isGenerating}
-                className="w-full py-4 rounded-xl bg-academic-navy text-white font-bold text-sm uppercase tracking-wider hover:bg-academic-blue transition-all shadow-lg shadow-academic-navy/20 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-xl bg-cafe-primary text-white font-bold text-sm uppercase tracking-wider hover:bg-cafe-primary-light transition-all shadow-lg shadow-cafe-primary/20 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isGenerating ? (
                   <>

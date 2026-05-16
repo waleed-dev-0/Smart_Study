@@ -42,15 +42,13 @@ router.get("/", (req, res) => {
   res.json({ success: true, message: "Server is running👌." });
 });
 
-router.use("/auth", authRoutes);
-<<<<<<< HEAD
-router.use("/summary",auth,summaryRoutes);
-=======
 import userRoutes from "./userRoutes.js";
+router.use("/auth", authRoutes);
+router.use("/summary",auth,summaryRoutes);
 router.use("/user", userRoutes);
->>>>>>> dab8ccbf1e9308b705706a8dfce33177cbb807ad
 
 router.get("/documents", auth, documentController.getDocuments);
+router.get("/documents/:id", auth, documentController.getDocumentById);
 router.get("/userProfile",auth,profileController.getProfile);
 router.post(
   "/upload",

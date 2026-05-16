@@ -1,29 +1,96 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @theme {
-  --color-academic-navy: #0f172a;
-  --color-academic-blue: #1e3a8a;
-  --color-academic-gold: #b45309;
-  --color-academic-paper: #f8fafc;
-  
-  --font-serif: "Crimson Pro", "Playfair Display", serif;
-  --font-sans: "Inter", system-ui, sans-serif;
+  --color-cafe-primary: #5D4432;
+  --color-cafe-primary-dark: #4A3628;
+  --color-cafe-primary-light: #7B5E4A;
+  --color-cafe-secondary: #E9E3DD;
+  --color-cafe-surface: #F9F7F5;
+  --color-cafe-surface-dark: #1c1917;
+  --color-cafe-surface-dark-alt: #292524;
+  --color-cafe-border-dark: #44403c;
+  --color-cafe-text: #3E2B1E;
+  --color-cafe-text-dark: #fafaf9;
+  --color-cafe-text-dark-muted: #a8a29e;
+  --color-cafe-warning: #D97706;
+  --color-cafe-success: #16A34A;
+  --color-cafe-danger: #DC2626;
+
+  --font-primary: "Poppins", sans-serif;
+  --font-display: "Poppins", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 }
 
 @layer base {
   body {
-    @apply bg-academic-paper text-slate-900 font-sans;
+    @apply bg-cafe-surface text-cafe-text font-primary;
   }
-  
+
   h1, h2, h3, h4 {
-    @apply font-serif;
+    @apply font-display;
   }
+}
+
+html.dark body {
+  @apply bg-cafe-surface-dark text-cafe-text-dark;
 }
 
 .glass-panel {
-  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl shadow-slate-200/50;
+  @apply bg-cafe-secondary/70 backdrop-blur-md border border-white/20 shadow-xl shadow-cafe-primary/10;
+}
+
+html.dark .glass-panel {
+  @apply bg-cafe-surface-dark-alt/80 border-cafe-border-dark/30 shadow-black/20;
 }
 
 .premium-card {
-  @apply bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl;
+  @apply bg-white border border-cafe-secondary shadow-sm hover:shadow-md transition-all duration-300 rounded-3xl;
+}
+
+html.dark .premium-card {
+  @apply bg-cafe-surface-dark-alt border-cafe-border-dark shadow-black/10;
+}
+
+html.dark input,
+html.dark textarea,
+html.dark select {
+  @apply border-cafe-border-dark bg-cafe-surface-dark-alt text-cafe-text-dark;
+}
+
+html.dark input:focus,
+html.dark textarea:focus {
+  @apply border-cafe-primary-light ring-2 ring-cafe-primary-light/20;
+}
+
+html.dark hr {
+  @apply border-cafe-border-dark;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes float-delayed {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 3.5s ease-in-out infinite;
+  animation-delay: 0.5s;
 }

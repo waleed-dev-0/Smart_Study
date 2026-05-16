@@ -1,12 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
-<<<<<<< HEAD
-=======
 import api from "../services/api";
 import { API_BASE_URL } from "../config";
 import { useAppContext } from "../context/AppContext";
->>>>>>> dab8ccbf1e9308b705706a8dfce33177cbb807ad
 import {
   Search,
   FileText,
@@ -23,21 +20,17 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
   const { isArabic } = useAppContext();
   const [searchQuery, setSearchQuery] = useState("");
 
-<<<<<<< HEAD
-  type document = {
-=======
   const t = {
-    title: isArabic ? "الأرشيف الأكاديمي" : "Scholarly Archive",
-    searchPlaceholder: isArabic ? "ابحث عن المواد المصدرية حسب التسمية أو التصنيف..." : "Query source materials by nomenclature or classification...",
+    title: isArabic ? "الأرشيف الأكاديمي" : "Archives",
+    searchPlaceholder: isArabic ? "ابحث عن المواد المصدرية حسب التسمية أو التصنيف..." : "Search archives...",
     uploaded: isArabic ? "تاريخ الرفع:" : "Uploaded:",
     deleteFailed: isArabic ? "فشل في حذف المستند" : "Failed to delete document",
-    noRecords: isArabic ? "لم يتم العثور على سجلات" : "No Records Found",
-    noRecordsDesc: isArabic ? "لم يتطابق استعلام البحث الخاص بك مع أي أرشيف في هذا المستودع." : "Your search query did not correlate with any archives in this repository.",
-    clearParams: isArabic ? "مسح جميع المعايير" : "Clear All Parameters",
+    noRecords: isArabic ? "لم يتم العثور على سجلات" : "No Archives Found",
+    noRecordsDesc: isArabic ? "لم يتطابق استعلام البحث الخاص بك مع أي أرشيف في هذا المستودع." : "We couldn't find any archives matching your search.",
+    clearParams: isArabic ? "مسح جميع المعايير" : "Clear Search",
   };
 
-  type Item = {
->>>>>>> dab8ccbf1e9308b705706a8dfce33177cbb807ad
+  type document = {
     _id: string;
     title: string;
     file_path: string;
@@ -64,9 +57,13 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
        })
   }, []);
 
-  const filteredDocs = documents.filter((document) =>
-    document.title.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredDocs = documents.filter((document) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      document.title.toLowerCase().includes(q) ||
+      (document.extracted_text && document.extracted_text.toLowerCase().includes(q))
+    );
+  });
 
   const formatSize = (bytes?: number) => {
     if (!bytes) return "0 MB";
@@ -82,103 +79,88 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
             },
         });
 
-<<<<<<< HEAD
-        const data = await res.json();
-        if (data.success) {
-            const updatedDocuments = documents.filter((document) => document._id !== id);
-            setDocuments(updatedDocuments);
-        } else {
-            alert("Failed to delete document");
-        }
-=======
       const data = await res.json();
       if (data.success) {
-        const updatedItems = items.filter((item) => item._id !== id);
-        setItems(updatedItems);
+        const updatedDocuments = documents.filter((document) => document._id !== id);
+        setDocuments(updatedDocuments);
       } else {
         alert(t.deleteFailed);
       }
->>>>>>> dab8ccbf1e9308b705706a8dfce33177cbb807ad
     } catch (error) {
         console.error("Delete error:", error);
     }
 };
 
   return (
-    <div className="flex min-h-screen bg-academic-paper">
-      <Sidebar currentScreen="dashboard" isAdmin={isAdmin} />
+    <div className="flex min-h-screen bg-cafe-surface dark:bg-cafe-surface-dark">
+      <Sidebar currentScreen="my_documents" isAdmin={isAdmin} />
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-academic-navy/5 flex items-center px-6 md:px-10 shrink-0 z-10 gap-6">
+        <header className="h-16 sm:h-20 bg-white/80 dark:bg-cafe-surface-dark-alt/80 backdrop-blur-md border-b border-cafe-primary/5 dark:border-cafe-border-dark flex items-center px-4 sm:px-6 md:px-10 shrink-0 z-10 gap-4 sm:gap-6">
           <button
             onClick={() => navigate("/dashboard")}
-            className="p-3 bg-slate-50 hover:bg-academic-navy hover:text-white rounded-xl text-slate-500 transition-all shrink-0 hover:shadow-lg"
+            className="p-2 sm:p-3 bg-slate-50 dark:bg-cafe-surface-dark hover:bg-cafe-primary dark:hover:bg-cafe-primary hover:text-white dark:text-cafe-text-dark dark:hover:text-white rounded-xl text-slate-500 transition-all shrink-0 hover:shadow-lg"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
-          <div className="flex items-center gap-3">
-            <Library className="w-6 h-6 text-academic-navy" />
-            <h1 className="text-2xl font-serif font-bold text-academic-navy tracking-tight">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Library className="w-5 h-5 sm:w-6 sm:h-6 text-cafe-primary shrink-0" />
+            <h1 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-cafe-primary dark:text-white tracking-tight truncate">
               {t.title}
             </h1>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6 md:p-10 pb-24 md:pb-10">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-10 pb-24 md:pb-10">
           <div className="max-w-7xl mx-auto">
-            <div className="mb-12 flex flex-col sm:flex-row gap-6">
+            <div className="mb-6 sm:mb-10 md:mb-12 flex flex-col sm:flex-row gap-4 sm:gap-6">
               <div className="relative flex-1">
-                <div className="absolute inset-y-0 start-0 ps-6 flex items-center pointer-events-none">
-                  <Search className="w-5 h-5 text-slate-300" />
+                <div className="absolute inset-y-0 start-0 ps-4 sm:ps-6 flex items-center pointer-events-none">
+                  <Search className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />
                 </div>
                 <input
                   type="text"
                   placeholder={t.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full ps-14 pe-6 py-4.5 bg-white border border-slate-200 rounded-[1.5rem] text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-academic-blue/5 focus:border-academic-blue shadow-xl shadow-academic-navy/5 transition-all font-medium"
+                  className="w-full ps-12 sm:ps-14 pe-4 sm:pe-6 py-3 sm:py-4 md:py-4.5 bg-white dark:bg-cafe-surface-dark border border-slate-200 dark:border-cafe-border-dark rounded-xl sm:rounded-[1.5rem] text-sm sm:text-base text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-4 focus:ring-cafe-primary-light/5 focus:border-cafe-primary-light shadow-xl shadow-cafe-primary/5 dark:shadow-black/20 transition-all font-medium"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {documents.map((document: document) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
+              {filteredDocs.map((document: document) => (
                 <div
                   key={document._id}
-                  onClick={() => navigate("/chat")}
-                  className="bg-white rounded-3xl border border-slate-100 p-7 hover:border-academic-blue/30 hover:shadow-2xl transition-all cursor-pointer group flex flex-col justify-between h-full relative overflow-hidden"
+                  onClick={() => navigate(`/summary/${document._id}`)}
+                  className="bg-white dark:bg-cafe-surface-dark-alt rounded-2xl sm:rounded-3xl border border-slate-100 dark:border-cafe-border-dark p-5 sm:p-7 hover:border-cafe-primary-light/30 hover:shadow-2xl dark:hover:shadow-black/20 transition-all cursor-pointer group flex flex-col justify-between h-full relative overflow-hidden"
                 >
-                  <div className="absolute top-0 start-0 w-1.5 h-full bg-academic-blue -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+                  <div className="absolute top-0 start-0 w-1.5 h-full bg-cafe-primary-light -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
 
-                  <div className="flex items-start gap-4 mb-6">
-                    <div className="w-14 h-14 rounded-xl bg-academic-blue/10 text-academic-blue flex items-center justify-center group-hover:bg-academic-blue group-hover:text-white transition-all">
-                      <FileText className="w-7 h-7" />
+                  <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-cafe-primary-light/10 dark:bg-cafe-primary-light/20 text-cafe-primary-light dark:text-white flex items-center justify-center group-hover:bg-cafe-primary-light group-hover:text-white transition-all shrink-0">
+                      <FileText className="w-6 h-6 sm:w-7 sm:h-7" />
                     </div>
 
                     <div className="flex flex-col min-w-0">
                       <h3
-                        className="text-2xl font-bold text-academic-blue truncate"
+                        className="text-lg sm:text-xl md:text-2xl font-bold text-cafe-primary-light dark:text-white truncate"
                         title={document.title}
                       >
                         {document.title}
                       </h3>
 
-                      <span className="text-sm font-medium text-academic-blue/70 uppercase tracking-widest mt-1">
+                      <span className="text-xs sm:text-sm font-medium text-cafe-primary-light/70 dark:text-cafe-text-dark-muted uppercase tracking-widest mt-1">
                         {document.file_format}
                       </span>
                     </div>
                   </div>
 
-                  <div className="mt-auto space-y-4">
-                    <div className="flex flex-col gap-1 text-sm text-academic-blue/70">
+                  <div className="mt-auto space-y-3 sm:space-y-4">
+                    <div className="flex flex-col gap-1 text-xs sm:text-sm text-cafe-primary-light/70 dark:text-cafe-text-dark">
                       <span>
-<<<<<<< HEAD
-                        Uploaded:{" "}
-                        {new Date(document.createdAt).toLocaleDateString("en-US", {
-=======
                         {t.uploaded}{" "}
-                        {new Date(item.createdAt).toLocaleDateString(isArabic ? "ar-EG" : "en-US", {
->>>>>>> dab8ccbf1e9308b705706a8dfce33177cbb807ad
+                        {new Date(document.createdAt).toLocaleDateString(isArabic ? "ar-EG" : "en-US", {
                           year: "numeric",
                           month: "short",
                           day: "2-digit",
@@ -186,25 +168,25 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
                       </span>
                     </div>
 
-                    <div className="flex items-center pt-4 border-t border-academic-blue/10">
-                      <span className="flex items-center gap-2 text-sm text-academic-blue font-medium">
-                        <HardDrive className="w-5 h-5" />
+                    <div className="flex items-center pt-3 sm:pt-4 border-t border-cafe-primary-light/10">
+                      <span className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-cafe-primary-light dark:text-cafe-text-dark font-medium">
+                        <HardDrive className="w-4 h-4 sm:w-5 sm:h-5" />
                         {formatSize(document.file_size_bytes)}
                       </span>
 
-                      <div className="flex items-center gap-2 ms-auto">
+                      <div className="flex items-center gap-1.5 sm:gap-2 ms-auto">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDelete(document._id);
                           }}
-                          className="p-2 rounded-xl text-red-500 hover:bg-red-100 hover:text-red-700 hover:scale-110
+                          className="p-1.5 sm:p-2 rounded-xl text-red-500 hover:bg-red-100 hover:text-red-700 hover:scale-110
                                           transition-all duration-200"
                         >
-                          <Trash2 className="w-5 h-5" />
+                          <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
 
-                        <ChevronRight className={`w-6 h-6 text-academic-blue/60 group-hover:text-academic-blue transition-colors ${isArabic ? 'rotate-180' : ''}`} />
+                        <ChevronRight className={`w-5 h-5 sm:w-6 sm:h-6 text-cafe-primary-light/60 group-hover:text-cafe-primary-light transition-colors ${isArabic ? 'rotate-180' : ''}`} />
                       </div>
                     </div>
                   </div>
@@ -212,20 +194,20 @@ export default function DocumentLibraryPage({isAdmin,}: { isAdmin?: boolean; }) 
               ))}
             </div>
 
-            {filteredDocs.length === 0 && (
-              <div className="text-center py-24 bg-white/50 backdrop-blur-sm rounded-[3rem] border border-slate-200 border-dashed">
-                <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl border border-slate-100">
-                  <Search className="w-10 h-10 text-slate-300" />
+            {documents.length > 0 && filteredDocs.length === 0 && (
+              <div className="text-center py-16 sm:py-24 bg-white/50 dark:bg-cafe-surface-dark-alt/50 backdrop-blur-sm rounded-2xl sm:rounded-[3rem] border border-slate-200 dark:border-cafe-border-dark border-dashed">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white dark:bg-cafe-surface-dark rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-xl border border-slate-100 dark:border-cafe-border-dark">
+                  <Search className="w-8 h-8 sm:w-10 sm:h-10 text-slate-300" />
                 </div>
-                <h3 className="text-2xl font-serif font-bold text-academic-navy mb-2">
+                <h3 className="text-xl sm:text-2xl font-display font-bold text-cafe-primary dark:text-white mb-2">
                   {t.noRecords}
                 </h3>
-                <p className="text-slate-500 font-medium">
+                <p className="text-sm sm:text-base text-slate-500 dark:text-cafe-text-dark px-4">
                   {t.noRecordsDesc}
                 </p>
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="mt-8 text-academic-blue font-bold uppercase tracking-widest text-xs hover:text-academic-navy transition-colors"
+                  className="mt-6 sm:mt-8 text-cafe-primary-light font-bold uppercase tracking-widest text-xs hover:text-cafe-primary transition-colors"
                 >
                   {t.clearParams}
                 </button>

@@ -1,6 +1,7 @@
 import Document from "../models/document.js";
 import DocumentSummary from "../models/documentsummary.js";
 import AIService from "../services/aiService.js";
+import fs from "fs";
 
 const generateSummary = async (req, res) => {
     try {
@@ -16,7 +17,25 @@ const generateSummary = async (req, res) => {
             });
         }
 
-        const text = document.extracted_text;
+        let text = document.extracted_text;
+
+        if (!text || text.trim().length === 0) {
+            if (document.file_path && fs.existsSync(document.file_path)) {
+                try {
+                    const dataBuffer = await fs.promises.readFile(document.file_path);
+                    const pdfParseModule = await import("pdf-parse");
+                    const pdfParse = pdfParseModule.default || pdfParseModule;
+                    const data = await pdfParse(dataBuffer);
+                    if (data && data.text && data.text.trim().length > 0) {
+                        text = data.text;
+                        document.extracted_text = text;
+                        await document.save();
+                    }
+                } catch (parseErr) {
+                    console.error("Re-extraction failed:", parseErr.message);
+                }
+            }
+        }
 
         if (!text || text.trim().length === 0) {
             return res.status(400).json({
@@ -82,7 +101,7 @@ ${text.slice(0, 10000)}
                 summary_content: generatedSummary
             },
             {
-                new: true,
+                returnDocument: 'after',
                 upsert: true,
                 runValidators: true
             }

@@ -94,21 +94,21 @@ export default function ChatSidebar({
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-academic-navy/20 backdrop-blur-sm z-[60] lg:hidden"
+          className="fixed inset-0 bg-cafe-primary/20 backdrop-blur-sm z-[60] lg:hidden"
           onClick={onClose}
         />
       )}
 
       <div
-        className={`fixed inset-y-0 left-0 z-[70] w-72 bg-white border-r border-slate-200 transform transition-transform duration-300 lg:relative lg:translate-x-0 lg:flex flex-col h-screen lg:w-64 lg:sticky lg:top-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed inset-y-0 left-0 z-[70] w-72 bg-white dark:bg-cafe-surface-dark-alt border-r border-slate-200 dark:border-cafe-border-dark transform transition-transform duration-300 lg:relative lg:translate-x-0 lg:flex flex-col h-screen lg:w-64 lg:sticky lg:top-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-          <h2 className="text-xs font-bold text-academic-navy uppercase tracking-widest">
+        <div className="p-6 border-b border-slate-100 dark:border-cafe-border-dark flex items-center justify-between">
+          <h2 className="text-xs font-bold text-cafe-primary dark:text-white uppercase tracking-widest">
             {t.chatHistory}
           </h2>
           <button
             onClick={onClose}
-            className="lg:hidden p-1.5 text-slate-400 hover:text-academic-navy hover:bg-slate-100 rounded-lg transition-colors"
+            className="lg:hidden p-1.5 text-slate-400 dark:text-cafe-text-dark-muted hover:text-cafe-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-cafe-border-dark rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -131,7 +131,7 @@ export default function ChatSidebar({
                     >
                       {isEditing ? (
                         <div className="p-3 flex items-start gap-3">
-                          <MessageSquare className="w-5 h-5 shrink-0 mt-0.5 text-academic-blue" />
+                          <MessageSquare className="w-5 h-5 shrink-0 mt-0.5 text-cafe-primary-light" />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
                               <input
@@ -145,7 +145,7 @@ export default function ChatSidebar({
                                   }
                                   if (e.key === "Escape") setEditingId(null);
                                 }}
-                                className="text-sm font-serif font-bold text-academic-navy bg-white border border-academic-blue rounded-lg px-2 py-1 w-full outline-none"
+                                className="text-sm font-display font-bold text-cafe-primary dark:text-white bg-white dark:bg-cafe-surface-dark-alt border border-cafe-primary-light dark:border-cafe-border-dark rounded-lg px-2 py-1 w-full outline-none"
                               />
                             </div>
                             <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 mt-1">
@@ -168,9 +168,9 @@ export default function ChatSidebar({
                             onClick={() => onSelectFreeChat?.(session.id)}
                             className="flex items-start gap-3 min-w-0 flex-1"
                           >
-                            <MessageSquare className={`w-5 h-5 shrink-0 mt-0.5 ${isActive ? "text-academic-blue" : "text-slate-400"}`} />
+                            <MessageSquare className={`w-5 h-5 shrink-0 mt-0.5 ${isActive ? "text-cafe-primary-light" : "text-slate-400"}`} />
                             <div className="min-w-0 flex-1">
-                              <p className={`text-sm line-clamp-2 leading-tight font-serif ${isActive ? "font-bold text-academic-navy" : "font-medium text-slate-600"}`}>
+                              <p className={`text-sm line-clamp-2 leading-tight font-display ${isActive ? "font-bold text-cafe-primary dark:text-white" : "font-medium text-slate-600 dark:text-cafe-text-dark-muted"}`}>
                                 {session.title}
                               </p>
                               <p className="text-[10px] font-bold uppercase tracking-wider mt-1 text-slate-400">
@@ -184,19 +184,19 @@ export default function ChatSidebar({
                                 e.stopPropagation();
                                 setMenuId(menuId === session.id ? null : session.id);
                               }}
-                              className="p-1 text-slate-300 hover:text-academic-navy rounded-lg transition-colors"
+                              className="p-1 text-slate-300 hover:text-cafe-primary rounded-lg transition-colors"
                             >
                               <MoreHorizontal className="w-4 h-4" />
                             </button>
                             {menuId === session.id && (
-                              <div className="absolute right-0 top-8 w-40 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden z-50 py-1">
+                              <div className="absolute right-0 top-8 w-40 bg-white dark:bg-cafe-surface-dark-alt rounded-xl shadow-xl dark:shadow-black/20 border border-slate-100 dark:border-cafe-border-dark overflow-hidden z-50 py-1">
                                 <button
                                   onClick={() => {
                                     setEditingId(session.id);
                                     setEditTitle(session.title);
                                     setMenuId(null);
                                   }}
-                                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 dark:text-cafe-text-dark hover:bg-slate-50 dark:hover:bg-cafe-border-dark"
                                 >
                                   <Pencil className="w-3.5 h-3.5" />
                                   {t.rename}
@@ -206,7 +206,7 @@ export default function ChatSidebar({
                                     setMenuId(null);
                                     onDeleteFreeChat?.(session.id);
                                   }}
-                                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
+                                  className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                   {t.delete}
@@ -239,13 +239,13 @@ export default function ChatSidebar({
                 key={doc._id}
                 className={`relative w-full rounded-2xl transition-all flex flex-col ${
                   isActive
-                    ? "bg-slate-50 border border-academic-blue/20 shadow-sm"
-                    : "bg-transparent hover:bg-slate-50 border border-transparent"
+                    ? "bg-slate-50 dark:bg-cafe-surface-dark border border-cafe-primary-light/20 shadow-sm dark:shadow-none"
+                    : "bg-transparent hover:bg-slate-50 dark:hover:bg-cafe-surface-dark border border-transparent"
                 }`}
               >
                 {isEditing ? (
                   <div className="p-4 flex items-start gap-3">
-                    <FileText className="w-5 h-5 shrink-0 mt-0.5 text-academic-blue" />
+                    <FileText className="w-5 h-5 shrink-0 mt-0.5 text-cafe-primary-light" />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <input
@@ -256,7 +256,7 @@ export default function ChatSidebar({
                             if (e.key === "Enter") saveRename(doc._id);
                             if (e.key === "Escape") setEditingId(null);
                           }}
-                          className="text-sm font-serif font-bold text-academic-navy bg-white border border-academic-blue rounded-lg px-2 py-1 w-full outline-none"
+                          className="text-sm font-display font-bold text-cafe-primary dark:text-white bg-white dark:bg-cafe-surface-dark-alt border border-cafe-primary-light dark:border-cafe-border-dark rounded-lg px-2 py-1 w-full outline-none"
                         />
                         {dupNum !== null && (
                           <span className="shrink-0 w-5 h-5 flex items-center justify-center bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full border border-amber-200">
@@ -282,12 +282,12 @@ export default function ChatSidebar({
                       className="flex items-start gap-3 min-w-0 flex-1"
                     >
                       <FileText
-                        className={`w-5 h-5 shrink-0 mt-0.5 ${isActive ? "text-academic-blue" : "text-slate-400 group-hover:text-academic-navy"}`}
+                        className={`w-5 h-5 shrink-0 mt-0.5 ${isActive ? "text-cafe-primary-light" : "text-slate-400 group-hover:text-cafe-primary"}`}
                       />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <p
-                            className={`text-sm line-clamp-2 leading-tight font-serif ${isActive ? "font-bold text-academic-navy" : "font-medium text-slate-600"}`}
+                            className={`text-sm line-clamp-2 leading-tight font-display ${isActive ? "font-bold text-cafe-primary dark:text-white" : "font-medium text-slate-600 dark:text-cafe-text-dark-muted"}`}
                           >
                             {doc.title}
                           </p>
@@ -310,15 +310,15 @@ export default function ChatSidebar({
                           e.stopPropagation();
                           setMenuId(menuId === doc._id ? null : doc._id);
                         }}
-                        className="p-1 text-slate-300 hover:text-academic-navy rounded-lg transition-colors"
+                        className="p-1 text-slate-300 hover:text-cafe-primary rounded-lg transition-colors"
                       >
                         <MoreHorizontal className="w-4 h-4" />
                       </button>
                       {menuId === doc._id && (
-                        <div className="absolute right-0 top-8 w-40 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden z-50 py-1">
+                        <div className="absolute right-0 top-8 w-40 bg-white dark:bg-cafe-surface-dark-alt rounded-xl shadow-xl dark:shadow-black/20 border border-slate-100 dark:border-cafe-border-dark overflow-hidden z-50 py-1">
                           <button
                             onClick={() => startRename(doc)}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 dark:text-cafe-text-dark hover:bg-slate-50 dark:hover:bg-cafe-border-dark"
                           >
                             <Pencil className="w-3.5 h-3.5" />
                             {t.rename}
@@ -328,7 +328,7 @@ export default function ChatSidebar({
                               setMenuId(null);
                               onDeleteDocument?.(doc._id);
                             }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
+                            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                             {t.delete}
@@ -348,7 +348,7 @@ export default function ChatSidebar({
               </p>
               <button
                 onClick={() => navigate("/upload")}
-                className="mt-4 text-[10px] font-bold text-academic-blue uppercase tracking-widest hover:underline"
+                className="mt-4 text-[10px] font-bold text-cafe-primary-light uppercase tracking-widest hover:underline"
               >
                 {t.uploadNow}
               </button>

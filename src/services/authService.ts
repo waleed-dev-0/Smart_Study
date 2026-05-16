@@ -1,16 +1,19 @@
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL = "http://localhost:5000/api";
+
+const AUTH_URL = "http://localhost:5000/api/auth";
 
 export const authService = {
-  async register(username: string, email: string, password: string) {
-    const response = await fetch(`${API_URL}/register`, {
+  async register(username: string, email: string, password: string, language: string = "English") {
+    const response = await fetch(`${AUTH_URL}/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username: username,
-        email: email,
-        password: password
+        username,
+        email,
+        password,
+        language,
       }),
     });
 
@@ -22,13 +25,14 @@ export const authService = {
 
     if (data.token) {
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
     }
 
     return data;
   },
 
   async login(email: string, password: string) {
-    const response = await fetch(`${API_URL}/login`, {
+    const response = await fetch(`${AUTH_URL}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -44,13 +48,14 @@ export const authService = {
 
     if (data.token) {
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
     }
 
     return data;
   },
 
   async forgotPassword(email: string) {
-    const response = await fetch(`${API_URL}/forgot-password`, {
+    const response = await fetch(`${AUTH_URL}/forgot-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
@@ -66,7 +71,7 @@ export const authService = {
   },
 
   async resetPassword(token: string, password: string) {
-    const response = await fetch(`${API_URL}/reset-password`, {
+    const response = await fetch(`${AUTH_URL}/reset-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token, password }),

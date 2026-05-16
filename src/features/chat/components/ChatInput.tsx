@@ -71,27 +71,27 @@ export default function ChatInput({
   };
 
   return (
-    <div className="p-6 bg-white border-t border-slate-100 shrink-0">
+    <div className="p-6 bg-white dark:bg-cafe-surface-dark-alt border-t border-slate-100 dark:border-cafe-border-dark shrink-0">
       <div className="max-w-4xl mx-auto">
-        <div className="relative flex items-end gap-3 bg-slate-50 border border-slate-200 rounded-2xl p-3 focus-within:border-academic-blue focus-within:ring-4 focus-within:ring-academic-blue/5 transition-all shadow-inner">
+        <div className="relative flex items-end gap-3 bg-slate-50 dark:bg-cafe-surface-dark border border-slate-200 dark:border-cafe-border-dark rounded-2xl p-3 focus-within:border-cafe-primary-light focus-within:ring-4 focus-within:ring-cafe-primary-light/5 transition-all shadow-inner dark:shadow-black/20">
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`p-3 rounded-xl transition-colors shrink-0 ${isDropdownOpen ? "bg-academic-navy text-white" : "text-slate-400 hover:text-academic-navy hover:bg-slate-200"}`}
+              className={`p-3 rounded-xl transition-colors shrink-0 ${isDropdownOpen ? "bg-cafe-primary text-white" : "text-slate-400 dark:text-cafe-text-dark-muted hover:text-cafe-primary dark:hover:text-white hover:bg-slate-200 dark:hover:bg-cafe-border-dark"}`}
             >
               <Paperclip className="w-5 h-5" />
             </button>
 
             {isDropdownOpen && (
-              <div className={`absolute bottom-full ${isArabic ? "right-0" : "left-0"} mb-4 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50 p-2 animate-in fade-in slide-in-from-bottom-2`}>
+              <div className={`absolute bottom-full ${isArabic ? "right-0" : "left-0"} mb-4 w-64 bg-white dark:bg-cafe-surface-dark-alt rounded-2xl shadow-2xl dark:shadow-black/30 border border-slate-100 dark:border-cafe-border-dark overflow-hidden z-50 p-2 animate-in fade-in slide-in-from-bottom-2`}>
                 <button
                   onClick={() => {
                     setIsDropdownOpen(false);
                     navigate("/library");
                   }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-xl transition-colors ${isArabic ? "text-right" : "text-left"}`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 dark:text-cafe-text-dark hover:bg-slate-50 dark:hover:bg-cafe-border-dark rounded-xl transition-colors ${isArabic ? "text-right" : "text-left"}`}
                 >
-                  <Database className="w-4 h-4 text-academic-blue" />
+                  <Database className="w-4 h-4 text-cafe-primary-light" />
                   {t.academicArchive}
                 </button>
                 <button
@@ -99,9 +99,9 @@ export default function ChatInput({
                     setIsDropdownOpen(false);
                     fileInputRef.current?.click();
                   }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-xl transition-colors ${isArabic ? "text-right" : "text-left"}`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 dark:text-cafe-text-dark hover:bg-slate-50 dark:hover:bg-cafe-border-dark rounded-xl transition-colors ${isArabic ? "text-right" : "text-left"}`}
                 >
-                  <Upload className="w-4 h-4 text-academic-gold" />
+                  <Upload className="w-4 h-4 text-cafe-warning" />
                   {t.indexNewRecord}
                 </button>
               </div>
@@ -127,14 +127,14 @@ export default function ChatInput({
                   : t.inputPlaceholderNoDoc
             }
             disabled={(!activeDocId && !isFreeChat) || isLoading}
-            className="w-full max-h-32 min-h-[48px] bg-transparent border-none outline-none resize-none py-3 text-sm text-slate-700 placeholder:text-slate-400 font-medium"
+            className="w-full max-h-32 min-h-[48px] bg-transparent border-none outline-none resize-none py-3 text-sm text-slate-700 dark:text-cafe-text-dark placeholder:text-slate-400 dark:placeholder:text-cafe-text-dark-muted font-medium"
             rows={1}
           />
 
           <button
             onClick={handleSend}
             disabled={!input.trim() || (!activeDocId && !isFreeChat) || isLoading}
-            className="p-3.5 bg-academic-navy text-white hover:bg-academic-blue rounded-xl transition-all shrink-0 shadow-lg shadow-academic-navy/20 active:scale-95 disabled:opacity-50"
+            className="p-3.5 bg-cafe-primary text-white hover:bg-cafe-primary-light rounded-xl transition-all shrink-0 shadow-lg shadow-cafe-primary/20 active:scale-95 disabled:opacity-50"
           >
             {isLoading ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -143,7 +143,7 @@ export default function ChatInput({
             )}
           </button>
         </div>
-        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] text-center mt-4">
+        <p className="text-[10px] text-slate-400 dark:text-cafe-text-dark-muted font-bold uppercase tracking-[0.2em] text-center mt-4">
           {t.autoAnalysisMsg}
         </p>
       </div>

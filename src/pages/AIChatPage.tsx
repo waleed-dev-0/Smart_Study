@@ -6,7 +6,6 @@ import {
   Sparkles,
   Bot,
   MoreHorizontal,
-  BookOpen,
   Search,
   Copy,
   Pencil,
@@ -26,7 +25,6 @@ import api from "../services/api";
 import ChatSidebar from "../features/chat/components/ChatSidebar";
 import ChatMessageList from "../features/chat/components/ChatMessageList";
 import ChatInput from "../features/chat/components/ChatInput";
-import QuizPanel from "../features/chat/components/QuizPanel";
 import FloatingActionButton from "../components/FloatingActionButton";
 
 export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
@@ -57,9 +55,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
     researchAssistant: isArabic ? "مساعد البحث" : "Research Assistant",
     analysis: isArabic ? "التحليل:" : "Analysis:",
     selectDoc: isArabic ? "اختر مستنداً" : "Select a document",
-    evaluations: isArabic ? "التقييمات" : "Evaluations",
     academicSession: isArabic ? "الجلسة الأكاديمية" : "Academic Session",
-    scholar: isArabic ? "الطالب" : "Scholar",
     referencePage: isArabic ? "المرجع: صفحة" : "Reference: Page",
     uploadingIndexing: isArabic ? "جاري رفع وفهرسة السجل الجديد..." : "Uploading and indexing new record...",
     academicArchive: isArabic ? "الأرشيف الأكاديمي" : "Academic Archive",
@@ -67,8 +63,6 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
     inputPlaceholderDoc: isArabic ? "صُغ استفسارك بخصوص المستند..." : "Formulate your inquiry regarding the document...",
     inputPlaceholderNoDoc: isArabic ? "يرجى رفع مستند أولاً لبدء المحادثة." : "Please upload a document first to start chatting.",
     autoAnalysisMsg: isArabic ? "تحليل آلي. يخضع للتدقيق الأكاديمي." : "Automated analysis. Subject to academic verification.",
-    evaluationsTitle: isArabic ? "التقييمات الأكاديمية" : "Academic Evaluations",
-    reviewResults: isArabic ? "مراجعة النتائج" : "Review Results",
     freeChat: isArabic ? "المحادثة الحرة" : "Free Chat",
     freeChatSubtitle: isArabic ? "اسألني أي شيء، أو ارفع مستنداً لتحليله" : "Ask me anything, or upload a document to analyze",
     newChat: isArabic ? "محادثة جديدة" : "New Chat",
@@ -92,7 +86,6 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   );
   const [isFreeChat, setIsFreeChat] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [isQuizzesOpen, setIsQuizzesOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [duplicateFile, setDuplicateFile] = useState<File | null>(null);
   const [headerRenameDocId, setHeaderRenameDocId] = useState<string | null>(
@@ -302,7 +295,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   };
 
   return (
-    <div className="flex min-h-screen bg-academic-paper">
+    <div className="flex min-h-screen bg-cafe-surface dark:bg-cafe-surface-dark">
       <Sidebar currentScreen="chat" isAdmin={isAdmin} />
 
       <ChatSidebar
@@ -320,31 +313,31 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
         freeChatSessions={freeChatSessions}
       />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-white relative">
-        <header className="h-20 border-b border-slate-100 flex items-center justify-between px-6 shrink-0 sticky top-0 z-10 bg-white/80 backdrop-blur-md gap-4">
-          <div className="flex items-center gap-4 min-w-0">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-white dark:bg-cafe-surface-dark-alt relative">
+        <header className="h-16 sm:h-20 border-b border-slate-100 dark:border-cafe-border-dark flex items-center justify-between px-4 sm:px-6 shrink-0 sticky top-0 z-10 bg-white/80 dark:bg-cafe-surface-dark-alt/80 backdrop-blur-md gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <button
               onClick={() => setIsHistoryOpen(true)}
-              className="lg:hidden p-2 hover:bg-slate-50 rounded-xl text-slate-500 transition-colors shrink-0 border border-slate-100"
+              className="lg:hidden p-2 hover:bg-slate-50 dark:hover:bg-cafe-surface-dark rounded-xl text-slate-500 dark:text-cafe-text-dark transition-colors shrink-0 border border-slate-100 dark:border-cafe-border-dark"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
-            <div className="flex items-center gap-4 min-w-0">
-              <div className="hidden sm:flex w-10 h-10 bg-academic-navy text-white rounded-xl items-center justify-center shrink-0 shadow-lg shadow-academic-navy/20">
-                <Search className="w-5 h-5" />
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+              <div className="hidden sm:flex w-8 h-8 sm:w-10 sm:h-10 bg-cafe-primary text-white rounded-lg sm:rounded-xl items-center justify-center shrink-0 shadow-lg shadow-cafe-primary/20">
+                <Search className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-lg font-serif font-bold text-academic-navy leading-tight flex items-center gap-2 truncate">
+                <h1 className="text-sm sm:text-lg font-display font-bold text-cafe-primary dark:text-white leading-tight flex items-center gap-2 truncate">
                   <span className="truncate">
                     {isFreeChat ? t.freeChat : t.researchAssistant}
                   </span>
                 </h1>
                 {isFreeChat ? (
-                  <p className="text-xs text-slate-500 font-medium">
+                  <p className="text-[10px] sm:text-xs text-slate-500 dark:text-cafe-text-dark-muted font-medium hidden sm:block">
                     {t.freeChatSubtitle}
                   </p>
                 ) : (
-                  <p className="text-xs text-slate-500 flex items-center gap-1 truncate font-medium">
+                  <p className="text-[10px] sm:text-xs text-slate-500 dark:text-cafe-text-dark-muted flex items-center gap-1 truncate font-medium">
                     {t.analysis}{" "}
                     {headerRenameDocId === activeDocId && activeDocId ? (
                       <span className="flex items-center gap-1 min-w-0">
@@ -356,7 +349,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
                             if (e.key === "Enter") handleHeaderRenameSave();
                             if (e.key === "Escape") setHeaderRenameDocId(null);
                           }}
-                          className="text-academic-blue text-xs font-medium bg-accent-blue/10 border border-academic-blue rounded px-1.5 py-0.5 outline-none min-w-0 w-full"
+                          className="text-cafe-primary-light text-[10px] sm:text-xs font-medium bg-accent-blue/10 border border-cafe-primary-light rounded px-1 sm:px-1.5 py-0.5 outline-none min-w-0 w-full"
                         />
                         <button
                           onClick={handleHeaderRenameSave}
@@ -374,14 +367,14 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
                     ) : (
                       <button
                         onClick={handleHeaderRenameStart}
-                        className="text-academic-blue truncate hover:bg-accent-blue/10 rounded px-1 -mx-1 transition-colors flex items-center gap-1"
+                        className="text-cafe-primary-light truncate hover:bg-accent-blue/10 rounded px-1 -mx-1 transition-colors flex items-center gap-1"
                         title={t.clickToRename}
                       >
                         <span className="truncate">
                           {documents.find((d) => d._id === activeDocId)?.title ||
                             t.selectDoc}
                         </span>
-                        <Pencil className="w-3 h-3 shrink-0 opacity-50" />
+                        <Pencil className="w-3 h-3 shrink-0 opacity-50 hidden sm:inline" />
                       </button>
                     )}
                   </p>
@@ -390,61 +383,53 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <button
               onClick={handleNewChat}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all ${
                 isFreeChat
-                  ? "bg-academic-navy text-white shadow-sm"
-                  : "text-slate-500 hover:text-academic-navy hover:bg-slate-50 border border-slate-200"
+                  ? "bg-cafe-primary text-white shadow-sm"
+                  : "text-slate-500 dark:text-cafe-text-dark hover:text-cafe-primary dark:hover:text-white hover:bg-slate-50 dark:hover:bg-cafe-surface-dark border border-slate-200 dark:border-cafe-border-dark"
               }`}
             >
-              <Plus className="w-4 h-4" />
-              {t.newChat}
+              <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">{t.newChat}</span>
             </button>
 
             <button
               onClick={() => navigate("/upload")}
-              className="p-2 text-slate-400 hover:text-academic-navy hover:bg-slate-50 rounded-xl transition-colors border border-slate-200"
+              className="p-1.5 sm:p-2 text-slate-400 dark:text-cafe-text-dark-muted hover:text-cafe-primary dark:hover:text-white hover:bg-slate-50 dark:hover:bg-cafe-surface-dark rounded-lg sm:rounded-xl transition-colors border border-slate-200 dark:border-cafe-border-dark"
               title={t.uploadDocument}
             >
-              <Upload className="w-4 h-4" />
+              <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
 
-            <div className="hidden sm:flex bg-slate-50 border border-slate-200 rounded-xl p-1 gap-1">
+            <div className="hidden sm:flex bg-slate-50 dark:bg-cafe-surface-dark border border-slate-200 dark:border-cafe-border-dark rounded-xl p-1 gap-1">
               <button
                 onClick={() => setProvider("gemini")}
-                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 ${provider === "gemini" ? "bg-academic-navy text-white shadow-sm" : "text-slate-500 hover:text-academic-navy"}`}
+                className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 sm:gap-1.5 ${provider === "gemini" ? "bg-cafe-primary text-white shadow-sm" : "text-slate-500 hover:text-cafe-primary"}`}
               >
                 <Sparkles className="w-3 h-3" />
                 Gemini
               </button>
               <button
                 onClick={() => setProvider("ollama")}
-                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 ${provider === "ollama" ? "bg-academic-navy text-white shadow-sm" : "text-slate-500 hover:text-academic-navy"}`}
+                className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 sm:gap-1.5 ${provider === "ollama" ? "bg-cafe-primary text-white shadow-sm" : "text-slate-500 hover:text-cafe-primary"}`}
               >
                 <Bot className="w-3 h-3" />
                 Ollama
               </button>
             </div>
 
-            <button
-              onClick={() => setIsQuizzesOpen(true)}
-              className="px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-academic-navy transition-all flex items-center gap-2"
-            >
-              <BookOpen className="w-4 h-4" />
-              <span className="hidden md:inline">{t.evaluations}</span>
-            </button>
-
-            <button className="p-2 text-slate-400 hover:text-academic-navy hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-100">
+            <button className="hidden sm:block p-2 text-slate-400 dark:text-cafe-text-dark-muted hover:text-cafe-primary dark:hover:text-white hover:bg-slate-50 dark:hover:bg-cafe-surface-dark rounded-xl transition-colors border border-transparent hover:border-slate-100 dark:hover:border-cafe-border-dark">
               <MoreHorizontal className="w-5 h-5" />
             </button>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6 flex flex-col gap-8 scroll-smooth">
-          <div className="text-center my-6">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] bg-slate-50 px-4 py-1.5 rounded-full border border-slate-100">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-6 sm:gap-8 scroll-smooth">
+          <div className="text-center my-4 sm:my-6">
+            <span className="text-[10px] font-bold text-slate-400 dark:text-cafe-text-dark-muted uppercase tracking-[0.2em] bg-slate-50 dark:bg-cafe-surface-dark px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border border-slate-100 dark:border-cafe-border-dark">
               {t.academicSession} •{" "}
               {new Date().toLocaleDateString(isArabic ? "ar-EG" : "en-US", {
                 month: "long",
@@ -478,30 +463,30 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
 
       {duplicateFile && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden max-w-md w-full animate-in zoom-in-95 duration-300">
-            <div className="p-8 text-center">
-              <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-amber-100">
-                <Copy className="w-8 h-8 text-amber-500" />
+          <div className="bg-white dark:bg-cafe-surface-dark-alt rounded-2xl sm:rounded-[2rem] shadow-2xl dark:shadow-black/30 overflow-hidden max-w-sm sm:max-w-md w-full animate-in zoom-in-95 duration-300 border border-slate-100 dark:border-cafe-border-dark">
+            <div className="p-6 sm:p-8 text-center">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-amber-50 dark:bg-amber-950/20 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-5 border border-amber-100 dark:border-amber-900/30">
+                <Copy className="w-7 h-7 sm:w-8 sm:h-8 text-amber-500" />
               </div>
-              <h3 className="text-xl font-serif font-bold text-amber-900 mb-2">
+              <h3 className="text-lg sm:text-xl font-display font-bold text-amber-900 dark:text-amber-100 mb-2">
                 {t.docAlreadyIndexed}
               </h3>
-              <p className="text-sm text-amber-700 mb-1">
-                <strong className="text-amber-900">{duplicateFile.name}</strong>
+              <p className="text-xs sm:text-sm text-amber-700 dark:text-amber-200 mb-1">
+                <strong className="text-amber-900 dark:text-amber-100">{duplicateFile.name}</strong>
               </p>
-              <p className="text-xs text-amber-600/80 mb-6">
+              <p className="text-[10px] sm:text-xs text-amber-600/80 mb-4 sm:mb-6">
                 {t.duplicateMsg}
               </p>
-              <div className="flex gap-3">
+              <div className="flex gap-2 sm:gap-3">
                 <button
                   onClick={() => setDuplicateFile(null)}
-                  className="flex-1 bg-white border border-amber-200 text-amber-700 px-6 py-3 rounded-xl text-sm font-bold hover:bg-amber-50 transition-all"
+                  className="flex-1 bg-white dark:bg-transparent border border-amber-200 dark:border-amber-900/30 text-amber-700 dark:text-amber-400 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all"
                 >
                   {t.cancel}
                 </button>
                 <button
                   onClick={handleForceUpload}
-                  className="flex-1 bg-amber-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-amber-700 transition-all shadow-md shadow-amber-600/20"
+                  className="flex-1 bg-amber-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold hover:bg-amber-700 transition-all shadow-md shadow-amber-600/20"
                 >
                   {t.uploadAnyway}
                 </button>
@@ -510,8 +495,6 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
           </div>
         </div>
       )}
-
-      <QuizPanel isOpen={isQuizzesOpen} onClose={() => setIsQuizzesOpen(false)} />
 
       <FloatingActionButton activeDocId={activeDocId} />
     </div>

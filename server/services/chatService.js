@@ -140,7 +140,7 @@ class ChatService {
     return await aiService.askAI(query, "", provider, "");
   }
 
-  async freeQuestionStream(query, provider = "gemini") {
+  freeQuestionStream(query, provider = "gemini") {
     return aiService.askAIStream(query, "", provider, "");
   }
 

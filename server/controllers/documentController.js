@@ -1,9 +1,6 @@
 import DocumentModel from '../models/document.js';
 import DocumentChunk from '../models/documentchunk.js';
-<<<<<<< HEAD
 import DocumentSummary from '../models/documentsummary.js';
-=======
->>>>>>> dab8ccbf1e9308b705706a8dfce33177cbb807ad
 import ChatSession from '../models/chatsession.js';
 import ChatMessage from '../models/chatmessage.js';
 import fs from 'fs';
@@ -24,7 +21,31 @@ const getDocuments = async (req, res) => {
     }
 };
 
+const getDocumentById = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const docId = req.params.id;
 
+        const document = await DocumentModel.findOne({
+            _id: docId,
+            user_id: userId
+        });
+
+        if (!document) {
+            return res.status(404).json({
+                success: false,
+                message: "Document not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: document
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 const deleteDocument = async (req, res) => {
     try {
@@ -49,36 +70,6 @@ const deleteDocument = async (req, res) => {
         if (filePath && fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
-
-<<<<<<< HEAD
-=======
-        await DocumentChunk.deleteMany({ document_id: docId });
-
-        const sessions = await ChatSession.find({
-            user_id: userId,
-            $or: [
-                { document_id: docId },
-                { additional_documents: docId }
-            ]
-        });
-        const sessionIds = sessions.map(s => s._id);
-        if (sessionIds.length > 0) {
-            await ChatMessage.deleteMany({ session_id: { $in: sessionIds } });
-            await ChatSession.deleteMany({ _id: { $in: sessionIds } });
-        }
-
-        await DocumentModel.deleteOne({_id:docId,user_id:userId});
-        res.status(200).json({
-            success:true,
-            message:"Document deleted successfully"
-        })
-    }catch(error){
-        res.status(500).json({
-            success:false,
-            message:error.message
-        })
-    }
->>>>>>> dab8ccbf1e9308b705706a8dfce33177cbb807ad
 
         await DocumentChunk.deleteMany({
             document_id: docId
@@ -129,5 +120,6 @@ const deleteDocument = async (req, res) => {
 
 export {
     deleteDocument,
-    getDocuments
+    getDocuments,
+    getDocumentById
 }
