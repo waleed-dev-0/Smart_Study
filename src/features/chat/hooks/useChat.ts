@@ -74,15 +74,25 @@ export const useChat = (isArabic?: boolean) => {
   const statusText = {
     searching: isArabic ? "جاري البحث في المستند..." : "Searching document...",
     generating: isArabic ? "جاري إنشاء الإجابة..." : "Generating answer...",
-    almostThere: isArabic ? "يكاد ينتهي، قد يستغرق هذا حتى 30 ثانية..." : "Almost there, this can take up to 30s...",
+    almostThere: isArabic
+      ? "يكاد ينتهي، قد يستغرق هذا حتى 30 ثانية..."
+      : "Almost there, this can take up to 30s...",
     thinking: isArabic ? "جاري التفكير..." : "Thinking...",
   };
 
   const errorTexts = {
-    general: isArabic ? "حدث خطأ أثناء معالجة طلبك. يرجى المحاولة مرة أخرى." : "I encountered an error processing your request. Please try again.",
-    timeout: isArabic ? "استغرق الذكاء الاصطناعي وقتاً طويلاً للرد. حاول بسؤال أقصر، أو قم بالتبديل إلى مزود آخر باستخدام المفاتيح أعلاه." : "The AI took too long to respond. Try a shorter question, or switch to a different provider using the toggle above.",
-    noContent: isArabic ? "لم يتم العثور على محتوى مفهرس لهذا المستند. يرجى إعادة رفع PDF لمعالجته بشكل صحيح." : "No indexed content was found for this document. Please re-upload the PDF so it can be processed correctly.",
-    failedResponse: isArabic ? "فشل في الحصول على الرد." : "Failed to get response.",
+    general: isArabic
+      ? "حدث خطأ أثناء معالجة طلبك. يرجى المحاولة مرة أخرى."
+      : "I encountered an error processing your request. Please try again.",
+    timeout: isArabic
+      ? "استغرق الذكاء الاصطناعي وقتاً طويلاً للرد. حاول بسؤال أقصر، أو قم بالتبديل إلى مزود آخر باستخدام المفاتيح أعلاه."
+      : "The AI took too long to respond. Try a shorter question, or switch to a different provider using the toggle above.",
+    noContent: isArabic
+      ? "لم يتم العثور على محتوى مفهرس لهذا المستند. يرجى إعادة رفع PDF لمعالجته بشكل صحيح."
+      : "No indexed content was found for this document. Please re-upload the PDF so it can be processed correctly.",
+    failedResponse: isArabic
+      ? "فشل في الحصول على الرد."
+      : "Failed to get response.",
   };
 
   const sendMessage = async (
@@ -154,10 +164,7 @@ export const useChat = (isArabic?: boolean) => {
             fullText += data.token;
             setStreamingText(fullText);
           } else if (data.error) {
-            setMessages((prev) => [
-              ...prev,
-              createAIMessage(data.error, true),
-            ]);
+            setMessages((prev) => [...prev, createAIMessage(data.error, true)]);
             return;
           }
         }
@@ -168,10 +175,7 @@ export const useChat = (isArabic?: boolean) => {
       console.error("Stream error:", error);
       setMessages((prev) => [
         ...prev,
-        createAIMessage(
-          error.message || errorTexts.general,
-          true,
-        ),
+        createAIMessage(error.message || errorTexts.general, true),
       ]);
     } finally {
       clearTimeout(statusTimer);
@@ -294,9 +298,7 @@ export const useChat = (isArabic?: boolean) => {
       setMessages((prev) => [
         ...prev,
         createAIMessage(
-          error.response?.data?.message ||
-            error.message ||
-            errorTexts.general,
+          error.response?.data?.message || error.message || errorTexts.general,
           true,
         ),
       ]);
@@ -312,21 +314,20 @@ export const useChat = (isArabic?: boolean) => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${api.defaults.baseURL}/chat/free/stream`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ query, provider: "ollama", language: lang }),
+      const response = await fetch(`${api.defaults.baseURL}/chat/free/stream`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify({ query, provider: "ollama", language: lang }),
+      });
 
       if (!response.ok) {
         const errBody = await response.json().catch(() => ({}));
-        throw new Error(errBody.message || `Request failed (${response.status})`);
+        throw new Error(
+          errBody.message || `Request failed (${response.status})`,
+        );
       }
 
       const reader = response.body!.getReader();
@@ -350,10 +351,7 @@ export const useChat = (isArabic?: boolean) => {
             fullText += data.token;
             setStreamingText(fullText);
           } else if (data.error) {
-            setMessages((prev) => [
-              ...prev,
-              createAIMessage(data.error, true),
-            ]);
+            setMessages((prev) => [...prev, createAIMessage(data.error, true)]);
             return;
           }
         }
@@ -364,10 +362,7 @@ export const useChat = (isArabic?: boolean) => {
       console.error("Free stream error:", error);
       setMessages((prev) => [
         ...prev,
-        createAIMessage(
-          error.message || errorTexts.failedResponse,
-          true,
-        ),
+        createAIMessage(error.message || errorTexts.failedResponse, true),
       ]);
     } finally {
       setStreamingText("");

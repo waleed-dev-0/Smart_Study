@@ -1,22 +1,15 @@
 import React, { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Paperclip,
   Send,
-  Database,
-  Upload,
-  Menu,
 } from "lucide-react";
 import { useAppContext } from "../../../context/AppContext";
-import { uploadFile } from "../../../features/upload/services/uploadService";
-import { fetchDocuments } from "../../../features/upload/services/uploadService";
 
 interface ChatInputProps {
   activeDocId: string | null;
   isLoading: boolean;
   onSend: (input: string) => void;
   onDocumentUpload: (file: File) => Promise<void>;
-  onLoadDocs: () => Promise<void>;
   onToggleHistory: () => void;
   isFreeChat?: boolean;
 }
@@ -26,20 +19,14 @@ export default function ChatInput({
   isLoading,
   onSend,
   onDocumentUpload,
-  onLoadDocs,
   onToggleHistory,
   isFreeChat,
 }: ChatInputProps) {
-  const navigate = useNavigate();
   const { isArabic } = useAppContext();
   const [input, setInput] = useState("");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const t = {
-    academicArchive: isArabic ? "الأرشيف الأكاديمي" : "Academic Archive",
-    indexNewRecord: isArabic ? "فهرسة سجل جديد" : "Index New Record",
     inputPlaceholderDoc: isArabic ? "صُغ استفسارك بخصوص المستند..." : "Formulate your inquiry regarding the document...",
     inputPlaceholderNoDoc: isArabic ? "يرجى رفع مستند أولاً لبدء المحادثة." : "Please upload a document first to start chatting.",
     autoAnalysisMsg: isArabic ? "تحليل آلي. يخضع للتدقيق الأكاديمي." : "Automated analysis. Subject to academic verification.",
@@ -63,9 +50,7 @@ export default function ChatInput({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsDropdownOpen(false);
     await onDocumentUpload(file);
-    await onLoadDocs();
 
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -74,46 +59,19 @@ export default function ChatInput({
     <div className="p-6 bg-white dark:bg-cafe-surface-dark-alt border-t border-slate-100 dark:border-cafe-border-dark shrink-0">
       <div className="max-w-4xl mx-auto">
         <div className="relative flex items-end gap-3 bg-slate-50 dark:bg-cafe-surface-dark border border-slate-200 dark:border-cafe-border-dark rounded-2xl p-3 focus-within:border-cafe-primary-light focus-within:ring-4 focus-within:ring-cafe-primary-light/5 transition-all shadow-inner dark:shadow-black/20">
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`p-3 rounded-xl transition-colors shrink-0 ${isDropdownOpen ? "bg-cafe-primary text-white" : "text-slate-400 dark:text-cafe-text-dark-muted hover:text-cafe-primary dark:hover:text-white hover:bg-slate-200 dark:hover:bg-cafe-border-dark"}`}
-            >
-              <Paperclip className="w-5 h-5" />
-            </button>
-
-            {isDropdownOpen && (
-              <div className={`absolute bottom-full ${isArabic ? "right-0" : "left-0"} mb-4 w-64 bg-white dark:bg-cafe-surface-dark-alt rounded-2xl shadow-2xl dark:shadow-black/30 border border-slate-100 dark:border-cafe-border-dark overflow-hidden z-50 p-2 animate-in fade-in slide-in-from-bottom-2`}>
-                <button
-                  onClick={() => {
-                    setIsDropdownOpen(false);
-                    navigate("/library");
-                  }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 dark:text-cafe-text-dark hover:bg-slate-50 dark:hover:bg-cafe-border-dark rounded-xl transition-colors ${isArabic ? "text-right" : "text-left"}`}
-                >
-                  <Database className="w-4 h-4 text-cafe-primary-light" />
-                  {t.academicArchive}
-                </button>
-                <button
-                  onClick={() => {
-                    setIsDropdownOpen(false);
-                    fileInputRef.current?.click();
-                  }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 dark:text-cafe-text-dark hover:bg-slate-50 dark:hover:bg-cafe-border-dark rounded-xl transition-colors ${isArabic ? "text-right" : "text-left"}`}
-                >
-                  <Upload className="w-4 h-4 text-cafe-warning" />
-                  {t.indexNewRecord}
-                </button>
-              </div>
-            )}
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept=".pdf"
-              onChange={handleFileUpload}
-            />
-          </div>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="p-3 rounded-xl transition-colors shrink-0 text-slate-400 dark:text-cafe-text-dark-muted hover:text-cafe-primary dark:hover:text-white hover:bg-slate-200 dark:hover:bg-cafe-border-dark"
+          >
+            <Paperclip className="w-5 h-5" />
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            accept=".pdf"
+            onChange={handleFileUpload}
+          />
 
           <textarea
             value={input}
