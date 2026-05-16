@@ -4,6 +4,27 @@ import ChatSession from "../models/chatsession.js";
 import ChatMessage from "../models/chatmessage.js";
 import mongoose from "mongoose";
 
+async function generateUniqueTitle(originalName, userId) {
+  const match = originalName.match(/^(.+?)(?:\s\((\d+)\))?(\.[^.]+)$/);
+  const baseName = match ? match[1] : originalName;
+  const ext = match ? match[3] : "";
+  const escaped = baseName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escapedExt = ext.replace(".", "\\.");
+
+  const existingDocs = await DocumentModel.find({
+    user_id: userId,
+    title: { $regex: `^${escaped}(?:\\s\\(\\d+\\))?${escapedExt}$` },
+  });
+
+  if (existingDocs.length === 0) return originalName;
+
+  let num = 1;
+  while (existingDocs.some((d) => d.title === `${baseName} (${num})${ext}`)) {
+    num++;
+  }
+  return `${baseName} (${num})${ext}`;
+}
+
 export const uploadDocument = async (req, res) => {
   try {
     if (!req.file) {
@@ -12,11 +33,17 @@ export const uploadDocument = async (req, res) => {
         .json({ success: false, message: "No file uploaded" });
     }
 
-    const { parentId } = req.body;
+    const { parentId, force } = req.body;
     const userId = req.user?._id;
+
+    let title = req.file.originalname;
+    if (force === "true") {
+      title = await generateUniqueTitle(req.file.originalname, userId);
+    }
+
     const documentId = await uploadService.processPDF(
       req.file.path,
-      req.file.originalname,
+      title,
       userId,
     );
 
@@ -71,6 +98,12 @@ export const uploadDocument = async (req, res) => {
       data: { documentId },
     });
   } catch (error) {
+    if (error.message === "File already exists") {
+      return res.status(409).json({
+        success: false,
+        message: "File already exists",
+      });
+    }
     res.status(500).json({ success: false, message: error.message });
   }
 };

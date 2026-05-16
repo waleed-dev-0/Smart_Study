@@ -9,6 +9,8 @@ import { auth } from "../middlewares/authMiddleware.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import questionRoutes from "./questionRoutes.js";
+import quizAttemptRoutes from "./quizAttemptRoutes.js";
 
 const router = express.Router();
 
@@ -40,10 +42,13 @@ router.get("/", (req, res) => {
   res.json({ success: true, message: "Server is running👌." });
 });
 
+import userRoutes from "./userRoutes.js";
 router.use("/auth", authRoutes);
 router.use("/summary",auth,summaryRoutes);
+router.use("/user", userRoutes);
 
 router.get("/documents", auth, documentController.getDocuments);
+router.get("/documents/:id", auth, documentController.getDocumentById);
 router.get("/userProfile",auth,profileController.getProfile);
 router.post(
   "/upload",
@@ -54,6 +59,12 @@ router.post(
 
 
 router.post("/chat", auth, chatController.askAI);
+router.post("/chat/stream", auth, chatController.askAIStream);
+router.post("/chat/free", auth, chatController.freeChat);
+router.post("/chat/free/stream", auth, chatController.freeChatStream);
 router.get("/chat/:documentId", auth, chatController.getChatHistory);
+router.put("/chat/session/:documentId", auth, chatController.renameSession);
 router.delete("/documents/:id", auth, documentController.deleteDocument);
+router.use("/questions", questionRoutes);
+router.use("/attempts", quizAttemptRoutes);
 export default router;

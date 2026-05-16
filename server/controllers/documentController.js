@@ -21,7 +21,31 @@ const getDocuments = async (req, res) => {
     }
 };
 
+const getDocumentById = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const docId = req.params.id;
 
+        const document = await DocumentModel.findOne({
+            _id: docId,
+            user_id: userId
+        });
+
+        if (!document) {
+            return res.status(404).json({
+                success: false,
+                message: "Document not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: document
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 const deleteDocument = async (req, res) => {
     try {
@@ -46,7 +70,6 @@ const deleteDocument = async (req, res) => {
         if (filePath && fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
-
 
         await DocumentChunk.deleteMany({
             document_id: docId
@@ -97,5 +120,6 @@ const deleteDocument = async (req, res) => {
 
 export {
     deleteDocument,
-    getDocuments
+    getDocuments,
+    getDocumentById
 }
