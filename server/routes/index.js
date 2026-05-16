@@ -44,7 +44,7 @@ router.get("/", (req, res) => {
 
 import userRoutes from "./userRoutes.js";
 router.use("/auth", authRoutes);
-router.use("/summary",auth,summaryRoutes);
+router.use("/summary",summaryRoutes);
 router.use("/user", userRoutes);
 
 router.get("/documents", auth, documentController.getDocuments);

@@ -34,11 +34,10 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
   const t = {
     researchHub: isArabic ? "مركز الأبحاث" : "Research Hub",
     welcome: isArabic ? "مرحباً بك مجدداً. لديك" : "Welcome back. You have",
-    reposActive: isArabic ? "مفهرس نشط في الأرشيف الخاص بك." : "repositories active in your archive.",
+    reposActive: isArabic ? "ملفات نشط في المكتبة الخاص بك." : "Documents active in your library.",
     archiveNewSource: isArabic ? "أرشفة مصدر جديد" : "Archive New Source",
     digitalCurricula: isArabic ? "المناهج الرقمية" : "Digital Curricula",
-    activeArchive: isArabic ? "الأرشيف النشط" : "Active Archive",
-    viewFullLibrary: isArabic ? "عرض المكتبة الكاملة" : "View Full Library",
+    activeArchive: isArabic ? "الأرشيف النشط" : "Active Document PDF",
     uploaded: isArabic ? "تم الرفع:" : "Uploaded:",
     indexed: isArabic ? "مفهرس" : "Indexed",
     synthesizing: isArabic ? "جاري التحليل..." : "Synthesizing..."
@@ -70,7 +69,7 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
   }, []);
 
   let Count = 0;
-  documents.forEach((items) => {
+  documents.forEach((document) => {
     Count++;
   });
   const formatSize = (bytes?: number) => {
@@ -112,7 +111,7 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
                   {t.researchHub}
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-cafe-text-dark-muted font-medium">
-                  {t.welcome} {Count} {t.reposActive}
+                  {t.welcome} at least 4 {t.reposActive}
                 </p>
               </div>
               <button
@@ -144,13 +143,6 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
               <h2 className="text-xl sm:text-2xl font-display font-bold text-cafe-primary dark:text-white">
                 {t.activeArchive}
               </h2>
-              <button
-                onClick={() => navigate("/library")}
-                className="text-xs font-bold text-cafe-primary-light hover:text-cafe-primary flex items-center gap-2 transition-all uppercase tracking-widest group"
-              >
-                {t.viewFullLibrary}
-                <ArrowRight className={`w-4 h-4 transition-transform ${isArabic ? 'group-hover:-translate-x-1 rotate-180' : 'group-hover:translate-x-1'}`} />
-              </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">

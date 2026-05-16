@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="1b36f0ee-3741-41a3-9347-fce1ac661e51" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="repository" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="3DANjJmzT8NaR5bNGsQOZZJDtNp" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Node.js.authController.js.executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.summaryRoutes.js.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/hussa/Desktop/Smart_Study&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\hussa\\Desktop\\Smart_Study\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mongo&quot;
+    ]
+  }
+}</component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-9c94529fcfe0-JavaScript-PS-252.26199.163" />
+        <option value="bundled-php-predefined-a98d8de5180a-f0a8ef430dfa-com.jetbrains.php.sharedIndexes-PS-252.26199.163" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1b36f0ee-3741-41a3-9347-fce1ac661e51" name="Changes" comment="" />
+      <created>1777721048317</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1777721048317</updated>
+      <workItem from="1777721049536" duration="85000" />
+      <workItem from="1777721508671" duration="68000" />
+      <workItem from="1777722053021" duration="801000" />
+      <workItem from="1777930000688" duration="5264000" />
+      <workItem from="1777977597057" duration="5339000" />
+      <workItem from="1777990313364" duration="7100000" />
+      <workItem from="1778239462083" duration="541000" />
+      <workItem from="1778242122399" duration="39000" />
+      <workItem from="1778242163625" duration="5342000" />
+      <workItem from="1778247566626" duration="32427000" />
+      <workItem from="1778320903114" duration="2854000" />
+      <workItem from="1778326490848" duration="2270000" />
+      <workItem from="1778421663432" duration="26000" />
+      <workItem from="1778421708035" duration="122000" />
+      <workItem from="1778421916723" duration="58000" />
+      <workItem from="1778422260618" duration="248000" />
+      <workItem from="1778422688870" duration="149000" />
+      <workItem from="1778423028893" duration="1497000" />
+      <workItem from="1778424936766" duration="3189000" />
+      <workItem from="1778430142715" duration="1591000" />
+      <workItem from="1778512983547" duration="1607000" />
+      <workItem from="1778592785141" duration="20700000" />
+      <workItem from="1778701567909" duration="3983000" />
+      <workItem from="1778767003044" duration="217000" />
+      <workItem from="1778769142097" duration="101000" />
+      <workItem from="1778842258942" duration="6182000" />
+      <workItem from="1778849462372" duration="21667000" />
+      <workItem from="1778925343889" duration="1558000" />
+      <workItem from="1778926957792" duration="2673000" />
+      <workItem from="1778935216876" duration="4660000" />
+      <workItem from="1778944729016" duration="65000" />
+      <workItem from="1778944796899" duration="18219000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
