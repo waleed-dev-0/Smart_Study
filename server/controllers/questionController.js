@@ -7,8 +7,8 @@ import mongoose from "mongoose";
 
 export const generateQuestions = async (req, res) => {
   try {
-    const document_id = req.body.document_id || req.body.documentId;
-    const count = req.body.count || req.body.numberOfQuestions || 10;
+    const document_id = req.body.document_id ;
+    const count = req.body.count || 10;
     const difficulty = req.body.difficulty || "medium";
     const language = req.body.language || "English";
     const userId = req.user?._id;

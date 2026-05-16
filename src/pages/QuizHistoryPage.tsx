@@ -92,7 +92,7 @@ export default function QuizHistoryPage({ isAdmin }: { isAdmin?: boolean }) {
   const stats = calculateStats();
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString(isArabic ? "ar-EG" : "en-US", {
+    return new Date(dateStr).toLocaleDateString(isArabic ? "ar" : "en-US", {
       year: "numeric",
       month: "short",
       day: "2-digit",

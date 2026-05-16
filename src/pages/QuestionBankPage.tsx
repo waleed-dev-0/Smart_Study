@@ -78,13 +78,13 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
 
   const currentQuestion = quizList[activeQ];
 
-  const handleOptionSelect = (index: number) => {
+  const OptionSelect = (index: number) => {
     if (!answered) {
       setChosenAnswer(index);
     }
   };
 
-  const handleSubmit = () => {
+  const Submit = () => {
     if (chosenAnswer !== null && currentQuestion) {
       setAnswered(true);
       let isCorrect = currentQuestion.options[chosenAnswer] === currentQuestion.correct_answer;
@@ -105,7 +105,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
     }
   };
 
-  let handleNext = () => {
+  let Next = () => {
     if (activeQ < quizList.length - 1) {
       setActiveQ(prev => prev + 1);
       setChosenAnswer(null);
@@ -139,7 +139,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
     }
   };
 
-  const handleReset = () => {
+  const Reset = () => {
     setActiveQ(0);
     setScore(0);
     setChosenAnswer(null);
@@ -174,7 +174,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
               </span>
             </div>
             <button
-              onClick={handleReset}
+              onClick={Reset}
               className="flex items-center gap-1.5 sm:gap-2 bg-white border border-cafe-secondary dark:border-cafe-surface-dark text-cafe-text px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold hover:bg-cafe-surface transition-all"
             >
               <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -219,7 +219,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
                 </p>
                 <div className="flex gap-3 sm:gap-4">
                   <button
-                    onClick={handleReset}
+                    onClick={Reset}
                     className="px-4 sm:px-6 py-2.5 sm:py-3 bg-cafe-primary text-white rounded-lg font-bold hover:bg-cafe-primary-dark transition-all text-xs sm:text-sm"
                   >
                     {t.retakeQuiz}
@@ -280,7 +280,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
                         return (
                           <button
                             key={index}
-                            onClick={() => handleOptionSelect(index)}
+                            onClick={() => OptionSelect(index)}
                             disabled={answered}
                             className={`w-full text-start p-3 sm:p-4 rounded-xl border-2 transition-all flex items-center justify-between gap-3 sm:gap-4 ${optionClass}`}
                           >
@@ -315,7 +315,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
                             {currentQuestion.explanation}
                           </div>
                           <button
-                            onClick={handleNext}
+                            onClick={Next}
                             className="flex items-center justify-center gap-2 bg-cafe-primary text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-bold hover:bg-cafe-primary-dark transition-all text-xs sm:text-sm"
                           >
                             {activeQ < quizList.length - 1 ? t.nextQuestion : t.finishQuiz}
@@ -329,7 +329,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
                   {!answered && (
                     <div className="bg-cafe-surface border-t border-cafe-secondary p-4 sm:p-6 flex justify-center">
                       <button
-                         onClick={handleSubmit}
+                         onClick={Submit}
                          disabled={chosenAnswer === null}
                          className={`w-full max-w-sm flex items-center justify-center py-2.5 sm:py-3 rounded-lg font-bold transition-all text-xs sm:text-sm ${chosenAnswer !== null
                              ? 'bg-cafe-primary text-white hover:bg-cafe-primary-dark'
