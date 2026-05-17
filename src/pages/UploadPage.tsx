@@ -11,9 +11,8 @@ import {
   ShieldCheck,
   GraduationCap,
   Clock,
-  Copy,
 } from "lucide-react";
-import { uploadFile, UploadError } from "../features/upload/services/uploadService";
+import { uploadFile } from "../features/upload/services/uploadService";
 import { useAppContext } from "../context/AppContext";
 
 export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
@@ -27,7 +26,7 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
     "idle" | "uploading" | "success" | "error"
   >("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
+
 
   const t = {
     archiveIngestion: isArabic ? "استيراد المستندات" : "Archive Ingestion",
@@ -46,12 +45,6 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
     processingArchive: isArabic ? "جاري المعالجة..." : "Processing Archive...",
     archiveSecured: isArabic ? "تم تأمين الأرشيف" : "Archive Secured",
     initiateSynthesis: isArabic ? "بدء التوليف" : "Initiate Synthesis",
-    documentAlreadyIndexed: isArabic ? "المستند مفهرس بالفعل" : "Document Already Indexed",
-    aFileNamed: isArabic ? "ملف باسم" : "A file named",
-    alreadyExists: isArabic ? "موجود بالفعل في أرشيفك." : "already exists in your archive.",
-    duplicateWarning: isArabic ? "إعادة الرفع ستؤدي إلى إنشاء إدخال مكرر. هل تريد المتابعة؟" : "Re-uploading will create a duplicate entry. Would you like to continue anyway?",
-    cancel: isArabic ? "إلغاء" : "Cancel",
-    uploadAnyway: isArabic ? "رفع على أي حال" : "Upload Anyway",
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -110,12 +103,7 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
       }, 1500);
     } catch (error: any) {
       console.error("Upload failed:", error);
-      if (error instanceof UploadError && error.status === 409) {
-        setShowDuplicateDialog(true);
-        setUploadStatus("idle");
-      } else {
-        setUploadStatus("error");
-      }
+      setUploadStatus("error");
     }
   };
 
@@ -301,51 +289,7 @@ export default function UploadPage({ isAdmin }: { isAdmin?: boolean }) {
                 </div>
               )}
 
-              {showDuplicateDialog && (
-                <div className="mt-6 sm:mt-8 border-2 border-amber-200 dark:border-amber-900/30 bg-amber-50/60 dark:bg-amber-900/20 rounded-xl sm:rounded-[2rem] p-6 sm:p-8 md:p-10 flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <div className="w-14 h-14 sm:w-20 sm:h-20 bg-white dark:bg-amber-950/50 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg mb-4 sm:mb-6 border border-amber-100 dark:border-amber-900/30">
-                    <Copy className="w-7 h-7 sm:w-10 sm:h-10 text-amber-500" />
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-display font-bold text-amber-900 dark:text-amber-100 mb-2 sm:mb-3">
-                    {t.documentAlreadyIndexed}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-amber-700 dark:text-amber-200 font-medium mb-1 sm:mb-2 leading-relaxed max-w-md">
-                    {t.aFileNamed} <strong className="text-amber-900 dark:text-amber-100">{selectedFile?.name}</strong> {t.alreadyExists}
-                  </p>
-                  <p className="text-[10px] sm:text-xs text-amber-600/80 font-medium mb-6 sm:mb-8">
-                    {t.duplicateWarning}
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full max-w-sm">
-                    <button
-                      onClick={() => {
-                        setShowDuplicateDialog(false);
-                        setSelectedFile(null);
-                      }}
-                      className="flex-1 bg-white dark:bg-transparent border border-amber-200 dark:border-amber-900/30 text-amber-700 dark:text-amber-400 px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-all shadow-sm"
-                    >
-                      {t.cancel}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowDuplicateDialog(false);
-                        setUploadStatus("uploading");
-                        setUploadProgress(30);
-                        uploadFile(selectedFile!, parentId || undefined, true)
-                          .then((result) => {
-                            setUploadProgress(100);
-                            setUploadStatus("success");
-                            localStorage.setItem("activeDocumentId", result.data.documentId);
-                            setTimeout(() => navigate("/chat"), 1500);
-                          })
-                          .catch(() => setUploadStatus("error"));
-                      }}
-                      className="flex-1 bg-amber-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold hover:bg-amber-700 transition-all shadow-lg shadow-amber-600/20 active:scale-95"
-                    >
-                      {t.uploadAnyway}
-                    </button>
-                  </div>
-                </div>
-              )}
+
             </div>
           </div>
         </main>

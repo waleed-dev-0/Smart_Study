@@ -19,7 +19,6 @@ import { useChat, getFreeWelcomeMessage } from "../features/chat/hooks/useChat";
 import {
   fetchDocuments,
   uploadFile,
-  UploadError,
 } from "../features/upload/services/uploadService";
 import api from "../services/api";
 import ChatSidebar from "../features/chat/components/ChatSidebar";
@@ -84,10 +83,11 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   const [activeDocId, setActiveDocId] = useState<string | null>(
     localStorage.getItem("activeDocumentId"),
   );
-  const [isFreeChat, setIsFreeChat] = useState(false);
+  const [isFreeChat, setIsFreeChat] = useState(() => {
+    return localStorage.getItem("isFreeChat") === "true";
+  });
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [duplicateFile, setDuplicateFile] = useState<File | null>(null);
   const [headerRenameDocId, setHeaderRenameDocId] = useState<string | null>(
     null,
   );
@@ -98,11 +98,25 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
       return JSON.parse(localStorage.getItem("freeChatSessions") || "[]");
     } catch { return []; }
   });
-  const [currentFreeChatId, setCurrentFreeChatId] = useState<string | null>(null);
+  const [currentFreeChatId, setCurrentFreeChatId] = useState<string | null>(() => {
+    return localStorage.getItem("currentFreeChatId");
+  });
 
   useEffect(() => {
     localStorage.setItem("freeChatSessions", JSON.stringify(freeChatSessions));
   }, [freeChatSessions]);
+
+  useEffect(() => {
+    localStorage.setItem("isFreeChat", String(isFreeChat));
+  }, [isFreeChat]);
+
+  useEffect(() => {
+    if (currentFreeChatId) {
+      localStorage.setItem("currentFreeChatId", currentFreeChatId);
+    } else {
+      localStorage.removeItem("currentFreeChatId");
+    }
+  }, [currentFreeChatId]);
 
   useEffect(() => {
     const docId = new URLSearchParams(location.search).get("docId");
@@ -116,7 +130,7 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
     try {
       const res = await fetchDocuments();
       setDocuments(res.data);
-      if (res.data.length > 0 && !activeDocId) {
+      if (res.data.length > 0 && !activeDocId && !isFreeChat) {
         setActiveDocId(res.data[0]._id);
         localStorage.setItem("activeDocumentId", res.data[0]._id);
       }
@@ -130,6 +144,15 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
   }, [messages, isLoading, isUploading]);
 
   useEffect(() => {
+    if (isFreeChat && currentFreeChatId) {
+      const session = freeChatSessions.find((s: any) => s.id === currentFreeChatId);
+      if (session) {
+        setInitialMessages(session.messages || [getFreeWelcomeMessage(isArabic)]);
+      } else {
+        setIsFreeChat(false);
+        setCurrentFreeChatId(null);
+      }
+    }
     loadDocs();
   }, []);
 
@@ -232,29 +255,12 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
         setActiveDocId(res.data.documentId);
         localStorage.setItem("activeDocumentId", res.data.documentId);
         setIsFreeChat(false);
+      } else if (activeDocId) {
+        fetchHistory(activeDocId);
       }
     } catch (err: any) {
-      if (err instanceof UploadError && err.status === 409) {
-        setDuplicateFile(file);
-      } else {
-        console.error("File upload failed", err);
-        alert(t.failedUpload);
-      }
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleForceUpload = async () => {
-    if (!duplicateFile) return;
-    setIsUploading(true);
-    setDuplicateFile(null);
-    try {
-      await uploadFile(duplicateFile, activeDocId || undefined, true);
-      await loadDocs();
-    } catch (err) {
-      console.error("Force upload failed", err);
-      alert(t.failedUploadGeneric);
+      console.error("File upload failed", err);
+      alert(t.failedUpload);
     } finally {
       setIsUploading(false);
     }
@@ -455,46 +461,10 @@ export default function AIChatPage({ isAdmin }: { isAdmin?: boolean }) {
           isLoading={isLoading}
           onSend={handleSend}
           onDocumentUpload={handleDocumentUpload}
-          onLoadDocs={loadDocs}
           onToggleHistory={() => setIsHistoryOpen(true)}
           isFreeChat={isFreeChat}
         />
       </div>
-
-      {duplicateFile && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-white dark:bg-cafe-surface-dark-alt rounded-2xl sm:rounded-[2rem] shadow-2xl dark:shadow-black/30 overflow-hidden max-w-sm sm:max-w-md w-full animate-in zoom-in-95 duration-300 border border-slate-100 dark:border-cafe-border-dark">
-            <div className="p-6 sm:p-8 text-center">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-amber-50 dark:bg-amber-950/20 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-5 border border-amber-100 dark:border-amber-900/30">
-                <Copy className="w-7 h-7 sm:w-8 sm:h-8 text-amber-500" />
-              </div>
-              <h3 className="text-lg sm:text-xl font-display font-bold text-amber-900 dark:text-amber-100 mb-2">
-                {t.docAlreadyIndexed}
-              </h3>
-              <p className="text-xs sm:text-sm text-amber-700 dark:text-amber-200 mb-1">
-                <strong className="text-amber-900 dark:text-amber-100">{duplicateFile.name}</strong>
-              </p>
-              <p className="text-[10px] sm:text-xs text-amber-600/80 mb-4 sm:mb-6">
-                {t.duplicateMsg}
-              </p>
-              <div className="flex gap-2 sm:gap-3">
-                <button
-                  onClick={() => setDuplicateFile(null)}
-                  className="flex-1 bg-white dark:bg-transparent border border-amber-200 dark:border-amber-900/30 text-amber-700 dark:text-amber-400 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all"
-                >
-                  {t.cancel}
-                </button>
-                <button
-                  onClick={handleForceUpload}
-                  className="flex-1 bg-amber-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold hover:bg-amber-700 transition-all shadow-md shadow-amber-600/20"
-                >
-                  {t.uploadAnyway}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       <FloatingActionButton activeDocId={activeDocId} />
     </div>
