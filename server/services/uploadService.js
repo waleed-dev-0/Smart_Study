@@ -19,8 +19,7 @@ class UploadService {
   async processPDF(filePath, originalName, userId, force = false) {
     try {
       const dataBuffer = await fs.promises.readFile(filePath);
-
-      const pdfParseModule = await import("pdf-parse");
+     const pdfParseModule = await import("pdf-parse");
       const pdfParse = pdfParseModule.default || pdfParseModule;
 
       let data;

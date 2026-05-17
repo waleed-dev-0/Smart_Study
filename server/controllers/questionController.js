@@ -4,6 +4,7 @@ import questionService from "../services/questionService.js";
 import DocumentModel from "../models/document.js";
 import fs from "fs";
 import mongoose from "mongoose";
+import * as pdfParse from "pdf-parse";
 
 export const generateQuestions = async (req, res) => {
   try {
@@ -42,9 +43,7 @@ export const generateQuestions = async (req, res) => {
       const document = await DocumentModel.findById(document_id);
 
       if (
-        !document ||
-        !document.file_path ||
-        !fs.existsSync(document.file_path)
+        !document || !document.file_path || !fs.existsSync(document.file_path)
       ) {
         return res.status(404).json({
           success: false,
@@ -54,8 +53,6 @@ export const generateQuestions = async (req, res) => {
       }
 
       try {
-        const pdfParseModule = await import("pdf-parse");
-        const pdfParse = pdfParseModule.default || pdfParseModule;
         const dataBuffer = await fs.promises.readFile(document.file_path);
 
         let data;
@@ -94,7 +91,7 @@ export const generateQuestions = async (req, res) => {
       contentToProcess = chunks.map((c) => c.chunk_content).join("\n\n");
     }
 
-    const numQuestions = Math.min(Math.max(parseInt(count), 1), 25);
+    const numQuestions = Math.min(Math.max(parseInt(count), 5), 25);
 
     const questions = await questionService.extractQuestionsFromText(
       contentToProcess,

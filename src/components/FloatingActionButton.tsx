@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BookOpen, X, Settings2, Loader2, Target, Globe2, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { API_BASE_URL } from '../config';
+import api from '../services/api';
 
 export default function FloatingActionButton({ activeDocId }: { activeDocId: string | null }) {
   const { isArabic } = useAppContext();
@@ -46,31 +46,22 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/questions/generate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          document_id: activeDocId,
-          difficulty,
-          count: numQuestions,
-          language
-        })
+      const response = await api.post('/questions/generate', {
+        document_id: activeDocId,
+        difficulty,
+        count: numQuestions,
+        language
       });
 
-      const result = await response.json();
-      if (result.success) {
+      if (response.data.success) {
         setIsModalOpen(false);
         navigate('/question-bank');
       } else {
-        alert(t.errorGenerating + result.message);
+        alert(t.errorGenerating + response.data.message);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to generate quiz", error);
-      alert(t.failedGenerate);
+      alert(error.response?.data?.message || t.failedGenerate);
     } finally {
       setIsGenerating(false);
     }

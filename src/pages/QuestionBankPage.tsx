@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from "../components/Sidebar";
 import { useAppContext } from "../context/AppContext";
 import { ArrowLeft, CheckCircle2, XCircle, RefreshCw, ChevronRight, Target, Lightbulb, GraduationCap, ShieldCheck, Loader2 } from 'lucide-react';
+import api from "../services/api";
 
 export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
   let navigate = useNavigate();
@@ -53,21 +54,15 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
           return;
         }
 
-        const token = localStorage.getItem('token');
-        let response = await fetch(`http://127.0.0.1:5000/api/questions/${activeDocId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        const result = await response.json();
+        const response = await api.get(`/questions/${activeDocId}`);
 
-        if (result.success) {
-          setQuizList(result.data);
+        if (response.data.success) {
+          setQuizList(response.data.data);
         } else {
-          setError(result.message || t.failedLoad);
+          setError(response.data.message || t.failedLoad);
         }
-      } catch (err) {
-        setError(t.errorLoading);
+      } catch (err: any) {
+        setError(err.response?.data?.message || t.errorLoading);
       } finally {
         setIsLoading(false);
       }
@@ -118,24 +113,17 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
 
   const saveResults = async () => {
     try {
-      let token = localStorage.getItem('token');
       let activeDocId = localStorage.getItem('activeDocumentId');
 
-      await fetch('http://localhost:5000/api/attempts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          documentId: activeDocId,
-          score: score,
-          totalQuestions: quizList.length,
-          difficulty: 'medium',
-          answers: myHistory
-        })
+      await api.post('/attempts', {
+        documentId: activeDocId,
+        score: score,
+        totalQuestions: quizList.length,
+        difficulty: 'medium',
+        answers: myHistory
       });
     } catch (err) {
+      console.error("Failed to save quiz attempt:", err);
     }
   };
 
