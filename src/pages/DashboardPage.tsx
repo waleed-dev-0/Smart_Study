@@ -34,7 +34,7 @@ export default function DashboardPage({ isAdmin }: { isAdmin?: boolean }) {
   const t = {
     researchHub: isArabic ? "مركز الأبحاث" : "Research Hub",
     welcome: isArabic ? "مرحباً بك مجدداً. لديك" : "Welcome back. You have",
-    reposActive: isArabic ? "ملفات نشط في المكتبة الخاص بك." : "Documents active in your library.",
+    reposActive: isArabic ? "ملفات نشط في لوحة التحكم الخاص بك." : "Documents active in your Dashboard.",
     archiveNewSource: isArabic ? "أرشفة مصدر جديد" : "Archive New Source",
     digitalCurricula: isArabic ? "المناهج الرقمية" : "Digital Curricula",
     activeArchive: isArabic ? "الأرشيف النشط" : "Active Document PDF",
