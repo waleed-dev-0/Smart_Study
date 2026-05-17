@@ -5,9 +5,11 @@ import { useAppContext } from "../context/AppContext";
 import { ArrowLeft, CheckCircle2, XCircle, RefreshCw, ChevronRight, Target, Lightbulb, GraduationCap, ShieldCheck, Loader2 } from 'lucide-react';
 import api from "../services/api";
 
+
 export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
   let navigate = useNavigate();
   const { isArabic } = useAppContext();
+
   let [quizList, setQuizList] = useState<any[]>([]);
   let [activeQ, setActiveQ] = useState(0);
   const [chosenAnswer, setChosenAnswer] = useState<number | null>(null);
@@ -17,6 +19,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
   const [error, setError] = useState<string | null>(null);
   let [isFinished, setIsFinished] = useState(false);
   let [myHistory, setMyHistory] = useState<any[]>([]);
+
 
   const t = {
     quizBank: isArabic ? "بنك الأسئلة" : "Quiz Bank",
@@ -43,6 +46,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
     failedLoad: isArabic ? "فشل في تحميل الأسئلة" : "Failed to load questions",
     errorLoading: isArabic ? "خطأ في تحميل الأسئلة. يرجى المحاولة مرة أخرى." : "Error loading questions. Please try again."
   };
+
 
   useEffect(() => {
     let fetchQuestions = async () => {
@@ -71,6 +75,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
     fetchQuestions();
   }, []);
 
+
   const currentQuestion = quizList[activeQ];
 
   const OptionSelect = (index: number) => {
@@ -78,6 +83,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
       setChosenAnswer(index);
     }
   };
+
 
   const Submit = () => {
     if (chosenAnswer !== null && currentQuestion) {
@@ -100,6 +106,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
     }
   };
 
+
   let Next = () => {
     if (activeQ < quizList.length - 1) {
       setActiveQ(prev => prev + 1);
@@ -110,6 +117,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
       saveResults();
     }
   };
+
 
   const saveResults = async () => {
     try {
@@ -127,6 +135,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
     }
   };
 
+
   const Reset = () => {
     setActiveQ(0);
     setScore(0);
@@ -136,12 +145,16 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
     setMyHistory([]);
   };
 
+
   return (
     <div className="flex min-h-screen bg-cafe-surface" dir={isArabic ? "rtl" : "ltr"}>
       <Sidebar currentScreen="question_bank" isAdmin={isAdmin} />
 
+
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
+
         <header className="h-16 sm:h-20 bg-white border-b border-cafe-secondary dark:border-cafe-surface-dark flex items-center justify-between px-4 sm:px-6 shrink-0 sticky top-0 z-10">
+
           <div className="flex items-center gap-2 sm:gap-4">
             <button
               onClick={() => navigate('/chat')}
@@ -154,6 +167,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
               <p className="text-[10px] sm:text-xs text-cafe-text/60">{t.testYourself}</p>
             </div>
           </div>
+
 
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-cafe-secondary rounded-lg border border-cafe-secondary">
@@ -171,13 +185,17 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
           </div>
         </header>
 
+
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col items-center">
           <div className="w-full max-w-3xl">
+
             {isLoading ? (
               <div className="flex flex-col items-center justify-center h-64 gap-4">
                 <Loader2 className="w-8 h-8 text-cafe-primary animate-spin" />
                 <p className="text-sm font-bold text-cafe-text/80">{t.loadingQuiz}</p>
               </div>
+
+
             ) : error ? (
               <div className="bg-red-50 text-red-600 p-4 sm:p-6 rounded-xl border border-red-200 dark:border-red-900/30 text-center">
                 <p className="font-bold text-sm sm:text-base">{error}</p>
@@ -188,6 +206,8 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
                   {t.return}
                 </button>
               </div>
+
+
             ) : quizList.length === 0 ? (
               <div className="bg-cafe-secondary text-cafe-text/80 p-4 sm:p-6 rounded-xl border border-cafe-secondary text-center">
                 <p className="font-bold text-sm sm:text-base">{t.noQuestions}</p>
@@ -198,6 +218,8 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
                   {t.goToChat}
                 </button>
               </div>
+
+
             ) : isFinished ? (
               <div className="bg-white rounded-2xl border border-cafe-secondary dark:border-cafe-surface-dark shadow-md dark:shadow-black/20 p-6 sm:p-10 text-center flex flex-col items-center">
                 <ShieldCheck className="w-12 h-12 sm:w-16 sm:h-16 text-cafe-primary mb-4" />
@@ -220,6 +242,8 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
                   </button>
                 </div>
               </div>
+
+
             ) : (
               <>
                 <div className="mb-4 sm:mb-6">
@@ -237,11 +261,14 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
                   </div>
                 </div>
 
+
                 <div className="bg-white rounded-2xl border border-cafe-secondary dark:border-cafe-surface-dark shadow-sm overflow-hidden">
+
                   <div className="p-4 sm:p-8">
                     <h2 dir="auto" className="text-base sm:text-xl font-bold text-cafe-text mb-6 sm:mb-8 leading-relaxed text-center">
                       {currentQuestion.question_text}
                     </h2>
+
 
                     <div className="grid gap-3 sm:gap-4">
                       {currentQuestion.options.map((option: string, index: number) => {
@@ -289,6 +316,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
                     </div>
                   </div>
 
+
                   {answered && (
                     <div className="bg-cafe-surface border-t border-cafe-secondary p-4 sm:p-8">
                       <div className="flex flex-col md:flex-row items-start gap-4 sm:gap-6">
@@ -314,6 +342,7 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
                     </div>
                   )}
 
+
                   {!answered && (
                     <div className="bg-cafe-surface border-t border-cafe-secondary p-4 sm:p-6 flex justify-center">
                       <button
@@ -328,9 +357,11 @@ export default function QuestionBankPage({ isAdmin }: { isAdmin?: boolean }) {
                       </button>
                     </div>
                   )}
+
                 </div>
               </>
             )}
+
           </div>
         </main>
       </div>

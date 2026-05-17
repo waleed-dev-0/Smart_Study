@@ -5,13 +5,16 @@ import { ArrowLeft, History, Target, TrendingUp, Calendar, ChevronRight, CheckCi
 import api from '../services/api';
 import { useAppContext } from "../context/AppContext";
 
+
 export default function QuizHistoryPage({ isAdmin }: { isAdmin?: boolean }) {
   let navigate = useNavigate();
   const { isArabic } = useAppContext();
+
   const [allPastScores, setAllPastScores] = useState<any[]>([]);
   let [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   let [clickedScore, setClickedScore] = useState<any | null>(null);
+
 
   const t = {
     quizHistory: isArabic ? "سجل الاختبارات" : "Quiz History",
@@ -38,9 +41,11 @@ export default function QuizHistoryPage({ isAdmin }: { isAdmin?: boolean }) {
     yourAnswer: isArabic ? "إجابتك" : "Your Answer",
   };
 
+
   useEffect(() => {
     fetchHistory();
   }, []);
+
 
   const fetchHistory = async () => {
     try {
@@ -57,6 +62,7 @@ export default function QuizHistoryPage({ isAdmin }: { isAdmin?: boolean }) {
     }
   };
 
+
   let fetchAttemptDetails = async (id: string) => {
     try {
       const response = await api.get(`/attempts/${id}`);
@@ -69,6 +75,7 @@ export default function QuizHistoryPage({ isAdmin }: { isAdmin?: boolean }) {
       alert(t.failedLoadDetails);
     }
   };
+
 
   const calculateStats = () => {
     if (allPastScores.length === 0) return { avg: 0, progress: 0 };
@@ -89,7 +96,9 @@ export default function QuizHistoryPage({ isAdmin }: { isAdmin?: boolean }) {
     return { avg: Math.round(avg), progress: Math.round(progress) };
   };
 
+
   const stats = calculateStats();
+
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString(isArabic ? "ar" : "en-US", {
@@ -99,11 +108,14 @@ export default function QuizHistoryPage({ isAdmin }: { isAdmin?: boolean }) {
     });
   };
 
+
   return (
     <div className={`flex min-h-screen bg-cafe-surface dark:bg-cafe-surface-dark`} dir={isArabic ? "rtl" : "ltr"}>
       <Sidebar currentScreen="quiz_history" isAdmin={isAdmin} />
 
+
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
+
         <header className="h-16 sm:h-20 bg-white/80 dark:bg-cafe-surface-dark-alt/80 backdrop-blur-md border-b border-cafe-primary/5 dark:border-cafe-border-dark flex items-center px-4 sm:px-6 md:px-10 shrink-0 sticky top-0 z-10">
           <button
             onClick={() => navigate('/chat')}
@@ -117,9 +129,10 @@ export default function QuizHistoryPage({ isAdmin }: { isAdmin?: boolean }) {
           </div>
         </header>
 
+
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-10 pb-24 md:pb-10">
           <div className="max-w-7xl mx-auto">
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-10">
               <div className="bg-white dark:bg-cafe-surface-dark-alt p-6 sm:p-8 rounded-2xl sm:rounded-[2rem] border border-slate-100 dark:border-cafe-border-dark shadow-xl shadow-cafe-primary/5 dark:shadow-black/20 flex items-center gap-4 sm:gap-6 group hover:border-cafe-primary-light/20 transition-all">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 bg-cafe-primary-light/5 text-cafe-primary-light rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform border border-cafe-primary-light/10">
@@ -150,21 +163,28 @@ export default function QuizHistoryPage({ isAdmin }: { isAdmin?: boolean }) {
               </div>
             </div>
 
+
             {isLoading ? (
               <div className="flex flex-col items-center justify-center py-16 sm:py-20 bg-white dark:bg-cafe-surface-dark-alt rounded-2xl sm:rounded-[2rem] border border-slate-100 dark:border-cafe-border-dark shadow-xl shadow-cafe-primary/5 dark:shadow-black/20">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-cafe-secondary dark:border-cafe-surface-dark border-t-cafe-primary rounded-full animate-spin mb-4"></div>
                 <p className="text-slate-500 dark:text-cafe-text-dark-muted font-medium text-xs sm:text-sm">{t.loading}</p>
               </div>
+
+
             ) : error ? (
               <div className="flex flex-col items-center justify-center py-16 sm:py-20 bg-white dark:bg-cafe-surface-dark-alt rounded-2xl sm:rounded-[2rem] border border-slate-100 dark:border-cafe-border-dark shadow-xl shadow-cafe-primary/5 dark:shadow-black/20">
                 <XCircle className="w-10 h-10 sm:w-12 sm:h-12 text-cafe-danger mb-4" />
                 <p className="text-cafe-danger font-medium text-xs sm:text-sm">{error}</p>
               </div>
+
+
             ) : allPastScores.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 sm:py-20 bg-white dark:bg-cafe-surface-dark-alt rounded-2xl sm:rounded-[2rem] border border-slate-100 dark:border-cafe-border-dark shadow-xl shadow-cafe-primary/5 dark:shadow-black/20">
                 <Brain className="w-12 h-12 sm:w-16 sm:h-16 text-cafe-primary-light/30 mb-4" />
                 <p className="text-slate-500 dark:text-cafe-text-dark-muted font-medium text-xs sm:text-sm">{t.noHistory}</p>
               </div>
+
+
             ) : (
               <div className="bg-white dark:bg-cafe-surface-dark-alt rounded-2xl sm:rounded-[2rem] border border-slate-100 dark:border-cafe-border-dark shadow-xl shadow-cafe-primary/5 dark:shadow-black/20 overflow-hidden">
                 <div className="overflow-x-auto">
@@ -235,9 +255,12 @@ export default function QuizHistoryPage({ isAdmin }: { isAdmin?: boolean }) {
           </div>
         </main>
 
+
+
         {clickedScore && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-white dark:bg-cafe-surface-dark-alt rounded-2xl sm:rounded-[2rem] w-full max-w-sm sm:max-w-3xl max-h-[80vh] flex flex-col shadow-2xl shadow-cafe-primary/20 dark:shadow-black/30 overflow-hidden">
+
               <div className="p-4 sm:p-6 border-b border-cafe-primary/5 dark:border-cafe-border-dark flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-2 sm:gap-3">
                   <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-cafe-primary-light/5 text-cafe-primary-light flex items-center justify-center border border-cafe-primary-light/10">
@@ -252,18 +275,22 @@ export default function QuizHistoryPage({ isAdmin }: { isAdmin?: boolean }) {
                   <X className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
+
+
               <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
+
                 {clickedScore.answers && clickedScore.answers.length > 0 ? (
                   clickedScore.answers.map((answer: any, index: number) => (
                     <div key={index} className="bg-cafe-surface dark:bg-cafe-surface-dark p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-cafe-primary/5 dark:border-cafe-border-dark">
                       <p className="font-display font-bold text-cafe-primary dark:text-white mb-3 sm:mb-5 text-sm sm:text-lg">{index + 1}. {answer.questionText}</p>
-                      
+
+
                       <div className="space-y-2 sm:space-y-3">
                         {answer.options?.map((opt: string, i: number) => {
                           let isSelected = answer.selectedAnswer === opt;
                           let isCorrect = answer.correctAnswer === opt;
-                          
-                          let                             bgClass = "bg-white dark:bg-cafe-surface-dark-alt border-slate-100 dark:border-cafe-border-dark text-slate-600 dark:text-cafe-text-dark";
+
+                          let bgClass = "bg-white dark:bg-cafe-surface-dark-alt border-slate-100 dark:border-cafe-border-dark text-slate-600 dark:text-cafe-text-dark";
                           let label = "";
                           if (isCorrect) {
                             bgClass = "bg-cafe-success/5 border-cafe-success/30 text-cafe-success font-bold";
@@ -272,6 +299,7 @@ export default function QuizHistoryPage({ isAdmin }: { isAdmin?: boolean }) {
                             bgClass = "bg-cafe-danger/5 border-cafe-danger/30 text-cafe-danger";
                             label = t.yourAnswer;
                           }
+
 
                           return (
                             <div key={i} className={`p-3 sm:p-4 rounded-xl border ${bgClass}`}>
@@ -290,12 +318,14 @@ export default function QuizHistoryPage({ isAdmin }: { isAdmin?: boolean }) {
                         })}
                       </div>
 
+
                       {!answer.isCorrect && answer.explanation && (
                         <div className="mt-3 sm:mt-5 p-4 sm:p-5 bg-cafe-primary-light/5 dark:bg-cafe-primary-dark/20 border border-cafe-primary-light/10 dark:border-cafe-primary-dark/30 rounded-xl sm:rounded-2xl">
                           <p className="text-[10px] sm:text-xs font-bold text-cafe-primary dark:text-cafe-primary-light mb-2 uppercase tracking-widest">{t.explanation}</p>
                           <p className="text-xs sm:text-sm text-slate-600 dark:text-cafe-text-dark">{answer.explanation}</p>
                         </div>
                       )}
+
                     </div>
                   ))
                 ) : (
@@ -304,6 +334,7 @@ export default function QuizHistoryPage({ isAdmin }: { isAdmin?: boolean }) {
                     <p className="text-slate-500 dark:text-cafe-text-dark-muted font-medium text-xs sm:text-sm">{t.noDetails}</p>
                   </div>
                 )}
+
               </div>
             </div>
           </div>

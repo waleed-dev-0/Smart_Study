@@ -4,8 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import api from '../services/api';
 
+
 export default function FloatingActionButton({ activeDocId }: { activeDocId: string | null }) {
   const { isArabic } = useAppContext();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [difficulty, setDifficulty] = useState('medium');
@@ -13,6 +15,7 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
   const [language, setLanguage] = useState(isArabic ? 'Arabic' : 'English');
   const [isGenerating, setIsGenerating] = useState(false);
   const navigate = useNavigate();
+
 
   const t = {
     generateQuiz: isArabic ? "إنشاء اختبار" : "Generate Quiz",
@@ -34,6 +37,7 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
     hard: isArabic ? "صعب" : "hard",
   };
 
+
   const handleCreateQuiz = () => {
     if (!activeDocId) {
       alert(t.selectDocFirst);
@@ -42,6 +46,7 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
     setIsOpen(false);
     setIsModalOpen(true);
   };
+
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -67,10 +72,12 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
     }
   };
 
+
   return (
     <>
+
       <div className="fixed bottom-40 end-8 md:end-12 z-40 flex flex-col items-end gap-3 animate-in fade-in slide-in-from-bottom-8 duration-700">
-        
+
         {isOpen && (
           <div className="flex flex-col items-end gap-3 mb-2 animate-in slide-in-from-bottom-4 fade-in duration-200">
             <button
@@ -84,6 +91,7 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
             </button>
           </div>
         )}
+
 
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -106,9 +114,11 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
         </button>
       </div>
 
+
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in">
           <div className="bg-white w-full max-w-md rounded-[2rem] shadow-2xl dark:shadow-black/30 overflow-hidden">
+
             <div className="p-6 border-b border-slate-100 dark:border-cafe-surface-dark flex justify-between items-center bg-slate-50/50/50">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-cafe-primary text-white flex items-center justify-center shadow-sm">
@@ -126,8 +136,10 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
+
             <div className="p-6 space-y-6">
+
               <div className="space-y-3">
                 <label className="flex items-center gap-2 text-xs font-bold text-cafe-primary uppercase tracking-wider">
                   <Target className="w-4 h-4 text-cafe-primary-light" />
@@ -150,6 +162,7 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
                 </div>
               </div>
 
+
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2 text-xs font-bold text-cafe-primary uppercase tracking-wider">
@@ -171,6 +184,7 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
                   <span>{t.max}</span>
                 </div>
               </div>
+
 
               <div className="space-y-3">
                 <label className="flex items-center gap-2 text-xs font-bold text-cafe-primary uppercase tracking-wider">
@@ -195,7 +209,8 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
               </div>
             </div>
 
-              <div className="p-6 border-t border-slate-100 dark:border-cafe-surface-dark bg-slate-50/50/50">
+
+            <div className="p-6 border-t border-slate-100 dark:border-cafe-surface-dark bg-slate-50/50/50">
               <button 
                 onClick={handleGenerate}
                 disabled={isGenerating}
@@ -211,6 +226,7 @@ export default function FloatingActionButton({ activeDocId }: { activeDocId: str
                 )}
               </button>
             </div>
+
           </div>
         </div>
       )}
