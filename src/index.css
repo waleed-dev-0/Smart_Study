@@ -68,6 +68,41 @@ html.dark hr {
   @apply border-cafe-border-dark;
 }
 
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-cafe-primary/20 rounded-full transition-colors duration-200;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-cafe-primary/40;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  @apply bg-cafe-text-dark-muted/20;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  @apply bg-cafe-text-dark-muted/40;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(93, 68, 50, 0.2) transparent;
+}
+
+html.dark * {
+  scrollbar-color: rgba(168, 162, 158, 0.2) transparent;
+}
+
 @keyframes float {
   0%, 100% {
     transform: translateY(0px);

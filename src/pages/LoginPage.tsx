@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect, FormEvent } from "react";
-import { GraduationCap, Mail, Lock, ArrowRight, ArrowLeft } from "lucide-react";
+import { GraduationCap, Mail, Lock, ArrowRight, ArrowLeft, FileText, HelpCircle, Bot, BarChart3 } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
 import { authService } from "../services/authService";
 
@@ -192,34 +192,64 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-cafe-primary to-cafe-primary-light opacity-95" />
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541339907198-e08759dfc3ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
 
-        <div className="absolute inset-0 flex flex-col justify-center px-16 xl:px-24 gap-8">
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-10 rounded-[2rem] max-w-xl shadow-2xl">
-            <div className="flex gap-1 mb-6">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <div
-                  key={star}
-                  className="w-2 h-2 rounded-full bg-cafe-warning/60"
-                ></div>
-              ))}
-            </div>
-            <blockquote className="text-2xl font-display font-light text-white leading-relaxed mb-8 italic">
+        <div className="absolute inset-0 flex flex-col justify-center px-16 xl:px-24 gap-10">
+          <div className="text-center">
+            <h3 className="text-4xl font-display font-bold text-white mb-3">
+              {isArabic ? "الدراسة الذكية" : "Smart Study"}
+            </h3>
+            <p className="text-slate-300 text-lg font-medium">
               {isArabic
-                ? '"دقة وإتقان التوليف البحثي الذي توفره هذه البوابة لا مثيل له. لقد أصبحت جزءاً أساسياً من دراساتي الدكتوراه."'
-                : '"The precision and fidelity of the research synthesis provided by this portal is unparalleled. It has become an essential component of my doctoral studies."'}
-            </blockquote>
-            <div className="flex items-center gap-5">
-              <div className="w-14 h-14 rounded-2xl bg-cafe-warning/20 border border-cafe-warning/30 flex items-center justify-center text-cafe-warning font-bold text-xl uppercase">
-                EM
-              </div>
-              <div>
-                <div className="text-white font-bold text-lg">
-                  {isArabic ? "د. إلينا موريتي" : "Dr. Elena Moretti"}
+                ? "مساعدك المدعوم بالذكاء الاصطناعي للتعلم والبحث"
+                : "Your AI-powered learning & research assistant"}
+            </p>
+          </div>
+
+          <div className="space-y-5">
+            {[
+              {
+                icon: FileText,
+                title: isArabic ? "تلخيص المستندات" : "Document Summaries",
+                desc: isArabic
+                  ? "رفع الكتب والمقالات واستخلاص الملخصات الذكية في ثوانٍ"
+                  : "Upload books & articles, get AI summaries in seconds",
+              },
+              {
+                icon: HelpCircle,
+                title: isArabic ? "بنوك الأسئلة" : "Question Banks",
+                desc: isArabic
+                  ? "توليد أسئلة من أي محتوى للاختبار والمراجعة"
+                  : "Generate questions from any content for testing & review",
+              },
+              {
+                icon: Bot,
+                title: isArabic ? "محادثة ذكية" : "AI Chat",
+                desc: isArabic
+                  ? "ناقش موادك الدراسية مع مساعد ذكي يفهم سياقك"
+                  : "Discuss your study material with a context-aware AI",
+              },
+              {
+                icon: BarChart3,
+                title: isArabic ? "اختبارات تفاعلية" : "Interactive Quizzes",
+                desc: isArabic
+                  ? "تقييم مستواك وتتبع تقدمك مع تحليلات الأداء"
+                  : "Assess your level & track progress with performance analytics",
+              },
+            ].map((feature, i) => (
+              <div
+                key={i}
+                className="group flex items-start gap-5 bg-white/5 backdrop-blur-sm border border-white/10 p-5 rounded-xl hover:bg-white/10 transition-all duration-300"
+              >
+                <feature.icon className="w-6 h-6 text-cafe-warning shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-white font-bold text-base mb-0.5">
+                    {feature.title}
+                  </h4>
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    {feature.desc}
+                  </p>
                 </div>
-                <div className="text-slate-400 text-sm font-medium tracking-wide">
-                  {isArabic ? "زميل أبحاث جامعي" : "University Research Fellow"}
-                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
